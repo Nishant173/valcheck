@@ -5,7 +5,7 @@ Package for quick data validation
 - You can install this library with `pip install valcheck` or `pip install valcheck==<version>`
 
 ## Usage
-python```
+```python
 from valcheck import base_validator, fields
 
 
