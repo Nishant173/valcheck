@@ -24,8 +24,12 @@ class UserValidator(base_validator.BaseValidator):
             "details": "provide age between 18-100 (must also be an even number)",
         },
     )
-    age_category = fields.ChoiceField(choices=['under-18', '18-30', '31-60', '60+'])
-    hobbies = fields.MultiChoiceField(choices=['football', 'hockey', 'cricket', 'rugby', 'kick-boxing'])
+    age_category = fields.ChoiceField(
+        choices=['under-18', '18-30', '31-60', '60+'],
+    )
+    hobbies = fields.MultiChoiceField(
+        choices=['football', 'hockey', 'cricket', 'rugby', 'kick-boxing'],
+    )
     extra_info = fields.DictionaryField(
         required=True,
         nullable=False,
@@ -37,7 +41,11 @@ class UserValidator(base_validator.BaseValidator):
             "details": "expected following params in `extra_info` field: ['fav_board_game', 'fav_sport']",
         },
     )
-    date_of_registration = fields.DateStringField(format_="%Y-%m-%d", required=False, nullable=True)
+    date_of_registration = fields.DateStringField(
+        format_="%Y-%m-%d",
+        required=False,
+        nullable=True,
+    )
 
 
 validator = UserValidator({
