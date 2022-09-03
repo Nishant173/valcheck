@@ -7,22 +7,25 @@ class ValidationError(Exception):
     def __init__(
             self,
             *,
-            message: Optional[str] = None,
+            details: Optional[Any] = None,
             source: Optional[str] = None,
             code: Optional[str] = None,
-            details: Optional[Any] = None,
+            message: Optional[str] = None,
         ) -> None:
-        self.message = message or ""
+        assert (source is None or isinstance(source, str)), "Param `source` must be a string"
+        assert (code is None or isinstance(code, str)), "Param `code` must be a string"
+        assert (message is None or isinstance(message, str)), "Param `message` must be a string"
+        self.details = details
         self.source = source or ""
         self.code = code or ""
-        self.details = details
+        self.message = message or ""
 
     def as_dict(self) -> Dict[str, Any]:
         return {
-            "message": self.message,
+            "details": self.details,
             "source": self.source,
             "code": self.code,
-            "details": self.details,
+            "message": self.message,
         }
 
     def __str__(self) -> str:

@@ -57,5 +57,9 @@ def is_key_present(dict_obj: Dict[str, Any], key: str) -> bool:
 
 
 def get_class_variables_dict(class_: Type, /) -> Dict[str, Any]:
-    return { key : value for key, value in vars(class_).items() if not key.startswith("__") }
-
+    return {
+        key : value for key, value in vars(class_).items() if (
+            not key.startswith("__")
+            and key != 'Meta'
+        )
+    }

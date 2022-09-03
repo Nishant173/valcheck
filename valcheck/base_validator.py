@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from valcheck.errors import ValidationError
 from valcheck.fields import BaseField
@@ -16,6 +16,7 @@ class BaseValidator:
             assert isinstance(data, dict), "Param `data` must be a dictionary"
         self.data = set_as_empty() if data is None else data
         self._class_variables_dict = self._get_class_variables_dict()
+        self._class_validators = self._get_class_validators()
         self._errors = []
         self._validated_data = {}
 
@@ -34,6 +35,17 @@ class BaseValidator:
                     " having key as field-name and value as sub-class of type `BaseField`"
                 )
         return dict_
+
+    def _get_class_validators(self) -> List[Callable]:
+        """Returns list of class validators (callables) from the Meta class"""
+        metaclass = vars(self.__class__).get('Meta', None)
+        if metaclass is None:
+            return []
+        class_validators = getattr(metaclass, "class_validators", [])
+        assert isinstance(class_validators, list), "Param `class_validators` in Meta class must be of type list"
+        for class_validator in class_validators:
+            assert callable(class_validator), "Param `class_validators` in Meta class must be list of callables"
+        return class_validators
 
     @staticmethod
     def _wrap_in_quotes_if_string(obj: Any) -> str:
@@ -75,7 +87,7 @@ class BaseValidator:
     def validated_data(self) -> Dict[str, Any]:
         return self._validated_data
 
-    def _perform_validation_checks(
+    def _perform_field_validation_checks(
             self,
             *,
             field: str,
@@ -89,7 +101,7 @@ class BaseValidator:
         error_kwargs = field_validator_instance.error_kwargs
         if 'message' in error_kwargs:
             raise ValueError(
-                "The param `error_kwargs` must not have the kwarg 'message', as this will be set by `BaseValidator` for all validations"
+                "The param `error_kwargs` must not have the kwarg 'message', as this will be set by `BaseValidator`"
             )
         MISSING_FIELD_ERROR_MESSAGE = f"Missing {field_type} '{field}'"
         INVALID_FIELD_ERROR_MESSAGE = f"Invalid {field_type} '{field}' having value {self._wrap_in_quotes_if_string(field_value)}"
@@ -120,13 +132,34 @@ class BaseValidator:
             return
         return None
 
-    def is_valid(self, raise_exception: Optional[bool] = False) -> bool:
+    def _perform_class_validation_checks(
+            self,
+            *,
+            class_validator: Callable,
+            raise_exception: bool,
+        ) -> None:
+        """Performs validation checks for the given Meta class, and registers/raises errors (if any)"""
+        error_kwargs = class_validator(values=self._validated_data.copy())
+        assert (error_kwargs is None or isinstance(error_kwargs, dict)), (
+            "Output of Meta class validator functions should be either NoneType or dictionary having error kwargs"
+        )
+        if error_kwargs is None:
+            return None
+        self._raise_exception_if_needed(error_kwargs=error_kwargs, raise_exception=raise_exception)
+        return None
+
+    def is_valid(self, *, raise_exception: Optional[bool] = False) -> bool:
         """Returns boolean. If `raise_exception=True` and data validation fails, then raises `ValidationError`"""
         assert isinstance(self.data, dict), "Cannot call `is_valid()` without setting the `data` dictionary"
         for field, field_validator_instance in self._class_variables_dict.items():
-            self._perform_validation_checks(
+            self._perform_field_validation_checks(
                 field=field,
                 field_validator_instance=field_validator_instance,
+                raise_exception=raise_exception,
+            )
+        for class_validator in self._class_validators:
+            self._perform_class_validation_checks(
+                class_validator=class_validator,
                 raise_exception=raise_exception,
             )
         return False if self.errors else True
