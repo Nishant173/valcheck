@@ -3,14 +3,12 @@ from typing import Any, Callable, Dict, List, Optional
 from valcheck.errors import ValidationError
 from valcheck.fields import BaseField
 from valcheck.utils import (
-    get_class_variables_dict,
     is_empty,
     set_as_empty,
 )
 
 
 class BaseValidator:
-
     def __init__(
             self,
             *,
@@ -19,26 +17,22 @@ class BaseValidator:
         if data is not None:
             assert isinstance(data, dict), "Param `data` must be a dictionary"
         self.data = set_as_empty() if data is None else data
-        self._class_variables_dict = self._get_class_variables_dict()
+        self._field_validators_dict = self._get_field_validators_dict()
         self._class_validators = self._get_class_validators()
         self._errors = []
         self._validated_data = {}
 
-    def _get_class_variables_dict(self) -> Dict[str, BaseField]:
-        """Raises `ValueError` if the `BaseValidator` class is used incorrectly"""
-        dict_ = get_class_variables_dict(self.__class__)
-        for field, field_validator_instance in dict_.items():
-            is_valid = (
-                isinstance(field, str)
+    def _get_field_validators_dict(self) -> Dict[str, BaseField]:
+        """Returns dictionary having keys = field names, and values = field validator instances"""
+        return {
+            field_name : field_validator_instance for field_name, field_validator_instance in vars(self.__class__).items() if (
+                not field_name.startswith("__")
+                and field_name != 'Meta'
+                and isinstance(field_name, str)
                 and field_validator_instance.__class__ is not BaseField
                 and issubclass(field_validator_instance.__class__, BaseField)
             )
-            if not is_valid:
-                raise ValueError(
-                    "Invalid usage of `BaseValidator`. Inherit from `BaseValidator` and assign class variables"
-                    " having key as field-name and value as sub-class of type `BaseField`"
-                )
-        return dict_
+        }
 
     def _get_class_validators(self) -> List[Callable]:
         """Returns list of class validators (callables) from the Meta class"""
@@ -156,7 +150,7 @@ class BaseValidator:
     def is_valid(self, *, raise_exception: Optional[bool] = False) -> bool:
         """Returns boolean. If `raise_exception=True` and data validation fails, then raises `ValidationError`"""
         assert isinstance(self.data, dict), "Cannot call `is_valid()` without setting the `data` dictionary"
-        for field, field_validator_instance in self._class_variables_dict.items():
+        for field, field_validator_instance in self._field_validators_dict.items():
             self._perform_field_validation_checks(
                 field=field,
                 field_validator_instance=field_validator_instance,

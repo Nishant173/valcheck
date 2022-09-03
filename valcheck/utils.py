@@ -54,12 +54,3 @@ def is_instance_of_any(obj: Any, types: List[Type]) -> bool:
 
 def is_key_present(dict_obj: Dict[str, Any], key: str) -> bool:
     return key in dict_obj
-
-
-def get_class_variables_dict(class_: Type, /) -> Dict[str, Any]:
-    return {
-        key : value for key, value in vars(class_).items() if (
-            not key.startswith("__")
-            and key != 'Meta'
-        )
-    }
