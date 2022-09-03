@@ -41,6 +41,14 @@ class UserValidator(base_validator.BaseValidator):
             return {"details": "Invalid entry. Cannot register a user born in December"}
         return None
 
+    def validate_middle_name(values):
+        middle_name = values.get('middle_name', None)
+        if middle_name is None:
+            return None
+        if len(middle_name) < 5:
+            return {"details": "Invalid entry. The middle name needs to be atleast 5 characters long"}
+        return None
+
 
 if __name__ == "__main__":
     validator = UserValidator(data={
