@@ -27,7 +27,6 @@ class BaseValidator:
         return {
             field_name : field_validator_instance for field_name, field_validator_instance in vars(self.__class__).items() if (
                 not field_name.startswith("__")
-                and field_name != 'Meta'
                 and isinstance(field_name, str)
                 and field_validator_instance.__class__ is not BaseField
                 and issubclass(field_validator_instance.__class__, BaseField)
@@ -35,15 +34,10 @@ class BaseValidator:
         }
 
     def _get_class_validators(self) -> List[Callable]:
-        """Returns list of class validators (callables) from the Meta class"""
-        metaclass = vars(self.__class__).get('Meta', None)
-        if metaclass is None:
-            return []
-        class_validators = getattr(metaclass, "class_validators", [])
-        assert isinstance(class_validators, list), "Param `class_validators` in Meta class must be of type list"
-        for class_validator in class_validators:
-            assert callable(class_validator), "Param `class_validators` in Meta class must be list of callables"
-        return class_validators
+        """Returns list of class validators (callables)"""
+        return [
+            validator_func for _, validator_func  in vars(self.__class__).items() if callable(validator_func)
+        ]
 
     @staticmethod
     def _wrap_in_quotes_if_string(obj: Any) -> str:
@@ -143,7 +137,7 @@ class BaseValidator:
         """Performs validation checks for the given class validator, and registers/raises errors (if any)"""
         error_kwargs = class_validator(values=self._validated_data.copy())
         assert (error_kwargs is None or isinstance(error_kwargs, dict)), (
-            "Output of Meta class validator functions should be either NoneType or dictionary having error kwargs"
+            "Output of class validator functions should be either NoneType or a dictionary having error kwargs"
         )
         if error_kwargs is None:
             return None
@@ -161,7 +155,8 @@ class BaseValidator:
                 field_validator_instance=field_validator_instance,
                 raise_exception=raise_exception,
             )
-        if not self.errors:  # perform class validator checks ONLY IF there are no errors in field validator checks
+        # Perform class validator checks ONLY IF there are no errors in field validator checks
+        if not self.errors:
             for class_validator in self._class_validators:
                 self._perform_class_validation_checks(
                     class_validator=class_validator,
