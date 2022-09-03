@@ -55,6 +55,10 @@ class BaseValidator:
     def errors(self) -> List[Dict[str, Any]]:
         return self._errors
 
+    def clear_errors(self) -> None:
+        """Clears out the list of errors"""
+        self._errors = []
+
     def _update_error_kwargs(
             self,
             error_kwargs: Dict[str, Any],
@@ -66,7 +70,7 @@ class BaseValidator:
     def _register_error(self, error_kwargs: Dict[str, Any]) -> None:
         self._errors.append(ValidationError(**error_kwargs).as_dict())
 
-    def _raise_exception_if_needed(
+    def _raise_error_if_needed(
             self,
             error_kwargs: Dict[str, Any],
             raise_exception: bool,
@@ -110,7 +114,7 @@ class BaseValidator:
             self._unregister_validated_data(field=field)
             self._update_error_kwargs(error_kwargs=error_kwargs, kwarg={'message': MISSING_FIELD_ERROR_MESSAGE})
             self._register_error(error_kwargs=error_kwargs)
-            self._raise_exception_if_needed(error_kwargs=error_kwargs, raise_exception=raise_exception)
+            self._raise_error_if_needed(error_kwargs=error_kwargs, raise_exception=raise_exception)
             return
         if is_empty(field_value) and not required:
             self._unregister_validated_data(field=field)
@@ -120,13 +124,13 @@ class BaseValidator:
             self._unregister_validated_data(field=field)
             self._update_error_kwargs(error_kwargs=error_kwargs, kwarg={'message': INVALID_FIELD_ERROR_MESSAGE})
             self._register_error(error_kwargs=error_kwargs)
-            self._raise_exception_if_needed(error_kwargs=error_kwargs, raise_exception=raise_exception)
+            self._raise_error_if_needed(error_kwargs=error_kwargs, raise_exception=raise_exception)
             return
         if not field_validator_instance.custom_validators_are_valid():
             self._unregister_validated_data(field=field)
             self._update_error_kwargs(error_kwargs=error_kwargs, kwarg={'message': INVALID_FIELD_ERROR_MESSAGE})
             self._register_error(error_kwargs=error_kwargs)
-            self._raise_exception_if_needed(error_kwargs=error_kwargs, raise_exception=raise_exception)
+            self._raise_error_if_needed(error_kwargs=error_kwargs, raise_exception=raise_exception)
             return
         return None
 
@@ -136,7 +140,7 @@ class BaseValidator:
             class_validator: Callable,
             raise_exception: bool,
         ) -> None:
-        """Performs validation checks for the given Meta class, and registers/raises errors (if any)"""
+        """Performs validation checks for the given class validator, and registers/raises errors (if any)"""
         error_kwargs = class_validator(values=self._validated_data.copy())
         assert (error_kwargs is None or isinstance(error_kwargs, dict)), (
             "Output of Meta class validator functions should be either NoneType or dictionary having error kwargs"
@@ -144,12 +148,13 @@ class BaseValidator:
         if error_kwargs is None:
             return None
         self._register_error(error_kwargs=error_kwargs)
-        self._raise_exception_if_needed(error_kwargs=error_kwargs, raise_exception=raise_exception)
+        self._raise_error_if_needed(error_kwargs=error_kwargs, raise_exception=raise_exception)
         return None
 
     def is_valid(self, *, raise_exception: Optional[bool] = False) -> bool:
         """Returns boolean. If `raise_exception=True` and data validation fails, then raises `ValidationError`"""
         assert isinstance(self.data, dict), "Cannot call `is_valid()` without setting the `data` dictionary"
+        self.clear_errors()
         for field, field_validator_instance in self._field_validators_dict.items():
             self._perform_field_validation_checks(
                 field=field,
