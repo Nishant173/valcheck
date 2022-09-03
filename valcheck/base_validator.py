@@ -52,7 +52,7 @@ class BaseValidator:
         return f"{obj}"
 
     @property
-    def errors(self) -> List[str]:
+    def errors(self) -> List[Dict[str, Any]]:
         return self._errors
 
     def _update_error_kwargs(
@@ -156,10 +156,11 @@ class BaseValidator:
                 field_validator_instance=field_validator_instance,
                 raise_exception=raise_exception,
             )
-        for class_validator in self._class_validators:
-            self._perform_class_validation_checks(
-                class_validator=class_validator,
-                raise_exception=raise_exception,
-            )
+        if not self.errors:  # perform class validator checks ONLY IF there are no errors in field validator checks
+            for class_validator in self._class_validators:
+                self._perform_class_validation_checks(
+                    class_validator=class_validator,
+                    raise_exception=raise_exception,
+                )
         return False if self.errors else True
 
