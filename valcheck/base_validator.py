@@ -11,7 +11,11 @@ from valcheck.utils import (
 
 class BaseValidator:
 
-    def __init__(self, data: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(
+            self,
+            *,
+            data: Optional[Dict[str, Any]] = None,
+        ) -> None:
         if data is not None:
             assert isinstance(data, dict), "Param `data` must be a dictionary"
         self.data = set_as_empty() if data is None else data
