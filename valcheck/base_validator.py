@@ -145,6 +145,7 @@ class BaseValidator:
         )
         if error_kwargs is None:
             return None
+        self._register_error(error_kwargs=error_kwargs)
         self._raise_exception_if_needed(error_kwargs=error_kwargs, raise_exception=raise_exception)
         return None
 
