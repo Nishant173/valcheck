@@ -83,6 +83,12 @@ class BaseValidator:
     def validated_data(self) -> Dict[str, Any]:
         return self._validated_data
 
+    def _ensure_validator_message_is_missing(self, error_kwargs: Dict[str, Any]) -> None:
+        """Ensures that the kwarg 'validator_message' is not passed in `error_kwargs`, as this will be set by `BaseValidator`"""
+        assert ('validator_message' not in error_kwargs), (
+            "The param `error_kwargs` must not have the kwarg 'validator_message', as this will be set by `BaseValidator`"
+        )
+
     def _perform_field_validation_checks(
             self,
             *,
@@ -95,16 +101,13 @@ class BaseValidator:
         field_value = self.data.get(field, set_as_empty())
         required = field_validator_instance.required
         error_kwargs = field_validator_instance.error_kwargs
-        if 'message' in error_kwargs:
-            raise ValueError(
-                "The param `error_kwargs` must not have the kwarg 'message', as this will be set by `BaseValidator`"
-            )
+        self._ensure_validator_message_is_missing(error_kwargs=error_kwargs)
         MISSING_FIELD_ERROR_MESSAGE = f"Missing {field_type} '{field}'"
         INVALID_FIELD_ERROR_MESSAGE = f"Invalid {field_type} '{field}' having value {self._wrap_in_quotes_if_string(field_value)}"
         self._register_validated_data(field=field, field_value=field_value)
         if is_empty(field_value) and required:
             self._unregister_validated_data(field=field)
-            self._update_error_kwargs(error_kwargs=error_kwargs, kwarg={'message': MISSING_FIELD_ERROR_MESSAGE})
+            self._update_error_kwargs(error_kwargs=error_kwargs, kwarg={'validator_message': MISSING_FIELD_ERROR_MESSAGE})
             self._register_error(error_kwargs=error_kwargs)
             self._raise_error_if_needed(error_kwargs=error_kwargs, raise_error=raise_error)
             return
@@ -114,7 +117,7 @@ class BaseValidator:
         field_validator_instance.field_value = field_value
         if not field_validator_instance.is_valid():
             self._unregister_validated_data(field=field)
-            self._update_error_kwargs(error_kwargs=error_kwargs, kwarg={'message': INVALID_FIELD_ERROR_MESSAGE})
+            self._update_error_kwargs(error_kwargs=error_kwargs, kwarg={'validator_message': INVALID_FIELD_ERROR_MESSAGE})
             self._register_error(error_kwargs=error_kwargs)
             self._raise_error_if_needed(error_kwargs=error_kwargs, raise_error=raise_error)
             return
@@ -133,6 +136,9 @@ class BaseValidator:
         )
         if error_kwargs is None:
             return None
+        self._ensure_validator_message_is_missing(error_kwargs=error_kwargs)
+        INVALID_MODEL_ERROR_MESSAGE = f"Invalid model due to failed validation in {model_validator.__name__}"
+        self._update_error_kwargs(error_kwargs=error_kwargs, kwarg={'validator_message': INVALID_MODEL_ERROR_MESSAGE})
         self._register_error(error_kwargs=error_kwargs)
         self._raise_error_if_needed(error_kwargs=error_kwargs, raise_error=raise_error)
         return None
@@ -160,13 +166,13 @@ class BaseValidator:
         validators = []
         for field, field_validator_instance in self._field_validators_dict.items():
             validators.append({
-                "type": 'field_validator',
+                "type": "Field-Validator",
                 "subtype": field_validator_instance.__class__.__name__,
                 "name": field,
             })
         for model_validator in self._model_validators:
             validators.append({
-                "type": 'model_validator',
+                "type": "Model-Validator",
                 "subtype": None,
                 "name": model_validator.__name__,
             })
