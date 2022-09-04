@@ -45,7 +45,7 @@ class BaseField:
     def can_be_set_to_null(self) -> bool:
         return self.nullable and self.field_value is None
 
-    def _has_valid_custom_validators(self) -> bool:
+    def has_valid_custom_validators(self) -> bool:
         if not self.validators:
             return True
         validator_return_values = [validator(self.field_value) for validator in self.validators]
@@ -56,8 +56,8 @@ class BaseField:
         return all(validator_return_values)
 
     def is_valid(self) -> bool:
-        assert not is_empty(self.field_value), "Cannot call `is_valid()` without setting `field_value` parameter"
-        return self._has_valid_custom_validators()
+        """Needs to be implemented by all child classes of the `BaseField` class"""
+        raise NotImplementedError()
 
 
 class BooleanField(BaseField):
@@ -67,7 +67,7 @@ class BooleanField(BaseField):
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return super().is_valid() and isinstance(self.field_value, bool)
+        return isinstance(self.field_value, bool) and super().has_valid_custom_validators()
 
 
 class StringField(BaseField):
@@ -77,7 +77,7 @@ class StringField(BaseField):
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return super().is_valid() and isinstance(self.field_value, str)
+        return isinstance(self.field_value, str) and super().has_valid_custom_validators()
 
 
 class EmailIdField(StringField):
@@ -143,7 +143,7 @@ class ChoiceField(BaseField):
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return super().is_valid() and self.field_value in self.choices
+        return self.field_value in self.choices and super().has_valid_custom_validators()
 
 
 class IntegerField(BaseField):
@@ -153,7 +153,7 @@ class IntegerField(BaseField):
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return super().is_valid() and isinstance(self.field_value, int)
+        return isinstance(self.field_value, int) and super().has_valid_custom_validators()
 
 
 class PositiveIntegerField(IntegerField):
@@ -189,7 +189,7 @@ class FloatField(BaseField):
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return super().is_valid() and isinstance(self.field_value, float)
+        return isinstance(self.field_value, float) and super().has_valid_custom_validators()
 
 
 class NumberField(BaseField):
@@ -199,7 +199,7 @@ class NumberField(BaseField):
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return super().is_valid() and is_instance_of_any(obj=self.field_value, types=[int, float])
+        return is_instance_of_any(obj=self.field_value, types=[int, float]) and super().has_valid_custom_validators()
 
 
 class DictionaryField(BaseField):
@@ -209,7 +209,7 @@ class DictionaryField(BaseField):
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return super().is_valid() and isinstance(self.field_value, dict)
+        return isinstance(self.field_value, dict) and super().has_valid_custom_validators()
 
 
 class ListField(BaseField):
@@ -219,7 +219,7 @@ class ListField(BaseField):
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return super().is_valid() and isinstance(self.field_value, list)
+        return isinstance(self.field_value, list) and super().has_valid_custom_validators()
 
 
 class MultiChoiceField(ListField):
