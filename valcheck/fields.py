@@ -1,6 +1,7 @@
 from typing import Any, Callable, Dict, Iterable, List, Optional
 
 from valcheck.utils import (
+    is_empty,
     is_instance_of_any,
     is_iterable,
     is_valid_datetime_string,
@@ -44,7 +45,7 @@ class BaseField:
     def can_be_set_to_null(self) -> bool:
         return self.nullable and self.field_value is None
 
-    def custom_validators_are_valid(self) -> bool:
+    def _has_valid_custom_validators(self) -> bool:
         if not self.validators:
             return True
         validator_return_values = [validator(self.field_value) for validator in self.validators]
@@ -55,7 +56,8 @@ class BaseField:
         return all(validator_return_values)
 
     def is_valid(self) -> bool:
-        raise NotImplementedError()
+        assert not is_empty(self.field_value), "Cannot call `is_valid()` without setting `field_value` parameter"
+        return self._has_valid_custom_validators()
 
 
 class BooleanField(BaseField):
@@ -65,7 +67,7 @@ class BooleanField(BaseField):
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return isinstance(self.field_value, bool)
+        return super().is_valid() and isinstance(self.field_value, bool)
 
 
 class StringField(BaseField):
@@ -75,7 +77,7 @@ class StringField(BaseField):
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return isinstance(self.field_value, str)
+        return super().is_valid() and isinstance(self.field_value, str)
 
 
 class EmailIdField(StringField):
@@ -141,7 +143,7 @@ class ChoiceField(BaseField):
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return self.field_value in self.choices
+        return super().is_valid() and self.field_value in self.choices
 
 
 class IntegerField(BaseField):
@@ -151,7 +153,7 @@ class IntegerField(BaseField):
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return isinstance(self.field_value, int)
+        return super().is_valid() and isinstance(self.field_value, int)
 
 
 class PositiveIntegerField(IntegerField):
@@ -187,7 +189,7 @@ class FloatField(BaseField):
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return isinstance(self.field_value, float)
+        return super().is_valid() and isinstance(self.field_value, float)
 
 
 class NumberField(BaseField):
@@ -197,7 +199,7 @@ class NumberField(BaseField):
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return is_instance_of_any(obj=self.field_value, types=[int, float])
+        return super().is_valid() and is_instance_of_any(obj=self.field_value, types=[int, float])
 
 
 class DictionaryField(BaseField):
@@ -207,7 +209,7 @@ class DictionaryField(BaseField):
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return isinstance(self.field_value, dict)
+        return super().is_valid() and isinstance(self.field_value, dict)
 
 
 class ListField(BaseField):
@@ -217,7 +219,7 @@ class ListField(BaseField):
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return isinstance(self.field_value, list)
+        return super().is_valid() and isinstance(self.field_value, list)
 
 
 class MultiChoiceField(ListField):

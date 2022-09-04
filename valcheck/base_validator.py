@@ -67,9 +67,9 @@ class BaseValidator:
     def _raise_error_if_needed(
             self,
             error_kwargs: Dict[str, Any],
-            raise_exception: bool,
+            raise_error: bool,
         ) -> None:
-        if raise_exception:
+        if raise_error:
             raise ValidationError(**error_kwargs)
 
     def _register_validated_data(self, field: str, field_value: Any) -> None:
@@ -88,7 +88,7 @@ class BaseValidator:
             *,
             field: str,
             field_validator_instance: BaseField,
-            raise_exception: bool,
+            raise_error: bool,
         ) -> None:
         """Performs validation checks for the given field, and registers/raises errors (if any)"""
         field_type = field_validator_instance.__class__.__name__
@@ -102,13 +102,11 @@ class BaseValidator:
         MISSING_FIELD_ERROR_MESSAGE = f"Missing {field_type} '{field}'"
         INVALID_FIELD_ERROR_MESSAGE = f"Invalid {field_type} '{field}' having value {self._wrap_in_quotes_if_string(field_value)}"
         self._register_validated_data(field=field, field_value=field_value)
-        if field_validator_instance.can_be_set_to_null():
-            return
         if is_empty(field_value) and required:
             self._unregister_validated_data(field=field)
             self._update_error_kwargs(error_kwargs=error_kwargs, kwarg={'message': MISSING_FIELD_ERROR_MESSAGE})
             self._register_error(error_kwargs=error_kwargs)
-            self._raise_error_if_needed(error_kwargs=error_kwargs, raise_exception=raise_exception)
+            self._raise_error_if_needed(error_kwargs=error_kwargs, raise_error=raise_error)
             return
         if is_empty(field_value) and not required:
             self._unregister_validated_data(field=field)
@@ -118,13 +116,7 @@ class BaseValidator:
             self._unregister_validated_data(field=field)
             self._update_error_kwargs(error_kwargs=error_kwargs, kwarg={'message': INVALID_FIELD_ERROR_MESSAGE})
             self._register_error(error_kwargs=error_kwargs)
-            self._raise_error_if_needed(error_kwargs=error_kwargs, raise_exception=raise_exception)
-            return
-        if not field_validator_instance.custom_validators_are_valid():
-            self._unregister_validated_data(field=field)
-            self._update_error_kwargs(error_kwargs=error_kwargs, kwarg={'message': INVALID_FIELD_ERROR_MESSAGE})
-            self._register_error(error_kwargs=error_kwargs)
-            self._raise_error_if_needed(error_kwargs=error_kwargs, raise_exception=raise_exception)
+            self._raise_error_if_needed(error_kwargs=error_kwargs, raise_error=raise_error)
             return
         return None
 
@@ -132,7 +124,7 @@ class BaseValidator:
             self,
             *,
             model_validator: Callable,
-            raise_exception: bool,
+            raise_error: bool,
         ) -> None:
         """Performs validation checks for the given `model_validator`, and registers/raises errors (if any)"""
         error_kwargs = model_validator(self._validated_data.copy())
@@ -142,25 +134,25 @@ class BaseValidator:
         if error_kwargs is None:
             return None
         self._register_error(error_kwargs=error_kwargs)
-        self._raise_error_if_needed(error_kwargs=error_kwargs, raise_exception=raise_exception)
+        self._raise_error_if_needed(error_kwargs=error_kwargs, raise_error=raise_error)
         return None
 
-    def is_valid(self, *, raise_exception: Optional[bool] = False) -> bool:
-        """Returns boolean. If `raise_exception=True` and data validation fails, then raises `ValidationError`"""
+    def is_valid(self, *, raise_error: Optional[bool] = False) -> bool:
+        """Returns boolean. If `raise_error=True` and data validation fails, then raises `ValidationError`"""
         assert isinstance(self.data, dict), "Cannot call `is_valid()` without setting the `data` dictionary"
         self.clear_errors()
         for field, field_validator_instance in self._field_validators_dict.items():
             self._perform_field_validation_checks(
                 field=field,
                 field_validator_instance=field_validator_instance,
-                raise_exception=raise_exception,
+                raise_error=raise_error,
             )
         # Perform model validator checks ONLY IF there are no errors in field validator checks
         if not self.errors:
             for model_validator in self._model_validators:
                 self._perform_model_validation_checks(
                     model_validator=model_validator,
-                    raise_exception=raise_exception,
+                    raise_error=raise_error,
                 )
         return False if self.errors else True
 
