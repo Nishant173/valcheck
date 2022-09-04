@@ -52,7 +52,7 @@ if __name__ == "__main__":
         *validator.list_validators(), # Lists all validators recognized
         sep="\n",
     )
-    if validator.is_valid(raise_exception=False):
+    if validator.is_valid(raise_error=False):
         print(f"Validated data: {validator.validated_data}")
     else:
         print(f"Errors: {validator.errors}")
