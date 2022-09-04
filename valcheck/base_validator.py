@@ -18,7 +18,7 @@ class BaseValidator:
             assert isinstance(data, dict), "Param `data` must be a dictionary"
         self.data = set_as_empty() if data is None else data
         self._field_validators_dict = self._get_field_validators_dict()
-        self._class_validators = self._get_class_validators()
+        self._model_validators = self._get_model_validators()
         self._errors = []
         self._validated_data = {}
 
@@ -33,8 +33,8 @@ class BaseValidator:
             )
         }
 
-    def _get_class_validators(self) -> List[Callable]:
-        """Returns list of class validators (callables)"""
+    def _get_model_validators(self) -> List[Callable]:
+        """Returns list of model validators (callables). Used to validate the entire model"""
         return [
             validator_func for _, validator_func  in vars(self.__class__).items() if callable(validator_func)
         ]
@@ -128,16 +128,16 @@ class BaseValidator:
             return
         return None
 
-    def _perform_class_validation_checks(
+    def _perform_model_validation_checks(
             self,
             *,
-            class_validator: Callable,
+            model_validator: Callable,
             raise_exception: bool,
         ) -> None:
-        """Performs validation checks for the given class validator, and registers/raises errors (if any)"""
-        error_kwargs = class_validator(values=self._validated_data.copy())
+        """Performs validation checks for the given `model_validator`, and registers/raises errors (if any)"""
+        error_kwargs = model_validator(self._validated_data.copy())
         assert (error_kwargs is None or isinstance(error_kwargs, dict)), (
-            "Output of class validator functions should be either NoneType or a dictionary having error kwargs"
+            "Output of model validator functions should be either NoneType or a dictionary having error kwargs"
         )
         if error_kwargs is None:
             return None
@@ -155,12 +155,28 @@ class BaseValidator:
                 field_validator_instance=field_validator_instance,
                 raise_exception=raise_exception,
             )
-        # Perform class validator checks ONLY IF there are no errors in field validator checks
+        # Perform model validator checks ONLY IF there are no errors in field validator checks
         if not self.errors:
-            for class_validator in self._class_validators:
-                self._perform_class_validation_checks(
-                    class_validator=class_validator,
+            for model_validator in self._model_validators:
+                self._perform_model_validation_checks(
+                    model_validator=model_validator,
                     raise_exception=raise_exception,
                 )
         return False if self.errors else True
+
+    def list_validators(self) -> List:
+        validators = []
+        for field, field_validator_instance in self._field_validators_dict.items():
+            validators.append({
+                "type": 'field_validator',
+                "subtype": field_validator_instance.__class__.__name__,
+                "name": field,
+            })
+        for model_validator in self._model_validators:
+            validators.append({
+                "type": 'model_validator',
+                "subtype": None,
+                "name": model_validator.__name__,
+            })
+        return validators
 
