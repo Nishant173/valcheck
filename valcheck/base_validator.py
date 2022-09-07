@@ -143,7 +143,7 @@ class BaseValidator:
         if error_kwargs is None:
             return None
         self._ensure_validator_message_is_missing(error_kwargs=error_kwargs)
-        INVALID_MODEL_ERROR_MESSAGE = f"Invalid model due to failed validation in {model_validator.__name__}"
+        INVALID_MODEL_ERROR_MESSAGE = f"Invalid model due to failed validation in `{model_validator.__name__}()`"
         self._update_error_kwargs(error_kwargs=error_kwargs, kwarg={'validator_message': INVALID_MODEL_ERROR_MESSAGE})
         self._register_error(error_kwargs=error_kwargs)
         self._raise_error_if_needed(error_kwargs=error_kwargs, raise_error=raise_error)
