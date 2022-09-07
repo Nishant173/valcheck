@@ -1,7 +1,6 @@
 from typing import Any, Callable, Dict, Iterable, List, Optional
 
 from valcheck.utils import (
-    is_empty,
     is_instance_of_any,
     is_iterable,
     is_valid_datetime_string,
@@ -63,6 +62,16 @@ class BaseField:
     def is_valid(self) -> bool:
         """Needs to be implemented by all child classes of the `BaseField` class"""
         raise NotImplementedError()
+
+
+class AnyField(BaseField):
+    def __init__(self, **kwargs: Any) -> None:
+        super(AnyField, self).__init__(**kwargs)
+
+    def is_valid(self) -> bool:
+        if super().can_be_set_to_null():
+            return True
+        return super().has_valid_custom_validators()
 
 
 class BooleanField(BaseField):
