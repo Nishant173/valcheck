@@ -9,8 +9,8 @@ class UserValidator(base_validator.BaseValidator):
     date_of_birth = fields.DateStringField(format_="%Y-%m-%d")
     annual_salary = fields.PositiveIntegerField(
         required=False,
-        nullable=False,
-        default_func=lambda: 265_000,
+        nullable=True,
+        default_func=lambda: None,
         validators=[lambda salary: 100_000 <= salary <= 350_000],
         error_kwargs={
             "details": "Annual salary must be between 100,000 and 350,000 (USD)",
