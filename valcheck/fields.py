@@ -17,11 +17,15 @@ class BaseField:
             *,
             required: Optional[bool] = True,
             nullable: Optional[bool] = False,
+            default_func: Optional[Callable] = None,
             validators: Optional[List[Callable]] = None,
             error_kwargs: Optional[Dict[str, Any]] = None,
         ) -> None:
         assert isinstance(required, bool), "Param `required` must be of type 'bool'"
         assert isinstance(nullable, bool), "Param `nullable` must be of type 'bool'"
+        assert default_func is None or callable(default_func), (
+            "Param `default_func` must be a callable that returns the default value if the field is missing when `required=False`"
+        )
         assert validators is None or isinstance(validators, list), "Param `validators` must be of type 'list'"
         if isinstance(validators, list):
             for validator in validators:
@@ -31,6 +35,7 @@ class BaseField:
         self._field_value = set_as_empty()
         self.required = required
         self.nullable = nullable
+        self.default_func = default_func
         self.validators = validators or []
         self.error_kwargs = error_kwargs or {}
 

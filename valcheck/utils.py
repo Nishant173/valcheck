@@ -37,7 +37,8 @@ def is_valid_email_id(email_id: str, /) -> bool:
 
 class _EmptyField:
     """Class used to denote an empty field (field whose value is missing)"""
-    pass
+    def __str__(self) -> str:
+        return self.__class__.__name__
 
 
 def set_as_empty() -> _EmptyField:

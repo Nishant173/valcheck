@@ -83,6 +83,10 @@ class BaseValidator:
     def validated_data(self) -> Dict[str, Any]:
         return self._validated_data
 
+    def clear_validated_data(self) -> None:
+        """Clears out the dictionary having validated data"""
+        self._validated_data = {}
+
     def _ensure_validator_message_is_missing(self, error_kwargs: Dict[str, Any]) -> None:
         """Ensures that the kwarg 'validator_message' is not passed in `error_kwargs`, as this will be set by `BaseValidator`"""
         assert ('validator_message' not in error_kwargs), (
@@ -97,11 +101,13 @@ class BaseValidator:
             raise_error: bool,
         ) -> None:
         """Performs validation checks for the given field, and registers/raises errors (if any)"""
-        field_type = field_validator_instance.__class__.__name__
-        field_value = self.data.get(field, set_as_empty())
         required = field_validator_instance.required
         error_kwargs = field_validator_instance.error_kwargs
+        default_func = field_validator_instance.default_func
+        default_value = default_func() if default_func is not None and not required else set_as_empty()
         self._ensure_validator_message_is_missing(error_kwargs=error_kwargs)
+        field_type = field_validator_instance.__class__.__name__
+        field_value = self.data.get(field, default_value)
         MISSING_FIELD_ERROR_MESSAGE = f"Missing {field_type} '{field}'"
         INVALID_FIELD_ERROR_MESSAGE = f"Invalid {field_type} '{field}' having value {self._wrap_in_quotes_if_string(field_value)}"
         self._register_validated_data(field=field, field_value=field_value)
@@ -147,6 +153,7 @@ class BaseValidator:
         """Returns boolean. If `raise_error=True` and data validation fails, then raises `ValidationError`"""
         assert isinstance(self.data, dict), "Cannot call `is_valid()` without setting the `data` dictionary"
         self.clear_errors()
+        self.clear_validated_data()
         for field, field_validator_instance in self._field_validators_dict.items():
             self._perform_field_validation_checks(
                 field=field,
