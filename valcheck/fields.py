@@ -20,6 +20,16 @@ class BaseField:
             validators: Optional[List[Callable]] = None,
             error_kwargs: Optional[Dict[str, Any]] = None,
         ) -> None:
+        """
+        Parameters:
+            - required (bool): True if the field is required, else False.
+            - nullable (bool): True if the field is nullable, else False.
+            - default_func (callable): Callable that returns the default value to set for the field
+            if `required=False` and the field is missing.
+            - validators (list of callables): List of callables that return a boolean.
+            True if validation is successful, else False.
+            - error_kwargs (dict): Dictionary having error kwargs to raise the `ValidationError` (if needed).
+        """
         assert isinstance(required, bool), "Param `required` must be of type 'bool'"
         assert isinstance(nullable, bool), "Param `nullable` must be of type 'bool'"
         assert default_func is None or callable(default_func), (
