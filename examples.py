@@ -4,12 +4,13 @@ from valcheck import base_validator, fields
 class UserValidator(base_validator.BaseValidator):
     id = fields.UuidStringField()
     first_name = fields.StringField()
-    middle_name = fields.StringField(required=False, nullable=True)
+    middle_name = fields.StringField(required=False, nullable=True, default_func=lambda: None)
     last_name = fields.StringField()
     date_of_birth = fields.DateStringField(format_="%Y-%m-%d")
     annual_salary = fields.PositiveIntegerField(
         required=False,
         nullable=False,
+        default_func=lambda: 265_000,
         validators=[lambda salary: 100_000 <= salary <= 350_000],
         error_kwargs={
             "details": "Annual salary must be between 100,000 and 350,000 (USD)",
