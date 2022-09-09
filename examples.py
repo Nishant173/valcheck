@@ -29,6 +29,7 @@ class UserValidator(base_validator.BaseValidator):
             "code": "",
         },
     )
+    json_data = fields.JsonStringField()
 
     # Model validator functions - Can be used to validate the entire model.
     # If there is an error, return dictionary having error kwargs, otherwise return None
@@ -68,6 +69,7 @@ if __name__ == "__main__":
         "monthly_salary": 250_000,
         "hobbies": ['football', 'hockey', 'cricket'],
         "extra_info": {"fav_board_game": "chess", "fav_sport": "football"},
+        "json_data": '{"name":"John","age":30,"city":"New York"}',
     })
     print("Validators:", *validator.list_validators(), sep="\n") # Lists all validators recognized
 
