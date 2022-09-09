@@ -1,4 +1,4 @@
-from valcheck import base_validator, fields
+from valcheck import base_validator, errors, fields
 
 
 class UserValidator(base_validator.BaseValidator):
@@ -42,6 +42,23 @@ class UserValidator(base_validator.BaseValidator):
         return None
 
 
+def without_exception(*, validator: base_validator.BaseValidator) -> None:
+    if validator.is_valid():
+        print(f"Validated data: {validator.validated_data}")
+    else:
+        print(f"Errors: {validator.errors}")
+
+
+def with_exception(*, validator: base_validator.BaseValidator) -> None:
+    try:
+        validator.is_valid(raise_exception=True, many=True)
+    except errors.ValidationError as err:
+        print("ValidationError was raised!")
+        print(f"Errors: {err.error_info}")
+    else:
+        print(f"Validated data: {validator.validated_data}")
+
+
 if __name__ == "__main__":
     validator = UserValidator(data={
         "id": "d82283aa-2eae-4f96-abc7-0ec69a557a84",
@@ -53,11 +70,7 @@ if __name__ == "__main__":
         "hobbies": ['football', 'hockey', 'cricket'],
         "extra_info": {"fav_board_game": "chess", "fav_sport": "football"},
     })
-    print(
-        *validator.list_validators(), # Lists all validators recognized
-        sep="\n",
-    )
-    if validator.is_valid(raise_exception=False):
-        print(f"Validated data: {validator.validated_data}")
-    else:
-        print(f"Errors: {validator.errors}")
+    print("Validators:", *validator.list_validators(), sep="\n") # Lists all validators recognized
+
+    # without_exception(validator=validator)
+    with_exception(validator=validator)
