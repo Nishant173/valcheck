@@ -5,6 +5,7 @@ from valcheck.utils import (
     is_iterable,
     is_valid_datetime_string,
     is_valid_email_id,
+    is_valid_json_string,
     is_valid_uuid_string,
     set_as_empty,
 )
@@ -102,6 +103,19 @@ class StringField(BaseField):
         if super().can_be_set_to_null():
             return True
         return isinstance(self.field_value, str) and super().has_valid_custom_validators()
+
+
+class JsonStringField(StringField):
+    def __init__(self, **kwargs: Any) -> None:
+        super(JsonStringField, self).__init__(**kwargs)
+
+    def is_valid(self) -> bool:
+        if super().can_be_set_to_null():
+            return True
+        return (
+            super().is_valid()
+            and is_valid_json_string(self.field_value)
+        )
 
 
 class EmailIdField(StringField):

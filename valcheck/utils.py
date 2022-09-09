@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 import re
 from typing import Any, Dict, List, Type
 from uuid import UUID
@@ -23,7 +24,15 @@ def is_valid_datetime_string(string: str, format_: str, /) -> bool:
     try:
         _ = datetime.strptime(string, format_)
         return True
-    except ValueError:
+    except (ValueError, TypeError):
+        return False
+
+
+def is_valid_json_string(string: str, /) -> bool:
+    try:
+        _ = json.loads(string)
+        return True
+    except (json.decoder.JSONDecodeError, TypeError):
         return False
 
 
