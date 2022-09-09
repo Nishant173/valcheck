@@ -34,7 +34,11 @@ class UserValidator(base_validator.BaseValidator):
     # If there is an error, return dictionary having error kwargs, otherwise return None
     def validate_fav_sport(values):
         if values['extra_info']['fav_sport'] not in values['hobbies']:
-            return {"details": "Invalid entry. Your favourite sport is not one of your hobbies"}
+            return {
+                "details": "Invalid entry. Your favourite sport is not one of your hobbies",
+                "source": "",
+                "code": "",
+            }
         return None
 
 
@@ -53,7 +57,7 @@ if __name__ == "__main__":
         *validator.list_validators(), # Lists all validators recognized
         sep="\n",
     )
-    if validator.is_valid(raise_error=False):
+    if validator.is_valid(raise_exception=False):
         print(f"Validated data: {validator.validated_data}")
     else:
         print(f"Errors: {validator.errors}")
