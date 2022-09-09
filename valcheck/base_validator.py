@@ -133,6 +133,11 @@ class BaseValidator:
         self._register_error(error_kwargs=error_kwargs)
         return None
 
+    def _raise_exception_if_needed(self, raise_exception: bool, many: bool) -> None:
+        """Raises `ValidationError` if needed"""
+        if raise_exception and self.errors:
+            raise ValidationError(error_info=self.errors) if many else ValidationError(error_info=self.errors[0])
+
     def is_valid(
             self,
             *,
@@ -152,8 +157,7 @@ class BaseValidator:
         if not self.errors:
             for model_validator in self._model_validators:
                 self._perform_model_validation_checks(model_validator=model_validator)
-        if raise_exception and self.errors:
-            raise ValidationError(error_info=self.errors) if many else ValidationError(error_info=self.errors[0])
+        self._raise_exception_if_needed(raise_exception=raise_exception, many=many)
         return False if self.errors else True
 
     def list_validators(self) -> List:
