@@ -2,6 +2,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 from valcheck.errors import ValidationError
 from valcheck.fields import BaseField
+from valcheck.models import Error
 from valcheck.utils import (
     is_empty,
     set_as_empty,
@@ -62,15 +63,7 @@ class BaseValidator:
         error_kwargs.update(**kwarg)
 
     def _register_error(self, error_kwargs: Dict[str, Any]) -> None:
-        self._errors.append(ValidationError(**error_kwargs).as_dict())
-
-    def _raise_error_if_needed(
-            self,
-            error_kwargs: Dict[str, Any],
-            raise_error: bool,
-        ) -> None:
-        if raise_error:
-            raise ValidationError(**error_kwargs)
+        self._errors.append(Error(**error_kwargs).as_dict())
 
     def _register_validated_data(self, field: str, field_value: Any) -> None:
         if not is_empty(field_value):
@@ -98,9 +91,8 @@ class BaseValidator:
             *,
             field: str,
             field_validator_instance: BaseField,
-            raise_error: bool,
         ) -> None:
-        """Performs validation checks for the given field, and registers/raises errors (if any)"""
+        """Performs validation checks for the given field, and registers errors (if any)"""
         required = field_validator_instance.required
         error_kwargs = field_validator_instance.error_kwargs
         default_func = field_validator_instance.default_func
@@ -115,7 +107,6 @@ class BaseValidator:
             self._unregister_validated_data(field=field)
             self._update_error_kwargs(error_kwargs=error_kwargs, kwarg={'validator_message': MISSING_FIELD_ERROR_MESSAGE})
             self._register_error(error_kwargs=error_kwargs)
-            self._raise_error_if_needed(error_kwargs=error_kwargs, raise_error=raise_error)
             return
         if is_empty(field_value) and not required:
             self._unregister_validated_data(field=field)
@@ -125,17 +116,11 @@ class BaseValidator:
             self._unregister_validated_data(field=field)
             self._update_error_kwargs(error_kwargs=error_kwargs, kwarg={'validator_message': INVALID_FIELD_ERROR_MESSAGE})
             self._register_error(error_kwargs=error_kwargs)
-            self._raise_error_if_needed(error_kwargs=error_kwargs, raise_error=raise_error)
             return
         return None
 
-    def _perform_model_validation_checks(
-            self,
-            *,
-            model_validator: Callable,
-            raise_error: bool,
-        ) -> None:
-        """Performs validation checks for the given `model_validator`, and registers/raises errors (if any)"""
+    def _perform_model_validation_checks(self, *, model_validator: Callable) -> None:
+        """Performs validation checks for the given `model_validator`, and registers errors (if any)"""
         error_kwargs = model_validator(self._validated_data.copy())
         assert (error_kwargs is None or isinstance(error_kwargs, dict)), (
             "Output of model validator functions should be either NoneType or a dictionary having error kwargs"
@@ -146,11 +131,15 @@ class BaseValidator:
         INVALID_MODEL_ERROR_MESSAGE = f"Invalid model due to failed validation in `{model_validator.__name__}()`"
         self._update_error_kwargs(error_kwargs=error_kwargs, kwarg={'validator_message': INVALID_MODEL_ERROR_MESSAGE})
         self._register_error(error_kwargs=error_kwargs)
-        self._raise_error_if_needed(error_kwargs=error_kwargs, raise_error=raise_error)
         return None
 
-    def is_valid(self, *, raise_error: Optional[bool] = False) -> bool:
-        """Returns boolean. If `raise_error=True` and data validation fails, then raises `ValidationError`"""
+    def is_valid(
+            self,
+            *,
+            raise_exception: Optional[bool] = False,
+            many: Optional[bool] = True,
+        ) -> bool:
+        """Returns boolean. If `raise_exception=True` and data validation fails, then raises `ValidationError`"""
         assert isinstance(self.data, dict), "Cannot call `is_valid()` without setting the `data` dictionary"
         self.clear_errors()
         self.clear_validated_data()
@@ -158,15 +147,13 @@ class BaseValidator:
             self._perform_field_validation_checks(
                 field=field,
                 field_validator_instance=field_validator_instance,
-                raise_error=raise_error,
             )
-        # Perform model validator checks ONLY IF there are no errors in field validator checks
+        # Perform model validator checks only if there are no errors in field validator checks
         if not self.errors:
             for model_validator in self._model_validators:
-                self._perform_model_validation_checks(
-                    model_validator=model_validator,
-                    raise_error=raise_error,
-                )
+                self._perform_model_validation_checks(model_validator=model_validator)
+        if raise_exception and self.errors:
+            raise ValidationError(error_info=self.errors) if many else ValidationError(error_info=self.errors[0])
         return False if self.errors else True
 
     def list_validators(self) -> List:

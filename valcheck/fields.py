@@ -28,7 +28,7 @@ class BaseField:
             if `required=False` and the field is missing.
             - validators (list of callables): List of callables that return a boolean.
             True if validation is successful, else False.
-            - error_kwargs (dict): Dictionary having error kwargs to raise the `ValidationError` (if needed).
+            - error_kwargs (dict): Dictionary having error kwargs.
         """
         assert isinstance(required, bool), "Param `required` must be of type 'bool'"
         assert isinstance(nullable, bool), "Param `nullable` must be of type 'bool'"
