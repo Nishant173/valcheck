@@ -7,7 +7,7 @@ class UserValidator(base_validator.BaseValidator):
     middle_name = fields.StringField(required=False, nullable=True, default_func=lambda: None)
     last_name = fields.StringField()
     date_of_birth = fields.DateStringField(format_="%Y-%m-%d")
-    annual_salary = fields.PositiveIntegerField(
+    monthly_salary = fields.PositiveIntegerField(
         required=False,
         nullable=True,
         default_func=lambda: None,
@@ -63,10 +63,9 @@ if __name__ == "__main__":
     validator = UserValidator(data={
         "id": "d82283aa-2eae-4f96-abc7-0ec69a557a84",
         "first_name": "Sundar",
-        "middle_name": None,
         "last_name": "Pichai",
-        "date_of_birth": "1980-11-25",
-        "annual_salary": 250_000,
+        "date_of_birth": "1970-11-25",
+        "monthly_salary": 250_000,
         "hobbies": ['football', 'hockey', 'cricket'],
         "extra_info": {"fav_board_game": "chess", "fav_sport": "football"},
     })
