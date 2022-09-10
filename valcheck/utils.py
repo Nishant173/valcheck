@@ -64,3 +64,9 @@ def is_instance_of_any(obj: Any, types: List[Type]) -> bool:
 
 def is_key_present(dict_obj: Dict[str, Any], key: str) -> bool:
     return key in dict_obj
+
+
+def wrap_in_quotes_if_string(obj: Any, /) -> str:
+    if isinstance(obj, str):
+        return f"'{obj}'"
+    return f"{obj}"

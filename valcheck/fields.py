@@ -1,5 +1,6 @@
-from typing import Any, Callable, Dict, Iterable, List, Optional
+from typing import Any, Callable, Iterable, List, Optional
 
+from valcheck.models import Error
 from valcheck.utils import (
     is_instance_of_any,
     is_iterable,
@@ -19,7 +20,7 @@ class BaseField:
             nullable: Optional[bool] = False,
             default_func: Optional[Callable] = None,
             validators: Optional[List[Callable]] = None,
-            error_kwargs: Optional[Dict[str, Any]] = None,
+            error: Optional[Error] = None,
         ) -> None:
         """
         Parameters:
@@ -29,7 +30,7 @@ class BaseField:
             if `required=False` and the field is missing.
             - validators (list of callables): List of callables that each return a boolean.
             The callable returns True if validation is successful, else False.
-            - error_kwargs (dict): Dictionary having error kwargs.
+            - error (Error instance): Instance of type `valcheck.models.Error`.
         """
         assert isinstance(required, bool), "Param `required` must be of type 'bool'"
         assert isinstance(nullable, bool), "Param `nullable` must be of type 'bool'"
@@ -40,14 +41,14 @@ class BaseField:
         if isinstance(validators, list):
             for validator in validators:
                 assert callable(validator), "Param `validators` must be a list of callables"
-        assert error_kwargs is None or isinstance(error_kwargs, dict), "Param `error_kwargs` must be of type 'dict'"
+        assert error is None or isinstance(error, Error), "Param `error` must be of type `valcheck.models.Error`"
 
         self._field_value = set_as_empty()
         self.required = required
         self.nullable = nullable
         self.default_func = default_func
         self.validators = validators or []
-        self.error_kwargs = error_kwargs or {}
+        self.error = error or Error()
 
     @property
     def field_value(self) -> Any:
