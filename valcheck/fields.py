@@ -23,12 +23,12 @@ class BaseField:
         ) -> None:
         """
         Parameters:
-            - required (bool): True if the field is required, else False.
-            - nullable (bool): True if the field is nullable, else False.
+            - required (bool): True if the field is required, else False. Default: True
+            - nullable (bool): True if the field is nullable, else False. Default: False
             - default_func (callable): Callable that returns the default value to set for the field
             if `required=False` and the field is missing.
-            - validators (list of callables): List of callables that return a boolean.
-            True if validation is successful, else False.
+            - validators (list of callables): List of callables that each return a boolean.
+            The callable returns True if validation is successful, else False.
             - error_kwargs (dict): Dictionary having error kwargs.
         """
         assert isinstance(required, bool), "Param `required` must be of type 'bool'"
