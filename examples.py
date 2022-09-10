@@ -1,4 +1,4 @@
-from valcheck import base_validator, errors, fields
+from valcheck import base_validator, errors, fields, models
 
 
 class UserValidator(base_validator.BaseValidator):
@@ -12,42 +12,28 @@ class UserValidator(base_validator.BaseValidator):
         nullable=True,
         default_func=lambda: None,
         validators=[lambda salary: 100_000 <= salary <= 350_000],
-        error_kwargs={
-            "details": "Annual salary must be between 100,000 and 350,000 (USD)",
-            "source": "",
-            "code": "",
-        },
+        error=models.Error(details="Annual salary must be between 100,000 and 350,000 (USD)"),
     )
-    hobbies = fields.MultiChoiceField(
-        choices=['football', 'hockey', 'cricket', 'rugby', 'kick-boxing'],
-    )
+    hobbies = fields.MultiChoiceField(choices=['football', 'hockey', 'cricket', 'rugby', 'kick-boxing'])
     extra_info = fields.DictionaryField(
         validators=[lambda dict_obj: "fav_sport" in dict_obj],
-        error_kwargs={
-            "details": "Expected following params in extra_info field: fav_sport",
-            "source": "",
-            "code": "",
-        },
+        error=models.Error(details="Expected following params in 'extra_info' dictionary field: ['fav_sport']"),
     )
     json_data = fields.JsonStringField()
 
     # Model validator functions - Can be used to validate the entire model.
-    # If there is an error, return dictionary having error kwargs, otherwise return None
+    # If there is an error, return an instance of `valcheck.models.Error`
     def validate_fav_sport(values):
         if values['extra_info']['fav_sport'] not in values['hobbies']:
-            return {
-                "details": "Invalid entry. Your favourite sport is not one of your hobbies",
-                "source": "",
-                "code": "",
-            }
+            return models.Error(details="Invalid entry. Your favourite sport is not one of your hobbies")
         return None
 
 
 def without_exception(*, validator: base_validator.BaseValidator) -> None:
     if validator.is_valid():
-        print(f"Validated data: {validator.validated_data}")
+        print(f"Validated data:\n{validator.validated_data}")
     else:
-        print(f"Errors: {validator.errors}")
+        print(f"Errors:\n{validator.errors_as_list_of_dicts}")
 
 
 def with_exception(*, validator: base_validator.BaseValidator) -> None:
@@ -55,9 +41,9 @@ def with_exception(*, validator: base_validator.BaseValidator) -> None:
         validator.is_valid(raise_exception=True, many=True)
     except errors.ValidationError as err:
         print("ValidationError was raised!")
-        print(f"Errors: {err.error_info}")
+        print(f"Errors:\n{err.error_info}")
     else:
-        print(f"Validated data: {validator.validated_data}")
+        print(f"Validated data:\n{validator.validated_data}")
 
 
 if __name__ == "__main__":
