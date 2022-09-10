@@ -1,44 +1,35 @@
 from valcheck import base_validator, errors, fields, models
 
 
-class UserValidator(base_validator.BaseValidator):
-    id = fields.UuidStringField()
-    first_name = fields.StringField()
-    middle_name = fields.StringField(required=False, nullable=True, default_func=lambda: None)
-    last_name = fields.StringField()
+class UserDetailsValidator(base_validator.BaseValidator):
+    name = fields.StringField()
     date_of_birth = fields.DateStringField(format_="%Y-%m-%d")
+    gender = fields.ChoiceField(choices=('Male', 'Female', 'Other'))
     monthly_salary = fields.PositiveIntegerField(
         required=False,
         nullable=True,
         default_func=lambda: None,
         validators=[lambda salary: 100_000 <= salary <= 350_000],
-        error=models.Error(details="Annual salary must be between 100,000 and 350,000 (USD)"),
+        error=models.Error(details="Monthly salary must be between $100,000 and $350,000"),
     )
-    hobbies = fields.MultiChoiceField(choices=['football', 'hockey', 'cricket', 'rugby', 'kick-boxing'])
-    extra_info = fields.DictionaryField(
-        validators=[lambda dict_obj: "fav_sport" in dict_obj],
-        error=models.Error(details="Expected following params in 'extra_info' dictionary field: ['fav_sport']"),
-    )
-    json_data = fields.JsonStringField()
+    other_info = fields.AnyField(required=False, nullable=True, default_func=lambda: None)
 
-    # Model validator functions - Can be used to validate the entire model.
-    # If there is an error, return an instance of `valcheck.models.Error`
-    def validate_fav_sport(values):
-        if values['extra_info']['fav_sport'] not in values['hobbies']:
-            return models.Error(details="Invalid entry. Your favourite sport is not one of your hobbies")
+    def validate_birth_year_by_gender(values):
+        year, _, _ = values['date_of_birth'].split('-')
+        year = int(year)
+        gender = values['gender']
+        if gender == 'Other' and year < 2000:
+            return models.Error(details="Gender 'Other' is invalid for users born before the year 2000")
         return None
 
 
 if __name__ == "__main__":
-    validator = UserValidator(data={
-        "id": "d82283aa-2eae-4f96-abc7-0ec69a557a84",
-        "first_name": "Sundar",
-        "last_name": "Pichai",
+    validator = UserDetailsValidator(data={
+        "name": "Sundar Pichai",
         "date_of_birth": "1970-11-25",
+        "gender": "Male",
         "monthly_salary": 250_000,
-        "hobbies": ['football', 'hockey', 'cricket'],
-        "extra_info": {"fav_board_game": "chess", "fav_sport": "football"},
-        "json_data": '{"name":"John","age":30,"city":"New York"}',
+        "other_info": {"fav_board_game": "chess", "fav_sport": "football"},
     })
     print("Validators:", *validator.list_validators(), sep="\n") # Lists all validators recognized
 
