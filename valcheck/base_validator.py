@@ -18,7 +18,7 @@ class BaseValidator:
         - validated_data
 
     Exposed methods:
-        - is_valid()
+        - run_validations()
         - list_validators()
     """
     def __init__(self, *, data: Dict[str, Any]) -> None:
@@ -123,19 +123,12 @@ class BaseValidator:
         self._register_error(error=error)
         return None
 
-    def _raise_exception_if_needed(self, raise_exception: bool, many: bool) -> None:
-        """Raises `ValidationError` if needed"""
-        if raise_exception and self.errors:
-            errors = self.errors_as_list_of_dicts
-            raise ValidationError(error_info=errors) if many else ValidationError(error_info=errors[0])
-
-    def is_valid(
-            self,
-            *,
-            raise_exception: Optional[bool] = False,
-            many: Optional[bool] = True,
-        ) -> bool:
-        """Returns boolean. If `raise_exception=True` and data validation fails, then raises `ValidationError`"""
+    def run_validations(self, *, raise_all: Optional[bool] = True) -> None:
+        """
+        Raises `valcheck.errors.ValidationError` if data validation fails.
+        If `raise_all=True`, mentions all errors recognized.
+        If `raise_all=False`, mentions only the first error recognized.
+        """
         self._clear_errors()
         self._clear_validated_data()
         for field, field_validator_instance in self._field_validators_dict.items():
@@ -147,8 +140,10 @@ class BaseValidator:
         if not self.errors:
             for model_validator in self._model_validators:
                 self._perform_model_validation_checks(model_validator=model_validator)
-        self._raise_exception_if_needed(raise_exception=raise_exception, many=many)
-        return False if self.errors else True
+        if self.errors:
+            errors = self.errors_as_list_of_dicts
+            raise ValidationError(error_info=errors) if raise_all else ValidationError(error_info=errors[0])
+        return None
 
     def list_validators(self) -> List:
         validators = []
