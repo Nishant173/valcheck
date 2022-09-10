@@ -84,7 +84,7 @@ class BaseValidator:
             field: str,
             field_validator_instance: BaseField,
         ) -> None:
-        """Performs validation checks for the given field, and registers errors (if any)"""
+        """Performs validation checks for the given field, and registers errors (if any) and validated data"""
         required = field_validator_instance.required
         error = field_validator_instance.error
         default_func = field_validator_instance.default_func
@@ -125,6 +125,7 @@ class BaseValidator:
 
     def run_validations(self, *, raise_all: Optional[bool] = True) -> None:
         """
+        Runs validations and registers errors (if any) and validated data.
         Raises `valcheck.errors.ValidationError` if data validation fails.
         If `raise_all=True`, mentions all errors recognized.
         If `raise_all=False`, mentions only the first error recognized.
