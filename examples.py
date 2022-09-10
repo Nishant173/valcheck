@@ -29,23 +29,6 @@ class UserValidator(base_validator.BaseValidator):
         return None
 
 
-def without_exception(*, validator: base_validator.BaseValidator) -> None:
-    if validator.is_valid():
-        print(f"Validated data:\n{validator.validated_data}")
-    else:
-        print(f"Errors:\n{validator.errors_as_list_of_dicts}")
-
-
-def with_exception(*, validator: base_validator.BaseValidator) -> None:
-    try:
-        validator.is_valid(raise_exception=True, many=True)
-    except errors.ValidationError as err:
-        print("ValidationError was raised!")
-        print(f"Errors:\n{err.error_info}")
-    else:
-        print(f"Validated data:\n{validator.validated_data}")
-
-
 if __name__ == "__main__":
     validator = UserValidator(data={
         "id": "d82283aa-2eae-4f96-abc7-0ec69a557a84",
@@ -59,5 +42,9 @@ if __name__ == "__main__":
     })
     print("Validators:", *validator.list_validators(), sep="\n") # Lists all validators recognized
 
-    # without_exception(validator=validator)
-    with_exception(validator=validator)
+    try:
+        validator.run_validations(raise_all=True)
+    except errors.ValidationError as err:
+        print(f"Error info:\n{err.error_info}")
+    else:
+        print(f"Validated data:\n{validator.validated_data}")
