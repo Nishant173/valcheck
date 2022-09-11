@@ -17,10 +17,12 @@ class UserDetailsValidator(base_validator.BaseValidator):
     )
     other_info = fields.AnyField(required=False, nullable=True, default_func=lambda: None)
 
-    def validate_birth_year_by_gender(values):
-        year, _, _ = values['date_of_birth'].split('-')
+    # You can define model validator functions that receive the validated field data as an input.
+    # Can be used to validate the entire model (after all individual fields are validated).
+    def validate_birth_year_by_gender(validated_data):
+        year, _, _ = validated_data['date_of_birth'].split('-')
         year = int(year)
-        gender = values['gender']
+        gender = validated_data['gender']
         if gender == 'Other' and year < 2000:
             return models.Error(details="Gender 'Other' is invalid for users born before the year 2000")
         return None
