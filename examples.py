@@ -2,15 +2,18 @@ from valcheck import base_validator, errors, fields, models
 
 
 class UserDetailsValidator(base_validator.BaseValidator):
-    name = fields.StringField()
+    name = fields.StringField(validators=[lambda name: len(name) > 0])
     date_of_birth = fields.DateStringField(format_="%Y-%m-%d")
     gender = fields.ChoiceField(choices=('Male', 'Female', 'Other'))
     monthly_salary = fields.PositiveIntegerField(
         required=False,
         nullable=True,
         default_func=lambda: None,
-        validators=[lambda salary: 100_000 <= salary <= 350_000],
-        error=models.Error(details="Monthly salary must be between $100,000 and $350,000"),
+        validators=[
+            lambda salary: 100_000 <= salary <= 350_000,
+            lambda salary: salary % 2 == 0,
+        ],
+        error=models.Error(details="Monthly salary must be between $100,000 and $350,000 (and must be an even number)"),
     )
     other_info = fields.AnyField(required=False, nullable=True, default_func=lambda: None)
 
