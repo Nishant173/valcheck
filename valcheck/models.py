@@ -24,6 +24,7 @@ class Error:
 
     @validator_message.setter
     def validator_message(self, value: str) -> None:
+        assert isinstance(value, str), "The param `validator_message` must be of type string"
         self._validator_message = value
 
     def as_dict(self) -> Dict[str, Any]:

@@ -5,7 +5,15 @@ class ValidationError(Exception):
     """Exception to be raised when data validation fails"""
 
     def __init__(self, *, error_info: Any) -> None:
-        self.error_info = error_info
+        self._error_info = error_info
+
+    @property
+    def error_info(self) -> Any:
+        return self._error_info
+
+    @error_info.setter
+    def error_info(self, value: Any) -> None:
+        self._error_info = value
 
     def as_dict(self) -> Dict[str, Any]:
         return {

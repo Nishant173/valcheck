@@ -123,12 +123,10 @@ class BaseValidator:
         self._register_error(error=error)
         return None
 
-    def run_validations(self, *, raise_all: Optional[bool] = True) -> None:
+    def run_validations(self) -> None:
         """
         Runs validations and registers errors (if any) and validated data.
         Raises `valcheck.errors.ValidationError` if data validation fails.
-        If `raise_all=True`, mentions all errors recognized.
-        If `raise_all=False`, mentions only the first error recognized.
         """
         self._clear_errors()
         self._clear_validated_data()
@@ -142,8 +140,7 @@ class BaseValidator:
             for model_validator in self._model_validators:
                 self._perform_model_validation_checks(model_validator=model_validator)
         if self.errors:
-            errors = self.errors_as_list_of_dicts
-            raise ValidationError(error_info=errors) if raise_all else ValidationError(error_info=errors[0])
+            raise ValidationError(error_info=self.errors_as_list_of_dicts)
         return None
 
     def list_validators(self) -> List:
