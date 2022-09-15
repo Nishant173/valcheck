@@ -39,8 +39,8 @@ if __name__ == "__main__":
     print("Validators:", *validator.list_validators(), sep="\n") # Lists all validators recognized
 
     try:
-        validator.run_validations(raise_all=True)
+        validator.run_validations()
     except errors.ValidationError as err:
-        print(f"Error info:\n{err.error_info}")
+        print(f"Error info:\n{err.error_info}") # List having error info
     else:
-        print(f"Validated data:\n{validator.validated_data}")
+        print(f"Validated data:\n{validator.validated_data}") # Dictionary having validated data (by field)
