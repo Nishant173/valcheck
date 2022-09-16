@@ -1,6 +1,6 @@
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List
 
-from valcheck.errors import ValidationError
+from valcheck.exceptions import ValidationException
 from valcheck.fields import BaseField
 from valcheck.models import Error
 from valcheck.utils import (
@@ -13,14 +13,14 @@ from valcheck.utils import (
 class BaseValidator:
     """
     Exposed properties:
-        - errors
-        - errors_as_list_of_dicts
         - validated_data
 
     Exposed methods:
-        - run_validations()
+        - list_errors()
         - list_validators()
+        - run_validations()
     """
+
     def __init__(self, *, data: Dict[str, Any]) -> None:
         assert isinstance(data, dict), "Param `data` must be a dictionary"
         self.data = data
@@ -46,13 +46,8 @@ class BaseValidator:
             validator_func for _, validator_func  in vars(self.__class__).items() if callable(validator_func)
         ]
 
-    @property
-    def errors(self) -> List[Error]:
-        return self._errors
-
-    @property
-    def errors_as_list_of_dicts(self) -> List[Dict[str, Any]]:
-        return [error.as_dict() for error in self.errors]
+    def list_errors(self) -> List[Dict[str, Any]]:
+        return [error.as_dict() for error in self._errors]
 
     def _clear_errors(self) -> None:
         """Clears out the list of errors"""
@@ -126,7 +121,7 @@ class BaseValidator:
     def run_validations(self) -> None:
         """
         Runs validations and registers errors (if any) and validated data.
-        Raises `valcheck.errors.ValidationError` if data validation fails.
+        Raises `valcheck.exceptions.ValidationException` if data validation fails.
         """
         self._clear_errors()
         self._clear_validated_data()
@@ -136,11 +131,11 @@ class BaseValidator:
                 field_validator_instance=field_validator_instance,
             )
         # Perform model validator checks only if there are no errors in field validator checks
-        if not self.errors:
+        if not self._errors:
             for model_validator in self._model_validators:
                 self._perform_model_validation_checks(model_validator=model_validator)
-        if self.errors:
-            raise ValidationError(error_info=self.errors_as_list_of_dicts)
+        if self._errors:
+            raise ValidationException(error_info=self.list_errors())
         return None
 
     def list_validators(self) -> List:

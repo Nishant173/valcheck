@@ -7,13 +7,14 @@ class Error:
     def __init__(
             self,
             *,
-            details: Optional[Any] = None,
+            details: Optional[Dict[str, Any]] = None,
             source: Optional[str] = None,
             code: Optional[str] = None,
         ) -> None:
+        assert (details is None or isinstance(details, dict)), "Param `details` must be a dictionary"
         assert (source is None or isinstance(source, str)), "Param `source` must be a string"
         assert (code is None or isinstance(code, str)), "Param `code` must be a string"
-        self.details = details
+        self.details = details or {}
         self.source = source or ""
         self.code = code or ""
         self._validator_message = ""
@@ -24,7 +25,7 @@ class Error:
 
     @validator_message.setter
     def validator_message(self, value: str) -> None:
-        assert isinstance(value, str), "The param `validator_message` must be of type string"
+        assert isinstance(value, str), "The param `validator_message` must be a string"
         self._validator_message = value
 
     def as_dict(self) -> Dict[str, Any]:

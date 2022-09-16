@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
 
-class ValidationError(Exception):
+class ValidationException(Exception):
     """Exception to be raised when data validation fails"""
 
     def __init__(self, *, error_info: Any) -> None:
