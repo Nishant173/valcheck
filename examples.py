@@ -1,3 +1,4 @@
+from pprint import pprint
 from valcheck import base_validator, exceptions, fields, models
 
 
@@ -36,11 +37,14 @@ if __name__ == "__main__":
         "monthly_salary": 250_000,
         "other_info": {"fav_board_game": "chess", "fav_sport": "football"},
     })
-    print("Validators:", *validator.list_validators(), sep="\n") # Lists all validators recognized
+    print("\nValidators")
+    pprint(validator.list_validators())
 
     try:
         validator.run_validations()
     except exceptions.ValidationException as exc:
-        print(f"Error info:\n{exc.error_info}") # List having error info
+        print("\nError info")
+        pprint(exc.error_info) # List having error info
     else:
-        print(f"Validated data:\n{validator.validated_data}") # Dictionary having validated data (by field)
+        print("\nValidated data")
+        pprint(validator.validated_data) # Dictionary having validated data (by field)
