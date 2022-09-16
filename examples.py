@@ -1,4 +1,4 @@
-from valcheck import base_validator, errors, fields, models
+from valcheck import base_validator, exceptions, fields, models
 
 
 class UserDetailsValidator(base_validator.BaseValidator):
@@ -13,7 +13,7 @@ class UserDetailsValidator(base_validator.BaseValidator):
             lambda salary: 100_000 <= salary <= 350_000,
             lambda salary: salary % 2 == 0,
         ],
-        error=models.Error(details="Monthly salary must be between $100,000 and $350,000 (and must be an even number)"),
+        error=models.Error(details={"message": "Monthly salary must be between $100,000 and $350,000 (and must be an even number)"}),
     )
     other_info = fields.AnyField(required=False, nullable=True, default_func=lambda: None)
 
@@ -24,7 +24,7 @@ class UserDetailsValidator(base_validator.BaseValidator):
         year = int(year)
         gender = validated_data['gender']
         if gender == 'Other' and year < 2000:
-            return models.Error(details="Gender 'Other' is invalid for users born before the year 2000")
+            return models.Error(details={"message": "Gender 'Other' is invalid for users born before the year 2000"})
         return None
 
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     try:
         validator.run_validations()
-    except errors.ValidationError as err:
-        print(f"Error info:\n{err.error_info}") # List having error info
+    except exceptions.ValidationException as exc:
+        print(f"Error info:\n{exc.error_info}") # List having error info
     else:
         print(f"Validated data:\n{validator.validated_data}") # Dictionary having validated data (by field)
