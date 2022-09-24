@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List
+from typing import Any, Dict, List, Union
 
 from valcheck.exceptions import ValidationException
 from valcheck.fields import BaseField
@@ -12,12 +12,13 @@ from valcheck.utils import (
 
 class BaseValidator:
     """
-    Exposed properties:
+    Properties:
         - validated_data
 
-    Exposed methods:
+    Instance methods:
         - list_errors()
-        - list_validators()
+        - list_field_validators()
+        - model_validator()
         - run_validations()
     """
 
@@ -25,7 +26,6 @@ class BaseValidator:
         assert isinstance(data, dict), "Param `data` must be a dictionary"
         self.data = data
         self._field_validators_dict: Dict[str, BaseField] = self._get_field_validators_dict()
-        self._model_validators: List[Callable] = self._get_model_validators()
         self._errors: List[Error] = []
         self._validated_data: Dict[str, Any] = {}
 
@@ -39,12 +39,6 @@ class BaseValidator:
                 and issubclass(field_validator_instance.__class__, BaseField)
             )
         }
-
-    def _get_model_validators(self) -> List[Callable]:
-        """Returns list of model validators (callables). Used to validate the entire model"""
-        return [
-            validator_func for _, validator_func  in vars(self.__class__).items() if callable(validator_func)
-        ]
 
     def list_errors(self) -> List[Dict[str, Any]]:
         return [error.as_dict() for error in self._errors]
@@ -105,17 +99,23 @@ class BaseValidator:
             return
         return None
 
-    def _perform_model_validation_checks(self, *, model_validator: Callable) -> None:
-        """Performs validation checks for the given `model_validator`, and registers errors (if any)"""
-        error = model_validator(self._validated_data.copy())
+    def _perform_model_validation_checks(self) -> None:
+        """Performs model validation checks, and registers errors (if any)"""
+        error = self.model_validator(validated_data=self._validated_data.copy())
         assert error is None or isinstance(error, Error), (
-            "Output of model validator functions should be either a NoneType or an instance of `valcheck.models.Error`"
+            "Output of model validator method should be either a NoneType or an instance of `valcheck.models.Error`"
         )
         if error is None:
             return None
-        INVALID_MODEL_ERROR_MESSAGE = f"Invalid model due to failed validation in `{model_validator.__name__}()`"
+        INVALID_MODEL_ERROR_MESSAGE = "Invalid model - Validation failed"
         self._assign_validator_message_to_error(error=error, validator_message=INVALID_MODEL_ERROR_MESSAGE)
         self._register_error(error=error)
+        return None
+
+    def model_validator(self, *, validated_data: Dict[str, Any]) -> Union[Error, None]:
+        """Output of model validator method should be either a NoneType or an instance of `valcheck.models.Error`"""
+        for field_name, field_value in validated_data.items():
+            ...
         return None
 
     def run_validations(self) -> None:
@@ -130,27 +130,18 @@ class BaseValidator:
                 field=field,
                 field_validator_instance=field_validator_instance,
             )
-        # Perform model validator checks only if there are no errors in field validator checks
+        # Perform model validation checks only if there are no errors in field validation checks
         if not self._errors:
-            for model_validator in self._model_validators:
-                self._perform_model_validation_checks(model_validator=model_validator)
+            self._perform_model_validation_checks()
         if self._errors:
             raise ValidationException(error_info=self.list_errors())
         return None
 
-    def list_validators(self) -> List:
-        validators = []
-        for field, field_validator_instance in self._field_validators_dict.items():
-            validators.append({
-                "type": "Field-Validator",
-                "subtype": field_validator_instance.__class__.__name__,
-                "name": field,
-            })
-        for model_validator in self._model_validators:
-            validators.append({
-                "type": "Model-Validator",
-                "subtype": None,
-                "name": model_validator.__name__,
-            })
-        return validators
+    def list_field_validators(self) -> List[Dict[str, Any]]:
+        return [
+            {
+                "field_type": field_validator_instance.__class__.__name__,
+                "field_name": field,
+            } for field, field_validator_instance in self._field_validators_dict.items()
+        ]
 
