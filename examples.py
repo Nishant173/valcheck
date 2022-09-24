@@ -18,9 +18,9 @@ class UserDetailsValidator(base_validator.BaseValidator):
     )
     other_info = fields.AnyField(required=False, nullable=True, default_func=lambda: None)
 
-    # You can define model validator functions that receive the validated field data as an input.
+    # You can define the model validator method that receives the validated field data as an input.
     # Can be used to validate the entire model (after all individual fields are validated).
-    def validate_birth_year_by_gender(validated_data):
+    def model_validator(self, *, validated_data):
         year, _, _ = validated_data['date_of_birth'].split('-')
         year = int(year)
         gender = validated_data['gender']
@@ -37,8 +37,8 @@ if __name__ == "__main__":
         "monthly_salary": 250_000,
         "other_info": {"fav_board_game": "chess", "fav_sport": "football"},
     })
-    print("\nValidators")
-    pprint(validator.list_validators())
+    print("\nField validators")
+    pprint(validator.list_field_validators())
 
     try:
         validator.run_validations()
