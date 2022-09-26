@@ -7,6 +7,7 @@ from valcheck.utils import (
     is_valid_datetime_string,
     is_valid_email_id,
     is_valid_json_string,
+    is_valid_string,
     is_valid_uuid_string,
     set_as_empty,
 )
@@ -97,13 +98,20 @@ class BooleanField(BaseField):
 
 
 class StringField(BaseField):
-    def __init__(self, **kwargs: Any) -> None:
+    def __init__(self, *, empty_string_allowed: Optional[bool] = True, **kwargs: Any) -> None:
+        self.empty_string_allowed = empty_string_allowed
         super(StringField, self).__init__(**kwargs)
 
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return isinstance(self.field_value, str) and super().has_valid_custom_validators()
+        return (
+            is_valid_string(
+                value=self.field_value,
+                empty_string_allowed=self.empty_string_allowed,
+            )
+            and super().has_valid_custom_validators()
+        )
 
 
 class JsonStringField(StringField):
@@ -146,7 +154,7 @@ class UuidStringField(StringField):
 
 
 class DateStringField(StringField):
-    def __init__(self, format_: Optional[str] = "%Y-%m-%d", **kwargs: Any) -> None:
+    def __init__(self, *, format_: Optional[str] = "%Y-%m-%d", **kwargs: Any) -> None:
         self.format_ = format_
         super(DateStringField, self).__init__(**kwargs)
 
@@ -160,7 +168,7 @@ class DateStringField(StringField):
 
 
 class DatetimeStringField(StringField):
-    def __init__(self, format_: Optional[str] = "%Y-%m-%d %H:%M:%S", **kwargs: Any) -> None:
+    def __init__(self, *, format_: Optional[str] = "%Y-%m-%d %H:%M:%S", **kwargs: Any) -> None:
         self.format_ = format_
         super(DatetimeStringField, self).__init__(**kwargs)
 
@@ -274,4 +282,14 @@ class MultiChoiceField(ListField):
             super().is_valid()
             and all([item in self.choices for item in self.field_value])
         )
+
+
+class BytesField(BaseField):
+    def __init__(self, **kwargs: Any) -> None:
+        super(BytesField, self).__init__(**kwargs)
+
+    def is_valid(self) -> bool:
+        if super().can_be_set_to_null():
+            return True
+        return isinstance(self.field_value, bytes) and super().has_valid_custom_validators()
 

@@ -9,6 +9,12 @@ def is_iterable(obj: Any, /) -> bool:
     return hasattr(obj, "__iter__")
 
 
+def is_valid_string(*, value: Any, empty_string_allowed: bool) -> bool:
+    if not isinstance(value, str):
+        return False
+    return True if empty_string_allowed else value != ''
+
+
 def is_valid_uuid_string(string: str, /) -> bool:
     if len(string) != 36:
         return False
