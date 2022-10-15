@@ -1,6 +1,11 @@
 from typing import Any, Dict
 
 
+class MissingFieldException(Exception):
+    """Exception to be raised when a field is missing"""
+    pass
+
+
 class ValidationException(Exception):
     """Exception to be raised when data validation fails"""
 
