@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Union
 
-from valcheck.exceptions import ValidationException
+from valcheck.exceptions import MissingFieldException, ValidationException
 from valcheck.fields import BaseField
 from valcheck.models import Error
 from valcheck.utils import (
@@ -16,6 +16,7 @@ class BaseValidator:
         - validated_data
 
     Instance methods:
+        - get_field_value()
         - list_errors()
         - list_field_validators()
         - model_validator()
@@ -63,6 +64,13 @@ class BaseValidator:
     def validated_data(self) -> Dict[str, Any]:
         return self._validated_data
 
+    def get_field_value(self, field: str, /) -> Any:
+        """Returns the validated field value. Raises `valcheck.exceptions.MissingFieldException` if the field is missing"""
+        try:
+            return self.validated_data[field]
+        except KeyError:
+            raise MissingFieldException(f"The field '{field}' is missing from the validated data")
+
     def _clear_validated_data(self) -> None:
         """Clears out the dictionary having validated data"""
         self._validated_data.clear()
@@ -101,7 +109,7 @@ class BaseValidator:
 
     def _perform_model_validation_checks(self) -> None:
         """Performs model validation checks, and registers errors (if any)"""
-        error = self.model_validator(validated_data=self._validated_data.copy())
+        error = self.model_validator()
         assert error is None or isinstance(error, Error), (
             "Output of model validator method should be either a NoneType or an instance of `valcheck.models.Error`"
         )
@@ -112,10 +120,8 @@ class BaseValidator:
         self._register_error(error=error)
         return None
 
-    def model_validator(self, *, validated_data: Dict[str, Any]) -> Union[Error, None]:
+    def model_validator(self) -> Union[Error, None]:
         """Output of model validator method should be either a NoneType or an instance of `valcheck.models.Error`"""
-        for field_name, field_value in validated_data.items():
-            ...
         return None
 
     def run_validations(self) -> None:
