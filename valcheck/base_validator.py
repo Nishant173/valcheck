@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 from valcheck.exceptions import MissingFieldException, ValidationException
 from valcheck.fields import BaseField
@@ -64,12 +64,16 @@ class BaseValidator:
     def validated_data(self) -> Dict[str, Any]:
         return self._validated_data
 
-    def get_field_value(self, field: str, /) -> Any:
-        """Returns the validated field value. Raises `valcheck.exceptions.MissingFieldException` if the field is missing"""
-        try:
+    def get_field_value(self, field: str, default: Optional[Any] = set_as_empty(), /) -> Any:
+        """
+        Returns the validated field value (or `default` if provided).
+        Raises `valcheck.exceptions.MissingFieldException` if the field is missing.
+        """
+        if field in self.validated_data:
             return self.validated_data[field]
-        except KeyError:
-            raise MissingFieldException(f"The field '{field}' is missing from the validated data")
+        if not is_empty(default):
+            return default
+        raise MissingFieldException(f"The field '{field}' is missing from the validated data")
 
     def _clear_validated_data(self) -> None:
         """Clears out the dictionary having validated data"""

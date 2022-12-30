@@ -98,8 +98,8 @@ class BooleanField(BaseField):
 
 
 class StringField(BaseField):
-    def __init__(self, *, empty_string_allowed: Optional[bool] = True, **kwargs: Any) -> None:
-        self.empty_string_allowed = empty_string_allowed
+    def __init__(self, *, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
+        self.allow_empty = allow_empty
         super(StringField, self).__init__(**kwargs)
 
     def is_valid(self) -> bool:
@@ -108,7 +108,7 @@ class StringField(BaseField):
         return (
             is_valid_string(
                 value=self.field_value,
-                empty_string_allowed=self.empty_string_allowed,
+                allow_empty=self.allow_empty,
             )
             and super().has_valid_custom_validators()
         )

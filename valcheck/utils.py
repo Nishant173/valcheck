@@ -9,10 +9,10 @@ def is_iterable(obj: Any, /) -> bool:
     return hasattr(obj, "__iter__")
 
 
-def is_valid_string(*, value: Any, empty_string_allowed: bool) -> bool:
+def is_valid_string(*, value: Any, allow_empty: bool) -> bool:
     if not isinstance(value, str):
         return False
-    return True if empty_string_allowed else value != ''
+    return True if allow_empty else value != ''
 
 
 def is_valid_uuid_string(string: str, /) -> bool:
@@ -50,18 +50,18 @@ def is_valid_email_id(email_id: str, /) -> bool:
     return True if match_obj else False
 
 
-class _EmptyField:
-    """Class used to denote an empty field (field whose value is missing)"""
+class _Empty:
+    """Class used to denote an empty/missing value"""
     def __str__(self) -> str:
         return self.__class__.__name__
 
 
-def set_as_empty() -> _EmptyField:
-    return _EmptyField()
+def set_as_empty() -> _Empty:
+    return _Empty()
 
 
 def is_empty(obj: Any, /) -> bool:
-    return isinstance(obj, _EmptyField)
+    return isinstance(obj, _Empty)
 
 
 def is_instance_of_any(obj: Any, types: List[Type]) -> bool:
