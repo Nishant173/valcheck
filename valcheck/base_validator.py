@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Type, Union
 
 from valcheck.exceptions import MissingFieldException, ValidationException
 from valcheck.fields import BaseField
@@ -149,4 +149,42 @@ class BaseValidator:
                 "field_name": field,
             } for field, field_validator_instance in self._field_validators_dict.items()
         ]
+
+
+def validate_list_of_models_field(
+        *,
+        model: Type,
+        field: str,
+        field_value: Any,
+        error: Optional[Error] = None,
+    ) -> None:
+    """Raises `valcheck.exceptions.ValidationException` if data validation fails"""
+    assert issubclass(model, BaseValidator), (
+        "Param `model` must be a sub-class of `valcheck.base_validator.BaseValidator`"
+    )
+    base_error = error if error else Error()
+    errors: List[Dict[str, Any]] = []
+    if not isinstance(field_value, list):
+        base_error.validator_message = f"Invalid ListOfModelsField '{field}' - This field is not a list"
+        errors.append(base_error.as_dict())
+        raise ValidationException(error_info=errors)
+    for idx, item in enumerate(field_value):
+        row_number = idx + 1
+        if not isinstance(item, dict):
+            base_error.validator_message = f"Invalid ListOfModelsField '{field}' - This row is not a dictionary"
+            base_error_dict = base_error.as_dict()
+            base_error_dict['row_number'] = row_number
+            errors.append(base_error_dict)
+            continue
+        try:
+            model(data=item).run_validations()
+        except ValidationException as exc:
+            errors_by_row = exc.error_info
+            for error in errors_by_row:
+                base_error.validator_message = f"Invalid ListOfModelsField '{field}' - {error['validator_message']}"
+                base_error_dict = base_error.as_dict()
+                base_error_dict['row_number'] = row_number
+                errors.append(base_error_dict)
+    if errors:
+        raise ValidationException(error_info=errors)
 
