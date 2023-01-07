@@ -1,3 +1,5 @@
+## Creating a validator class to validate a data-model
+
 from pprint import pprint
 from valcheck import base_validator, exceptions, fields, models
 

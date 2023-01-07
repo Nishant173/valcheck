@@ -1,3 +1,5 @@
+## Validating a list of data-models
+
 from pprint import pprint
 from valcheck import base_validator, exceptions, fields, models
 
@@ -40,4 +42,5 @@ if __name__ == "__main__":
             model=PersonDetailsValidator,
         )
     except exceptions.ValidationException as exc:
+        print("\nError info")
         pprint(exc.error_info)
