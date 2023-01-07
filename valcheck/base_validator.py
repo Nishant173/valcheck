@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Type, Union
+from typing import Any, Dict, List, Type, Union
 
 from valcheck.exceptions import MissingFieldException, ValidationException
 from valcheck.fields import BaseField
@@ -156,13 +156,12 @@ def validate_list_of_models_field(
         model: Type,
         field: str,
         field_value: Any,
-        error: Optional[Error] = None,
     ) -> None:
     """Raises `valcheck.exceptions.ValidationException` if data validation fails"""
     assert issubclass(model, BaseValidator), (
         "Param `model` must be a sub-class of `valcheck.base_validator.BaseValidator`"
     )
-    base_error = error if error else Error()
+    base_error = Error()
     errors: List[Dict[str, Any]] = []
     if not isinstance(field_value, list):
         base_error.validator_message = f"Invalid ListOfModelsField '{field}' - This field is not a list"
@@ -179,12 +178,10 @@ def validate_list_of_models_field(
         try:
             model(data=item).run_validations()
         except ValidationException as exc:
-            errors_by_row = exc.error_info
-            for error in errors_by_row:
-                base_error.validator_message = f"Invalid ListOfModelsField '{field}' - {error['validator_message']}"
-                base_error_dict = base_error.as_dict()
-                base_error_dict['row_number'] = row_number
-                errors.append(base_error_dict)
+            for error_item in exc.error_info:
+                error_item['validator_message'] = f"Invalid ListOfModelsField '{field}' - {error_item['validator_message']}"
+                error_item['row_number'] = row_number
+            errors.extend(exc.error_info)
     if errors:
         raise ValidationException(error_info=errors)
 
