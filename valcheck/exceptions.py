@@ -1,4 +1,13 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
+
+from valcheck.models import Error
+
+
+def _validate_list_of_errors(obj: Any, /) -> None:
+    """Ensures that the given object is a list of errors; each of type `valcheck.models.Error`"""
+    assert isinstance(obj, list), "Must be list of errors"
+    for error in obj:
+        assert isinstance(error, Error), "Must be list of errors; each of type `valcheck.models.Error`"
 
 
 class MissingFieldException(Exception):
@@ -9,20 +18,22 @@ class MissingFieldException(Exception):
 class ValidationException(Exception):
     """Exception to be raised when data validation fails"""
 
-    def __init__(self, *, error_info: Any) -> None:
-        self._error_info = error_info
+    def __init__(self, *, errors: List[Error]) -> None:
+        _validate_list_of_errors(errors)
+        self._errors = errors
 
     @property
-    def error_info(self) -> Any:
-        return self._error_info
+    def errors(self) -> List[Error]:
+        return self._errors
 
-    @error_info.setter
-    def error_info(self, value: Any) -> None:
-        self._error_info = value
+    @errors.setter
+    def errors(self, value: List[Error]) -> None:
+        _validate_list_of_errors(value)
+        self._errors = value
 
     def as_dict(self) -> Dict[str, Any]:
         return {
-            "error_info": self.error_info,
+            "errors": [error.as_dict() for error in self.errors],
         }
 
     def __str__(self) -> str:

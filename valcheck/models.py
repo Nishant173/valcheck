@@ -7,16 +7,19 @@ class Error:
     def __init__(
             self,
             *,
-            details: Optional[Dict[str, Any]] = None,
-            source: Optional[str] = None,
+            description: Optional[str] = None,
             code: Optional[str] = None,
+            source: Optional[str] = None,
+            details: Optional[Dict[str, Any]] = None,
         ) -> None:
-        assert (details is None or isinstance(details, dict)), "Param `details` must be a dictionary"
-        assert (source is None or isinstance(source, str)), "Param `source` must be a string"
+        assert (description is None or isinstance(description, str)), "Param `description` must be a string"
         assert (code is None or isinstance(code, str)), "Param `code` must be a string"
-        self.details = details or {}
-        self.source = source or ""
+        assert (source is None or isinstance(source, str)), "Param `source` must be a string"
+        assert (details is None or isinstance(details, dict)), "Param `details` must be a dictionary"
+        self.description = description or ""
         self.code = code or ""
+        self.source = source or ""
+        self.details = details or {}
         self._validator_message = ""
 
     @property
@@ -30,9 +33,10 @@ class Error:
 
     def as_dict(self) -> Dict[str, Any]:
         return {
-            "details": self.details,
-            "source": self.source,
+            "description": self.description,
             "code": self.code,
+            "source": self.source,
+            "details": self.details,
             "validator_message": self.validator_message,
         }
 
