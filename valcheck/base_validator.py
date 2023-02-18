@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Type, Union
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 from valcheck.exceptions import MissingFieldException, ValidationException
-from valcheck.fields import BaseField, ListOfModelsField
+from valcheck.fields import BaseField, DictionaryOfModelField, ListOfModelsField
 from valcheck.models import Error
 from valcheck.utils import (
     is_empty,
@@ -12,45 +12,80 @@ from valcheck.utils import (
 )
 
 
+def _validate_dictionary_of_model_field(
+        *,
+        validator_model: Type[BaseValidator],
+        field_name: str,
+        field_type: str,
+        field_value: Any,
+    ) -> Tuple[List[Error], Dict[str, Any]]:
+    """
+    Returns tuple having (errors, validated_data).
+    Param `errors` will be a list of errors (each of type `valcheck.models.Error`). Will be an empty list if there are no errors.
+    Param `validated_data` will contain the validated data for this field.
+    """
+    assert validator_model is not BaseValidator and issubclass(validator_model, BaseValidator), (
+        "Param `validator_model` must be a sub-class of `valcheck.base_validator.BaseValidator`"
+    )
+    validated_data = {}
+    if not isinstance(field_value, dict):
+        error = Error()
+        error.validator_message = f"Invalid {field_type} '{field_name}' - Field is not a dictionary"
+        return ([error], validated_data)
+    validator = validator_model(data=field_value)
+    error_objs = validator.run_validations()
+    if not error_objs:
+        validated_data.update(**validator.validated_data)
+    for error_obj in error_objs:
+        error_obj.validator_message = f"Invalid {field_type} '{field_name}' - {error_obj.validator_message}"
+    return (error_objs, validated_data)
+
+
 def _validate_list_of_models_field(
         *,
-        model: Type[BaseValidator],
+        validator_model: Type[BaseValidator],
         field_name: str,
         field_type: str,
         field_value: Any,
         allow_empty: Optional[bool] = True,
-    ) -> List[Error]:
-    """Returns list of errors (each of type `valcheck.models.Error`). Will be an empty list if there are no errors"""
-    assert model is not BaseValidator and issubclass(model, BaseValidator), (
-        "Param `model` must be a sub-class of `valcheck.base_validator.BaseValidator`"
+    ) -> Tuple[List[Error], List[Any]]:
+    """
+    Returns tuple having (errors, validated_data).
+    Param `errors` will be a list of errors (each of type `valcheck.models.Error`). Will be an empty list if there are no errors.
+    Param `validated_data` will contain the validated data for this field.
+    """
+    assert validator_model is not BaseValidator and issubclass(validator_model, BaseValidator), (
+        "Param `validator_model` must be a sub-class of `valcheck.base_validator.BaseValidator`"
     )
-    errors: List[Error] = []
+    validated_data = []
     if not isinstance(field_value, list):
-        base_error = Error()
-        base_error.validator_message = f"Invalid {field_type} '{field_name}' - Field is not a list"
-        errors.append(base_error)
-        raise ValidationException(errors=errors)
+        error = Error()
+        error.validator_message = f"Invalid {field_type} '{field_name}' - Field is not a list"
+        return ([error], validated_data)
     if not allow_empty and not field_value:
-        base_error = Error()
-        base_error.validator_message = f"Invalid {field_type} '{field_name}' - Field is an empty list"
-        errors.append(base_error)
-        raise ValidationException(errors=errors)
+        error = Error()
+        error.validator_message = f"Invalid {field_type} '{field_name}' - Field is an empty list"
+        return ([error], validated_data)
+    errors: List[Error] = []
     for idx, item in enumerate(field_value):
         row_number = idx + 1
         if not isinstance(item, dict):
-            base_error = Error()
-            base_error.validator_message = f"Invalid {field_type} '{field_name}' - Row is not a dictionary"
-            base_error.details.update(row_number=row_number)
-            errors.append(base_error)
+            error = Error()
+            error.validator_message = f"Invalid {field_type} '{field_name}' - Row is not a dictionary"
+            error.details.update(row_number=row_number)
+            errors.append(error)
             continue
-        try:
-            model(data=item).run_validations()
-        except ValidationException as exc:
-            for error_item in exc.errors:
-                error_item.validator_message = f"Invalid {field_type} '{field_name}' - {error_item.validator_message}"
-                error_item.details.update(row_number=row_number)
-            errors.extend(exc.errors)
-    return errors
+        validator = validator_model(data=item)
+        error_objs = validator.run_validations()
+        if not error_objs:
+            validated_data.append(validator.validated_data)
+        for error_obj in error_objs:
+            error_obj.validator_message = f"Invalid {field_type} '{field_name}' - {error_obj.validator_message}"
+            error_obj.details.update(row_number=row_number)
+        errors.extend(error_objs)
+    if errors:
+        validated_data.clear()
+    return (errors, validated_data)
 
 
 class BaseValidator:
@@ -125,8 +160,8 @@ class BaseValidator:
         """Performs validation checks for the given field, and registers errors (if any) and validated data"""
         required = field_validator_instance.required
         error = field_validator_instance.error
-        default_func = field_validator_instance.default_func
-        default_value = default_func() if default_func is not None and not required else set_as_empty()
+        default_factory = field_validator_instance.default_factory
+        default_value = default_factory() if default_factory is not None and not required else set_as_empty()
         field_type = field_validator_instance.__class__.__name__
         field_value = self.data.get(field, default_value)
         MISSING_FIELD_ERROR_MESSAGE = f"Missing {field_type} '{field}'"
@@ -147,17 +182,30 @@ class BaseValidator:
             self._register_error(error=error)
             return
         if isinstance(field_validator_instance, ListOfModelsField):
-            errors = _validate_list_of_models_field(
-                model=field_validator_instance.model,
+            errors, validated_data = _validate_list_of_models_field(
+                validator_model=field_validator_instance.validator_model,
                 field_name=field,
                 field_type=field_type,
                 field_value=field_validator_instance.field_value,
                 allow_empty=field_validator_instance.allow_empty,
             )
+            self._unregister_validated_data(field=field)
             if errors:
-                self._unregister_validated_data(field=field)
                 self._register_errors(errors=errors)
-                return
+            else:
+                self._register_validated_data(field=field, field_value=validated_data)
+        if isinstance(field_validator_instance, DictionaryOfModelField):
+            errors, validated_data = _validate_dictionary_of_model_field(
+                validator_model=field_validator_instance.validator_model,
+                field_name=field,
+                field_type=field_type,
+                field_value=field_validator_instance.field_value,
+            )
+            self._unregister_validated_data(field=field)
+            if errors:
+                self._register_errors(errors=errors)
+            else:
+                self._register_validated_data(field=field, field_value=validated_data)
         return None
 
     def _perform_model_validation_checks(self) -> None:
@@ -177,10 +225,10 @@ class BaseValidator:
         """Output of model validator method should be either a NoneType or an instance of `valcheck.models.Error`"""
         return None
 
-    def run_validations(self) -> None:
+    def run_validations(self, *, raise_exception: Optional[bool] = False) -> List[Error]:
         """
-        Runs validations and registers errors (if any) and validated data.
-        Raises `valcheck.exceptions.ValidationException` if data validation fails.
+        Runs validations and registers errors / validated data. Returns list of errors.
+        If `raise_exception=True` and validations fail, raises `valcheck.exceptions.ValidationException`.
         """
         self._clear_errors()
         self._clear_validated_data()
@@ -192,9 +240,9 @@ class BaseValidator:
         # Perform model validation checks only if there are no errors in field validation checks
         if not self._errors:
             self._perform_model_validation_checks()
-        if self._errors:
+        if raise_exception and self._errors:
             raise ValidationException(errors=self._errors)
-        return None
+        return self._errors
 
     def list_field_validators(self) -> List[Dict[str, Any]]:
         return [
