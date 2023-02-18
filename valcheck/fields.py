@@ -1,4 +1,4 @@
-from typing import Any, Callable, Iterable, List, Optional
+from typing import Any, Callable, Iterable, List, Optional, Type
 
 from valcheck.models import Error
 from valcheck.utils import (
@@ -267,6 +267,20 @@ class ListField(BaseField):
         if super().can_be_set_to_null():
             return True
         return isinstance(self.field_value, list) and super().has_valid_custom_validators()
+
+
+class ListOfModelsField(BaseField):
+    def __init__(self, *, model: Type, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
+        self.model = model
+        self.allow_empty = allow_empty
+        kwargs.pop('validators', None)
+        kwargs.pop('error', None)
+        super(ListOfModelsField, self).__init__(**kwargs)
+
+    def is_valid(self) -> bool:
+        if super().can_be_set_to_null():
+            return True
+        return True
 
 
 class MultiChoiceField(ListField):

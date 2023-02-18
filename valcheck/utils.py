@@ -1,12 +1,20 @@
 from datetime import datetime
 import json
 import re
-from typing import Any, List, Type
+from typing import Any, List, Optional, Type
 from uuid import UUID
 
 
 def is_iterable(obj: Any, /) -> bool:
     return hasattr(obj, "__iter__")
+
+
+def is_list_of_dicts(obj: Any, /, *, allow_empty: Optional[bool] = True) -> bool:
+    if not isinstance(obj, list):
+        return False
+    if not allow_empty and not obj:
+        return False
+    return all((isinstance(item, dict) for item in obj))
 
 
 def is_valid_string(*, value: Any, allow_empty: bool) -> bool:
