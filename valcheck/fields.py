@@ -259,6 +259,19 @@ class DictionaryField(BaseField):
         return isinstance(self.field_value, dict) and super().has_valid_custom_validators()
 
 
+class DictionaryOfModelField(BaseField):
+    def __init__(self, *, model: Type, **kwargs: Any) -> None:
+        self.model = model
+        kwargs.pop('validators', None)
+        kwargs.pop('error', None)
+        super(DictionaryOfModelField, self).__init__(**kwargs)
+
+    def is_valid(self) -> bool:
+        if super().can_be_set_to_null():
+            return True
+        return True
+
+
 class ListField(BaseField):
     def __init__(self, **kwargs: Any) -> None:
         super(ListField, self).__init__(**kwargs)

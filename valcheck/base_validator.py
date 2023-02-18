@@ -3,13 +3,39 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, Union
 
 from valcheck.exceptions import MissingFieldException, ValidationException
-from valcheck.fields import BaseField, ListOfModelsField
+from valcheck.fields import BaseField, DictionaryOfModelField, ListOfModelsField
 from valcheck.models import Error
 from valcheck.utils import (
     is_empty,
     set_as_empty,
     wrap_in_quotes_if_string,
 )
+
+
+def _validate_dictionary_of_model_field(
+        *,
+        model: Type[BaseValidator],
+        field_name: str,
+        field_type: str,
+        field_value: Any,
+    ) -> List[Error]:
+    """Returns list of errors (each of type `valcheck.models.Error`). Will be an empty list if there are no errors"""
+    assert model is not BaseValidator and issubclass(model, BaseValidator), (
+        "Param `model` must be a sub-class of `valcheck.base_validator.BaseValidator`"
+    )
+    errors: List[Error] = []
+    if not isinstance(field_value, dict):
+        base_error = Error()
+        base_error.validator_message = f"Invalid {field_type} '{field_name}' - Field is not a dictionary"
+        errors.append(base_error)
+        raise ValidationException(errors=errors)
+    try:
+        model(data=field_value).run_validations()
+    except ValidationException as exc:
+        for error_item in exc.errors:
+            error_item.validator_message = f"Invalid {field_type} '{field_name}' - {error_item.validator_message}"
+        errors.extend(exc.errors)
+    return errors
 
 
 def _validate_list_of_models_field(
@@ -153,6 +179,17 @@ class BaseValidator:
                 field_type=field_type,
                 field_value=field_validator_instance.field_value,
                 allow_empty=field_validator_instance.allow_empty,
+            )
+            if errors:
+                self._unregister_validated_data(field=field)
+                self._register_errors(errors=errors)
+                return
+        if isinstance(field_validator_instance, DictionaryOfModelField):
+            errors = _validate_dictionary_of_model_field(
+                model=field_validator_instance.model,
+                field_name=field,
+                field_type=field_type,
+                field_value=field_validator_instance.field_value,
             )
             if errors:
                 self._unregister_validated_data(field=field)
