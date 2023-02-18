@@ -14,20 +14,20 @@ from valcheck.utils import (
 
 def _validate_dictionary_of_model_field(
         *,
-        model: Type[BaseValidator],
+        validator_model: Type[BaseValidator],
         field_name: str,
         field_type: str,
         field_value: Any,
     ) -> List[Error]:
     """Returns list of errors (each of type `valcheck.models.Error`). Will be an empty list if there are no errors"""
-    assert model is not BaseValidator and issubclass(model, BaseValidator), (
-        "Param `model` must be a sub-class of `valcheck.base_validator.BaseValidator`"
+    assert validator_model is not BaseValidator and issubclass(validator_model, BaseValidator), (
+        "Param `validator_model` must be a sub-class of `valcheck.base_validator.BaseValidator`"
     )
     if not isinstance(field_value, dict):
         error = Error()
         error.validator_message = f"Invalid {field_type} '{field_name}' - Field is not a dictionary"
         return [error]
-    validator = model(data=field_value)
+    validator = validator_model(data=field_value)
     error_objs = validator.run_validations()
     for error_obj in error_objs:
         error_obj.validator_message = f"Invalid {field_type} '{field_name}' - {error_obj.validator_message}"
@@ -36,15 +36,15 @@ def _validate_dictionary_of_model_field(
 
 def _validate_list_of_models_field(
         *,
-        model: Type[BaseValidator],
+        validator_model: Type[BaseValidator],
         field_name: str,
         field_type: str,
         field_value: Any,
         allow_empty: Optional[bool] = True,
     ) -> List[Error]:
     """Returns list of errors (each of type `valcheck.models.Error`). Will be an empty list if there are no errors"""
-    assert model is not BaseValidator and issubclass(model, BaseValidator), (
-        "Param `model` must be a sub-class of `valcheck.base_validator.BaseValidator`"
+    assert validator_model is not BaseValidator and issubclass(validator_model, BaseValidator), (
+        "Param `validator_model` must be a sub-class of `valcheck.base_validator.BaseValidator`"
     )
     if not isinstance(field_value, list):
         error = Error()
@@ -63,7 +63,7 @@ def _validate_list_of_models_field(
             error.details.update(row_number=row_number)
             errors.append(error)
             continue
-        validator = model(data=item)
+        validator = validator_model(data=item)
         error_objs = validator.run_validations()
         for error_obj in error_objs:
             error_obj.validator_message = f"Invalid {field_type} '{field_name}' - {error_obj.validator_message}"
@@ -167,7 +167,7 @@ class BaseValidator:
             return
         if isinstance(field_validator_instance, ListOfModelsField):
             errors = _validate_list_of_models_field(
-                model=field_validator_instance.model,
+                validator_model=field_validator_instance.validator_model,
                 field_name=field,
                 field_type=field_type,
                 field_value=field_validator_instance.field_value,
@@ -179,7 +179,7 @@ class BaseValidator:
                 return
         if isinstance(field_validator_instance, DictionaryOfModelField):
             errors = _validate_dictionary_of_model_field(
-                model=field_validator_instance.model,
+                validator_model=field_validator_instance.validator_model,
                 field_name=field,
                 field_type=field_type,
                 field_value=field_validator_instance.field_value,

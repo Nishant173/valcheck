@@ -260,8 +260,8 @@ class DictionaryField(BaseField):
 
 
 class DictionaryOfModelField(BaseField):
-    def __init__(self, *, model: Type, **kwargs: Any) -> None:
-        self.model = model
+    def __init__(self, *, validator_model: Type, **kwargs: Any) -> None:
+        self.validator_model = validator_model
         kwargs.pop('validators', None)
         kwargs.pop('error', None)
         super(DictionaryOfModelField, self).__init__(**kwargs)
@@ -283,8 +283,8 @@ class ListField(BaseField):
 
 
 class ListOfModelsField(BaseField):
-    def __init__(self, *, model: Type, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
-        self.model = model
+    def __init__(self, *, validator_model: Type, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
+        self.validator_model = validator_model
         self.allow_empty = allow_empty
         kwargs.pop('validators', None)
         kwargs.pop('error', None)
