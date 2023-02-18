@@ -19,7 +19,7 @@ class BaseField:
             *,
             required: Optional[bool] = True,
             nullable: Optional[bool] = False,
-            default_func: Optional[Callable] = None,
+            default_factory: Optional[Callable] = None,
             validators: Optional[List[Callable]] = None,
             error: Optional[Error] = None,
         ) -> None:
@@ -27,7 +27,7 @@ class BaseField:
         Parameters:
             - required (bool): True if the field is required, else False. Default: True
             - nullable (bool): True if the field is nullable, else False. Default: False
-            - default_func (callable): Callable that returns the default value to set for the field
+            - default_factory (callable): Callable that returns the default value to set for the field
             if `required=False` and the field is missing.
             - validators (list of callables): List of callables that each return a boolean.
             The callable returns True if validation is successful, else False.
@@ -35,8 +35,8 @@ class BaseField:
         """
         assert isinstance(required, bool), "Param `required` must be of type 'bool'"
         assert isinstance(nullable, bool), "Param `nullable` must be of type 'bool'"
-        assert default_func is None or callable(default_func), (
-            "Param `default_func` must be a callable that returns the default value if the field is missing when `required=False`"
+        assert default_factory is None or callable(default_factory), (
+            "Param `default_factory` must be a callable that returns the default value if the field is missing when `required=False`"
         )
         assert validators is None or isinstance(validators, list), "Param `validators` must be of type 'list'"
         if isinstance(validators, list):
@@ -47,7 +47,7 @@ class BaseField:
         self._field_value = set_as_empty()
         self.required = required
         self.nullable = nullable
-        self.default_func = default_func
+        self.default_factory = default_factory
         self.validators = validators or []
         self.error = error or Error()
 

@@ -144,8 +144,8 @@ class BaseValidator:
         """Performs validation checks for the given field, and registers errors (if any) and validated data"""
         required = field_validator_instance.required
         error = field_validator_instance.error
-        default_func = field_validator_instance.default_func
-        default_value = default_func() if default_func is not None and not required else set_as_empty()
+        default_factory = field_validator_instance.default_factory
+        default_value = default_factory() if default_factory is not None and not required else set_as_empty()
         field_type = field_validator_instance.__class__.__name__
         field_value = self.data.get(field, default_value)
         MISSING_FIELD_ERROR_MESSAGE = f"Missing {field_type} '{field}'"
