@@ -2,7 +2,9 @@
 An open-source, lightweight, highly performant library for quick data validation
 
 ## Installation
-- You can install this library with `pip install valcheck` or `pip install valcheck==<version>`
+```
+pip install valcheck
+```
 
 ## Usage
-- Refer to the `examples/` folder, based on the **valcheck** version you use
+- Refer to the `examples/` folder, based on the **valcheck** version you are using
