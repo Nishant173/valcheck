@@ -9,7 +9,6 @@ from valcheck.utils import (
     is_empty,
     is_list_of_instances_of_type,
     set_as_empty,
-    wrap_in_quotes_if_string,
 )
 
 
@@ -193,7 +192,7 @@ class BaseValidator:
         field_type = field_validator_instance.__class__.__name__
         field_value = self.data.get(field, default_value)
         MISSING_FIELD_ERROR_MESSAGE = f"Missing {field_type} '{field}'"
-        INVALID_FIELD_ERROR_MESSAGE = f"Invalid {field_type} '{field}' having value {wrap_in_quotes_if_string(field_value)}"
+        INVALID_FIELD_ERROR_MESSAGE = f"Invalid {field_type} '{field}'"
         self._register_validated_data(field=field, field_value=field_value)
         if is_empty(field_value) and required:
             self._unregister_validated_data(field=field)
