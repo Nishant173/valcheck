@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import namedtuple
 from typing import Any, Dict, List, Optional, Tuple, Type
 
 from valcheck.exceptions import MissingFieldException, ValidationException
@@ -92,6 +93,7 @@ class BaseValidator:
     """
     Properties:
         - validated_data
+        - validated_data_as_named_tuple
 
     Instance methods:
         - get_field_value()
@@ -140,6 +142,12 @@ class BaseValidator:
     @property
     def validated_data(self) -> Dict[str, Any]:
         return self._validated_data
+
+    @property
+    def validated_data_as_named_tuple(self) -> Any:
+        """Returns named-tuple of type `ValidatedData`"""
+        named_tuple_type = namedtuple(typename='ValidatedData', field_names=list(self.validated_data.keys()))
+        return named_tuple_type(**self.validated_data)
 
     def get_field_value(self, field: str, /) -> Any:
         """Returns the validated field value. Raises `valcheck.exceptions.MissingFieldException` if the field is missing"""
@@ -249,6 +257,8 @@ class BaseValidator:
         # Perform model validation checks only if there are no errors in field validation checks
         if not self._errors:
             self._perform_model_validation_checks()
+        if self._errors:
+            self._clear_validated_data()
         if raise_exception and self._errors:
             raise ValidationException(errors=self._errors)
         return self._errors
