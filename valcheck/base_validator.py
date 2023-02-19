@@ -152,6 +152,33 @@ class BaseValidator:
         """Clears out the dictionary having validated data"""
         self._validated_data.clear()
 
+    def _handle_list_of_models_field(self, *, field_name: str, field_type: str, field_validator_instance: ListOfModelsField) -> None:
+        errors, validated_data = _validate_list_of_models_field(
+            validator_model=field_validator_instance.validator_model,
+            field_name=field_name,
+            field_type=field_type,
+            field_value=field_validator_instance.field_value,
+            allow_empty=field_validator_instance.allow_empty,
+        )
+        self._unregister_validated_data(field=field_name)
+        if errors:
+            self._register_errors(errors=errors)
+        else:
+            self._register_validated_data(field=field_name, field_value=validated_data)
+
+    def _handle_dictionary_of_model_field(self, *, field_name: str, field_type: str, field_validator_instance: DictionaryOfModelField) -> None:
+        errors, validated_data = _validate_dictionary_of_model_field(
+            validator_model=field_validator_instance.validator_model,
+            field_name=field_name,
+            field_type=field_type,
+            field_value=field_validator_instance.field_value,
+        )
+        self._unregister_validated_data(field=field_name)
+        if errors:
+            self._register_errors(errors=errors)
+        else:
+            self._register_validated_data(field=field_name, field_value=validated_data)
+
     def _perform_field_validation_checks(
             self,
             *,
@@ -183,30 +210,9 @@ class BaseValidator:
             self._register_error(error=error)
             return
         if isinstance(field_validator_instance, ListOfModelsField):
-            errors, validated_data = _validate_list_of_models_field(
-                validator_model=field_validator_instance.validator_model,
-                field_name=field,
-                field_type=field_type,
-                field_value=field_validator_instance.field_value,
-                allow_empty=field_validator_instance.allow_empty,
-            )
-            self._unregister_validated_data(field=field)
-            if errors:
-                self._register_errors(errors=errors)
-            else:
-                self._register_validated_data(field=field, field_value=validated_data)
+            self._handle_list_of_models_field(field_name=field, field_type=field_type, field_validator_instance=field_validator_instance)
         if isinstance(field_validator_instance, DictionaryOfModelField):
-            errors, validated_data = _validate_dictionary_of_model_field(
-                validator_model=field_validator_instance.validator_model,
-                field_name=field,
-                field_type=field_type,
-                field_value=field_validator_instance.field_value,
-            )
-            self._unregister_validated_data(field=field)
-            if errors:
-                self._register_errors(errors=errors)
-            else:
-                self._register_validated_data(field=field, field_value=validated_data)
+            self._handle_dictionary_of_model_field(field_name=field, field_type=field_type, field_validator_instance=field_validator_instance)
         return None
 
     def _perform_model_validation_checks(self) -> None:
