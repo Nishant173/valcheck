@@ -2,6 +2,7 @@ from typing import Any, Callable, Iterable, List, Optional, Type
 
 from valcheck.models import Error
 from valcheck.utils import (
+    dict_has_any_keys,
     is_instance_of_any,
     is_iterable,
     is_valid_datetime_string,
@@ -261,9 +262,10 @@ class DictionaryField(BaseField):
 
 class DictionaryOfModelField(BaseField):
     def __init__(self, *, validator_model: Type, **kwargs: Any) -> None:
+        kwargs_to_disallow = ['validators', 'error']
+        if dict_has_any_keys(kwargs, keys=kwargs_to_disallow):
+            raise ValueError(f"This field does not accept the following params: {kwargs_to_disallow}")
         self.validator_model = validator_model
-        kwargs.pop('validators', None)
-        kwargs.pop('error', None)
         super(DictionaryOfModelField, self).__init__(**kwargs)
 
     def is_valid(self) -> bool:
@@ -284,10 +286,11 @@ class ListField(BaseField):
 
 class ListOfModelsField(BaseField):
     def __init__(self, *, validator_model: Type, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
+        kwargs_to_disallow = ['validators', 'error']
+        if dict_has_any_keys(kwargs, keys=kwargs_to_disallow):
+            raise ValueError(f"This field does not accept the following params: {kwargs_to_disallow}")
         self.validator_model = validator_model
         self.allow_empty = allow_empty
-        kwargs.pop('validators', None)
-        kwargs.pop('error', None)
         super(ListOfModelsField, self).__init__(**kwargs)
 
     def is_valid(self) -> bool:

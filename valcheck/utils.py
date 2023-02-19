@@ -1,8 +1,16 @@
 from datetime import datetime
 import json
 import re
-from typing import Any, List, Optional, Type
+from typing import Any, Dict, List, Optional, Type
 from uuid import UUID
+
+
+def dict_has_any_keys(d: Dict, /, *, keys: List) -> bool:
+    return any((key in keys for key in d))
+
+
+def dict_has_all_keys(d: Dict, /, *, keys: List) -> bool:
+    return all((key in keys for key in d))
 
 
 def is_iterable(obj: Any, /) -> bool:
