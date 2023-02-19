@@ -1,13 +1,13 @@
 from typing import Any, Dict, List
 
 from valcheck.models import Error
+from valcheck.utils import is_list_of_instances_of_type
 
 
 def _validate_list_of_errors(obj: Any, /) -> None:
-    """Ensures that the given object is a list of errors; each of type `valcheck.models.Error`"""
-    assert isinstance(obj, list), "Must be list of errors"
-    for error in obj:
-        assert isinstance(error, Error), "Must be list of errors; each of type `valcheck.models.Error`"
+    """Ensures that the given object is a list of errors (each of type `valcheck.models.Error`)"""
+    if not is_list_of_instances_of_type(obj, type_=Error, allow_empty=True):
+        raise ValueError("Must be list of errors (each of type `valcheck.models.Error`)")
 
 
 class MissingFieldException(Exception):

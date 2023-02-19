@@ -17,12 +17,13 @@ def is_iterable(obj: Any, /) -> bool:
     return hasattr(obj, "__iter__")
 
 
-def is_list_of_dicts(obj: Any, /, *, allow_empty: Optional[bool] = True) -> bool:
+def is_list_of_instances_of_type(obj: Any, /, *, type_: Type, allow_empty: Optional[bool] = True) -> bool:
+    """Returns True if `obj` is a list of instances of type `type_`"""
     if not isinstance(obj, list):
         return False
     if not allow_empty and not obj:
         return False
-    return all((isinstance(item, dict) for item in obj))
+    return all((isinstance(item, type_) for item in obj))
 
 
 def is_valid_string(*, value: Any, allow_empty: bool) -> bool:

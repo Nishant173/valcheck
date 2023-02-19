@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Tuple, Type
 
 from valcheck.exceptions import MissingFieldException, ValidationException
 from valcheck.fields import BaseField, DictionaryOfModelField, ListOfModelsField
 from valcheck.models import Error
 from valcheck.utils import (
     is_empty,
+    is_list_of_instances_of_type,
     set_as_empty,
     wrap_in_quotes_if_string,
 )
@@ -210,20 +211,23 @@ class BaseValidator:
 
     def _perform_model_validation_checks(self) -> None:
         """Performs model validation checks, and registers errors (if any)"""
-        error = self.model_validator()
-        assert error is None or isinstance(error, Error), (
-            "Output of model validator method should be either a NoneType or an instance of `valcheck.models.Error`"
+        errors = self.model_validator()
+        assert is_list_of_instances_of_type(errors, type_=Error, allow_empty=True), (
+            "The output of the model validator method must be a list of errors (each of type `valcheck.models.Error`)."
+            " Must be an empty list if there are no errors."
         )
-        if error is None:
-            return None
         INVALID_MODEL_ERROR_MESSAGE = "Invalid model - Validation failed"
-        self._assign_validator_message_to_error(error=error, validator_message=INVALID_MODEL_ERROR_MESSAGE)
-        self._register_error(error=error)
+        for error in errors:
+            self._assign_validator_message_to_error(error=error, validator_message=INVALID_MODEL_ERROR_MESSAGE)
+        self._register_errors(errors=errors)
         return None
 
-    def model_validator(self) -> Union[Error, None]:
-        """Output of model validator method should be either a NoneType or an instance of `valcheck.models.Error`"""
-        return None
+    def model_validator(self) -> List[Error]:
+        """
+        The output of the model validator method must be a list of errors (each of type `valcheck.models.Error`).
+        Must be an empty list if there are no errors.
+        """
+        return []
 
     def run_validations(self, *, raise_exception: Optional[bool] = False) -> List[Error]:
         """
