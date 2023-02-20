@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections import namedtuple
 from typing import Any, Dict, List, Optional, Tuple, Type
 
 from valcheck.exceptions import MissingFieldException, ValidationException
