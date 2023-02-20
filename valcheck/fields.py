@@ -8,7 +8,7 @@ from valcheck.utils import (
     is_valid_datetime_string,
     is_valid_email_id,
     is_valid_json_string,
-    is_valid_string,
+    is_valid_object_of_type,
     is_valid_uuid_string,
     set_as_empty,
 )
@@ -107,10 +107,7 @@ class StringField(BaseField):
         if super().can_be_set_to_null():
             return True
         return (
-            is_valid_string(
-                value=self.field_value,
-                allow_empty=self.allow_empty,
-            )
+            is_valid_object_of_type(self.field_value, type_=str, allow_empty=self.allow_empty)
             and super().has_valid_custom_validators()
         )
 
@@ -251,13 +248,17 @@ class NumberField(BaseField):
 
 
 class DictionaryField(BaseField):
-    def __init__(self, **kwargs: Any) -> None:
+    def __init__(self, *, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
+        self.allow_empty = allow_empty
         super(DictionaryField, self).__init__(**kwargs)
 
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return isinstance(self.field_value, dict) and super().has_valid_custom_validators()
+        return (
+            is_valid_object_of_type(self.field_value, type_=dict, allow_empty=self.allow_empty)
+            and super().has_valid_custom_validators()
+        )
 
 
 class DictionaryOfModelField(BaseField):
@@ -275,13 +276,17 @@ class DictionaryOfModelField(BaseField):
 
 
 class ListField(BaseField):
-    def __init__(self, **kwargs: Any) -> None:
+    def __init__(self, *, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
+        self.allow_empty = allow_empty
         super(ListField, self).__init__(**kwargs)
 
     def is_valid(self) -> bool:
         if super().can_be_set_to_null():
             return True
-        return isinstance(self.field_value, list) and super().has_valid_custom_validators()
+        return (
+            is_valid_object_of_type(self.field_value, type_=list, allow_empty=self.allow_empty)
+            and super().has_valid_custom_validators()
+        )
 
 
 class ListOfModelsField(BaseField):

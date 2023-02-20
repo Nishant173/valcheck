@@ -26,10 +26,10 @@ def is_list_of_instances_of_type(obj: Any, /, *, type_: Type, allow_empty: Optio
     return all((isinstance(item, type_) for item in obj))
 
 
-def is_valid_string(*, value: Any, allow_empty: bool) -> bool:
-    if not isinstance(value, str):
+def is_valid_object_of_type(obj: Any, /, *, type_: Type, allow_empty: Optional[bool] = True) -> bool:
+    if not isinstance(obj, type_):
         return False
-    return True if allow_empty else value != ''
+    return True if allow_empty else bool(obj)
 
 
 def is_valid_uuid_string(string: str, /) -> bool:
