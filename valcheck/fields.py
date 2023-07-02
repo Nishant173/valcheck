@@ -152,7 +152,7 @@ class Field:
         return self.converter_factory(self.field_value) if self.converter_factory else set_as_empty()
 
     def validate(self) -> List[Error]:
-        """Returns list of errors of type `valcheck.models.Error`"""
+        """Returns list of errors (each of type `valcheck.models.Error`)"""
         raise NotImplementedError()
 
     def run_validations(self) -> FieldInfo:

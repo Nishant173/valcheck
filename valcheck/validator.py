@@ -107,6 +107,7 @@ class Validator:
 
     def model_validator(self) -> List[Error]:
         """
+        Used to validate the entire model, after all individual fields are validated.
         The output of the model validator method must be a list of errors (each of type `valcheck.models.Error`).
         Must be an empty list if there are no errors.
         """

@@ -9,7 +9,7 @@ ITEM_UNITS = ("lbs", "kgs", "grams", "count")
 
 
 ### NOTE
-### You can define the `model_validator()` method, which is inherited from `base_validator.BaseValidator`.
+### You can define the `model_validator()` method, which is inherited from `valcheck.validator.Validator`.
 ### It is used to validate the entire model, after all individual fields are validated.
 
 
