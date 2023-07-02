@@ -67,18 +67,18 @@ def is_valid_email_id(email_id: str, /) -> bool:
     return True if match_obj else False
 
 
-class _Empty:
+class Empty:
     """Class used to denote an empty/missing value"""
     def __str__(self) -> str:
         return self.__class__.__name__
 
 
-def set_as_empty() -> _Empty:
-    return _Empty()
+def set_as_empty() -> Empty:
+    return Empty()
 
 
 def is_empty(obj: Any, /) -> bool:
-    return isinstance(obj, _Empty)
+    return isinstance(obj, Empty)
 
 
 def is_instance_of_any(obj: Any, types: List[Type]) -> bool:
