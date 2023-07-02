@@ -22,7 +22,7 @@ class Validator:
     def __init__(self, *, data: Dict[str, Any]) -> None:
         assert isinstance(data, dict), "Param `data` must be a dictionary"
         self.data = data
-        self._field_validators_dict: Dict[str, Field] = self._get_field_validators_dict()
+        self._field_info: Dict[str, Field] = self._get_field_info()
         self._errors: List[Error] = []
         self._validated_data: Dict[str, Any] = {}
         self._converted_data: Dict[str, Any] = {}
@@ -32,17 +32,17 @@ class Validator:
             {
                 "field_type": field.__class__.__name__,
                 "field_name": field_name,
-            } for field_name, field in self._field_validators_dict.items()
+            } for field_name, field in self._field_info.items()
         ]
 
-    def _get_field_validators_dict(self) -> Dict[str, Field]:
-        """Returns dictionary having keys = field names, and values = field validator instances"""
+    def _get_field_info(self) -> Dict[str, Field]:
+        """Returns dictionary having keys = field names, and values = field instances"""
         return {
-            field_name : field_validator_instance for field_name, field_validator_instance in vars(self.__class__).items() if (
+            field_name : field for field_name, field in vars(self.__class__).items() if (
                 not field_name.startswith("__")
                 and isinstance(field_name, str)
-                and field_validator_instance.__class__ is not Field
-                and issubclass(field_validator_instance.__class__, Field)
+                and field.__class__ is not Field
+                and issubclass(field.__class__, Field)
             )
         }
 
@@ -120,7 +120,7 @@ class Validator:
         """
         self._clear_errors()
         self._clear_validated_data()
-        for field_name, field in self._field_validators_dict.items():
+        for field_name, field in self._field_info.items():
             field.field_name = field_name
             field.field_value = self.data.get(field_name, set_as_empty())
             self._perform_field_validation_checks(field=field)
