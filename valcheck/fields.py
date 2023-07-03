@@ -410,17 +410,22 @@ class ListOfModelsField(Field):
         errors: List[Error] = []
         for idx, item in enumerate(self.field_value):
             row_number = idx + 1
+            row_number_string = f"<Row number: {row_number}>"
             if not isinstance(item, dict):
                 error = Error()
-                error.validator_message = _invalid_field_error(self, suffix=" - Row is not a dictionary")
-                error.details.update(row_number=row_number)
+                error.validator_message = _invalid_field_error(
+                    self,
+                    suffix=f" - Row is not a dictionary {row_number_string}",
+                )
                 errors.append(error)
                 continue
             validator = self.validator_model(data=item)
             error_objs = validator.run_validations()
             for error_obj in error_objs:
-                error_obj.validator_message = _invalid_field_error(self, suffix=f" - {error_obj.validator_message}")
-                error_obj.details.update(row_number=row_number)
+                error_obj.validator_message = _invalid_field_error(
+                    self,
+                    suffix=f" - {error_obj.validator_message} {row_number_string}",
+                )
             errors.extend(error_objs)
         return errors
 
