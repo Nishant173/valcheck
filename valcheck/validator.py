@@ -88,10 +88,11 @@ class Validator:
             self._register_errors(errors=field_info.errors)
             return
         self._register_validated_data(field_name=field_info.field_name, field_value=field_info.field_value)
-        self._register_converted_data(
-            field_name=field_info.field_name,
-            value=field_info.field_value if is_empty(field_info.converted_value) else field_info.converted_value,
-        )
+        if not is_empty(field_info.converted_value):
+            self._register_converted_data(
+                field_name=field_info.field_name,
+                value=field_info.converted_value,
+            )
 
     def _perform_model_validation_checks(self) -> None:
         """Performs model validation checks, and registers errors (if any)"""
