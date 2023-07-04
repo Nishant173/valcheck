@@ -181,6 +181,7 @@ class Field:
             return field_info
         if is_empty(self.field_value) and self.required:
             self.error.validator_message = _missing_field_error(self)
+            self.error.append_to_path(self.field_name)
             field_info.errors += [self.error]
             return field_info
         errors = self.validate()
@@ -189,6 +190,7 @@ class Field:
             return field_info
         if not self._has_valid_custom_validators():
             self.error.validator_message = _invalid_field_error(self)
+            self.error.append_to_path(self.field_name)
             field_info.errors += [self.error]
             return field_info
         field_info.converted_value = self._get_converted_value()
@@ -212,6 +214,7 @@ class BooleanField(Field):
         if isinstance(self.field_value, bool):
             return []
         self.error.validator_message = _invalid_field_error(self)
+        self.error.append_to_path(self.field_name)
         return [self.error]
 
 
@@ -225,6 +228,7 @@ class StringField(Field):
         if is_valid_object_of_type(self.field_value, type_=str, allow_empty=self.allow_empty):
             return []
         self.error.validator_message = _invalid_field_error(self)
+        self.error.append_to_path(self.field_name)
         return [self.error]
 
 
@@ -236,6 +240,7 @@ class JsonStringField(Field):
         if isinstance(self.field_value, str) and is_valid_json_string(self.field_value):
             return []
         self.error.validator_message = _invalid_field_error(self)
+        self.error.append_to_path(self.field_name)
         return [self.error]
 
 
@@ -247,6 +252,7 @@ class EmailIdField(Field):
         if isinstance(self.field_value, str) and is_valid_email_id(self.field_value):
             return []
         self.error.validator_message = _invalid_field_error(self)
+        self.error.append_to_path(self.field_name)
         return [self.error]
 
 
@@ -258,6 +264,7 @@ class UuidStringField(Field):
         if isinstance(self.field_value, str) and is_valid_uuid_string(self.field_value):
             return []
         self.error.validator_message = _invalid_field_error(self)
+        self.error.append_to_path(self.field_name)
         return [self.error]
 
 
@@ -270,6 +277,7 @@ class DateStringField(Field):
         if isinstance(self.field_value, str) and is_valid_datetime_string(self.field_value, self.format_):
             return []
         self.error.validator_message = _invalid_field_error(self)
+        self.error.append_to_path(self.field_name)
         return [self.error]
 
 
@@ -282,6 +290,7 @@ class DatetimeStringField(Field):
         if isinstance(self.field_value, str) and is_valid_datetime_string(self.field_value, self.format_):
             return []
         self.error.validator_message = _invalid_field_error(self)
+        self.error.append_to_path(self.field_name)
         return [self.error]
 
 
@@ -295,6 +304,7 @@ class ChoiceField(Field):
         if self.field_value in self.choices:
             return []
         self.error.validator_message = _invalid_field_error(self)
+        self.error.append_to_path(self.field_name)
         return [self.error]
 
 
@@ -311,6 +321,7 @@ class MultiChoiceField(Field):
         ):
             return []
         self.error.validator_message = _invalid_field_error(self)
+        self.error.append_to_path(self.field_name)
         return [self.error]
 
 
@@ -322,6 +333,7 @@ class BytesField(Field):
         if isinstance(self.field_value, bytes):
             return []
         self.error.validator_message = _invalid_field_error(self)
+        self.error.append_to_path(self.field_name)
         return [self.error]
 
 
@@ -333,6 +345,7 @@ class NumberField(Field):
         if is_instance_of_any(obj=self.field_value, types=[int, float]):
             return []
         self.error.validator_message = _invalid_field_error(self)
+        self.error.append_to_path(self.field_name)
         return [self.error]
 
 
@@ -344,6 +357,7 @@ class IntegerField(Field):
         if isinstance(self.field_value, int):
             return []
         self.error.validator_message = _invalid_field_error(self)
+        self.error.append_to_path(self.field_name)
         return [self.error]
 
 
@@ -355,6 +369,7 @@ class FloatField(Field):
         if isinstance(self.field_value, float):
             return []
         self.error.validator_message = _invalid_field_error(self)
+        self.error.append_to_path(self.field_name)
         return [self.error]
 
 
@@ -371,15 +386,16 @@ class DictionaryOfModelField(Field):
         super(DictionaryOfModelField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        field_type_name = self.__class__.__name__
         if not isinstance(self.field_value, dict):
             error = Error()
             error.validator_message = _invalid_field_error(self, suffix=" - Field is not a dictionary")
+            error.append_to_path(self.field_name)
             return [error]
         validator = self.validator_model(data=self.field_value)
         error_objs = validator.run_validations()
         for error_obj in error_objs:
             error_obj.validator_message = _invalid_field_error(self, suffix=f" - {error_obj.validator_message}")
+            error_obj.append_to_path(self.field_name)
         return error_objs
 
 
@@ -397,14 +413,15 @@ class ListOfModelsField(Field):
         super(ListOfModelsField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        field_type_name = self.__class__.__name__
         if not isinstance(self.field_value, list):
             error = Error()
             error.validator_message = _invalid_field_error(self, suffix=" - Field is not a list")
+            error.append_to_path(self.field_name)
             return [error]
         if not self.allow_empty and not self.field_value:
             error = Error()
             error.validator_message = _invalid_field_error(self, suffix=" - Field is an empty list")
+            error.append_to_path(self.field_name)
             return [error]
         errors: List[Error] = []
         for idx, item in enumerate(self.field_value):
@@ -416,6 +433,7 @@ class ListOfModelsField(Field):
                     self,
                     suffix=f" - Row is not a dictionary {row_number_string}",
                 )
+                error.append_to_path(self.field_name)
                 errors.append(error)
                 continue
             validator = self.validator_model(data=item)
@@ -425,6 +443,7 @@ class ListOfModelsField(Field):
                     self,
                     suffix=f" - {error_obj.validator_message} {row_number_string}",
                 )
+                error_obj.append_to_path(self.field_name)
             errors.extend(error_objs)
         return errors
 

@@ -29,6 +29,24 @@ class Error:
         assert isinstance(value, str), "The param `validator_message` must be a string"
         self._validator_message = value
 
+    def append_to_path(
+            self,
+            s: str,
+            /,
+            *,
+            at_beginning: Optional[bool] = True,
+            separator: Optional[str] = ".",
+        ) -> None:
+        """Updates path in-place"""
+        if not self.path:
+            self.path += s
+            return
+        self.path = (
+            s + separator + self.path
+            if at_beginning else
+            self.path + separator + s
+        )
+
     @property
     def path(self) -> str:
         return self._path
