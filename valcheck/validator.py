@@ -91,7 +91,7 @@ class Validator:
         raise MissingFieldException(f"The field '{field}' is missing from the converted data")
 
     def _perform_field_validation_checks(self, *, field: Field) -> None:
-        """Performs validation checks for the given field, and registers errors (if any) and validated data"""
+        """Performs validation checks for the given field, and registers errors (if any) and validated-data/converted-data"""
         field_info = field.run_validations()
         if field_info.errors:
             self._register_errors(errors=field_info.errors)
@@ -126,11 +126,12 @@ class Validator:
 
     def run_validations(self, *, raise_exception: Optional[bool] = False) -> List[Error]:
         """
-        Runs validations and registers errors / validated data. Returns list of errors.
+        Runs validations and registers errors/validated-data/converted-data. Returns list of errors.
         If `raise_exception=True` and validations fail, raises `valcheck.exceptions.ValidationException`.
         """
         self._clear_errors()
         self._clear_validated_data()
+        self._clear_converted_data()
         for field_name, field in self._field_info.items():
             field.field_name = field_name
             field.field_value = self.data.get(field_name, set_as_empty())
