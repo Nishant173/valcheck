@@ -98,7 +98,7 @@ class Field:
             - nullable (bool): True if the field is nullable, else False. Default: False
             - default_factory (callable): Callable that returns the default value to set for the field
             if `required=False` and the field is missing.
-            - validators (list of callables): List of callables that each return a boolean.
+            - validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
             The callable returns True if validation is successful, else False.
             - error (Error instance): Instance of type `valcheck.models.Error`.
             - converter_factory (callable): Callable that takes in the validated value (of the field), and returns
@@ -179,7 +179,6 @@ class Field:
         if self._can_be_set_to_null():
             field_info.converted_value = self._get_converted_value()
             return field_info
-        field_type_name = self.__class__.__name__
         if is_empty(self.field_value) and self.required:
             self.error.validator_message = _missing_field_error(self)
             field_info.errors += [self.error]

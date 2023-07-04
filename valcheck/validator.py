@@ -81,14 +81,24 @@ class Validator:
             return self.validated_data[field]
         raise MissingFieldException(f"The field '{field}' is missing from the validated data")
 
+    def get_converted_value(self, field: str, /) -> Any:
+        """
+        Returns the converted value of the field.
+        Raises `valcheck.exceptions.MissingFieldException` if the field's converted value is missing.
+        """
+        if field in self.converted_data:
+            return self.converted_data[field]
+        raise MissingFieldException(f"The field '{field}' is missing from the converted data")
+
     def _perform_field_validation_checks(self, *, field: Field) -> None:
         """Performs validation checks for the given field, and registers errors (if any) and validated data"""
         field_info = field.run_validations()
         if field_info.errors:
             self._register_errors(errors=field_info.errors)
             return
-        self._register_validated_data(field_name=field_info.field_name, field_value=field_info.field_value)
-        if not is_empty(field_info.converted_value):
+        if not is_empty(field_info.field_value):
+            self._register_validated_data(field_name=field_info.field_name, field_value=field_info.field_value)
+        if not is_empty(field_info.field_value) and not is_empty(field_info.converted_value):
             self._register_converted_data(
                 field_name=field_info.field_name,
                 value=field_info.converted_value,
