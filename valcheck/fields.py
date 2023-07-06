@@ -395,7 +395,7 @@ class ModelDictionaryField(Field):
             error_obj.validator_message = _invalid_field_error(self, suffix=f" - {error_obj.validator_message}")
             error_obj.append_to_path(self.field_name)
         if not error_objs:
-            self.field_value = validator.validated_data.copy()
+            self.field_value = validator.validated_data
         return error_objs
 
 
