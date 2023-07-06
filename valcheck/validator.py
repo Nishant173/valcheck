@@ -1,15 +1,14 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from valcheck.exceptions import MissingFieldException, ValidationException
 from valcheck.fields import Field
 from valcheck.models import Error
-from valcheck.utils import is_empty, is_list_of_instances_of_type, set_as_empty
+from valcheck.utils import Empty, is_empty, is_list_of_instances_of_type, set_as_empty
 
 
 class Validator:
     """
     Properties:
-        - converted_data
         - validated_data
 
     Instance methods:
@@ -25,7 +24,6 @@ class Validator:
         self._field_info: Dict[str, Field] = self._get_field_info()
         self._errors: List[Error] = []
         self._validated_data: Dict[str, Any] = {}
-        self._converted_data: Dict[str, Any] = {}
 
     def list_field_validators(self) -> List[Dict[str, Any]]:
         return [
@@ -64,45 +62,25 @@ class Validator:
         """Clears out the dictionary having validated data"""
         self._validated_data.clear()
 
-    def _register_converted_data(self, *, field_name: str, value: Any) -> None:
-        self._converted_data[field_name] = value
-
-    def _clear_converted_data(self) -> None:
-        """Clears out the dictionary having converted data"""
-        self._converted_data.clear()
-
-    @property
-    def converted_data(self) -> Dict[str, Any]:
-        return self._converted_data
-
-    def get_field_value(self, field: str, /) -> Any:
-        """Returns the validated field value. Raises `valcheck.exceptions.MissingFieldException` if the field is missing"""
+    def get_field_value(self, field: str, default: Union[Any, Empty] = set_as_empty(), /) -> Any:
+        """
+        Returns the validated field value. Raises `valcheck.exceptions.MissingFieldException` if the field
+        is missing, and no default is provided.
+        """
         if field in self.validated_data:
             return self.validated_data[field]
+        if not is_empty(default):
+            return default
         raise MissingFieldException(f"The field '{field}' is missing from the validated data")
 
-    def get_converted_value(self, field: str, /) -> Any:
-        """
-        Returns the converted value of the field.
-        Raises `valcheck.exceptions.MissingFieldException` if the field's converted value is missing.
-        """
-        if field in self.converted_data:
-            return self.converted_data[field]
-        raise MissingFieldException(f"The field '{field}' is missing from the converted data")
-
     def _perform_field_validation_checks(self, *, field: Field) -> None:
-        """Performs validation checks for the given field, and registers errors (if any) and validated-data/converted-data"""
-        field_info = field.run_validations()
-        if field_info.errors:
-            self._register_errors(errors=field_info.errors)
+        """Performs validation checks for the given field, and registers errors (if any) and validated-data"""
+        validated_field = field.run_validations()
+        if validated_field.errors:
+            self._register_errors(errors=validated_field.errors)
             return
-        if not is_empty(field_info.field_value):
-            self._register_validated_data(field_name=field_info.field_name, field_value=field_info.field_value)
-        if not is_empty(field_info.field_value) and not is_empty(field_info.converted_value):
-            self._register_converted_data(
-                field_name=field_info.field_name,
-                value=field_info.converted_value,
-            )
+        if not is_empty(validated_field.field_value):
+            self._register_validated_data(field_name=validated_field.field_name, field_value=validated_field.field_value)
 
     def _perform_model_validation_checks(self) -> None:
         """Performs model validation checks, and registers errors (if any)"""
@@ -126,12 +104,11 @@ class Validator:
 
     def run_validations(self, *, raise_exception: Optional[bool] = False) -> List[Error]:
         """
-        Runs validations and registers errors/validated-data/converted-data. Returns list of errors.
+        Runs validations and registers errors/validated-data. Returns list of errors.
         If `raise_exception=True` and validations fail, raises `valcheck.exceptions.ValidationException`.
         """
         self._clear_errors()
         self._clear_validated_data()
-        self._clear_converted_data()
         for field_name, field in self._field_info.items():
             field.field_name = field_name
             field.field_value = self.data.get(field_name, set_as_empty())
@@ -141,7 +118,6 @@ class Validator:
             self._perform_model_validation_checks()
         if self._errors:
             self._clear_validated_data()
-            self._clear_converted_data()
         if raise_exception and self._errors:
             raise ValidationException(errors=self._errors)
         return self._errors
