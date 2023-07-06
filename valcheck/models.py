@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+from copy import deepcopy
 from typing import Any, Dict, Optional
 
 
@@ -19,6 +22,10 @@ class Error:
         self.details = details or {}
         self._validator_message = ""
         self._path = ""
+
+    def copy(self) -> Error:
+        """Returns deep-copy of current `Error` object"""
+        return deepcopy(self)
 
     @property
     def validator_message(self) -> str:
