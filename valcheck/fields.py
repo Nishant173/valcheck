@@ -380,7 +380,11 @@ class ModelDictionaryField(Field):
         )
         kwargs_to_disallow = ['validators', 'error']
         if dict_has_any_keys(kwargs, keys=kwargs_to_disallow):
-            raise ValueError(f"This field does not accept the following params: {kwargs_to_disallow}")
+            msg = (
+                f"This field does not accept the following params: {kwargs_to_disallow}, since"
+                " the `validator_model` handles these parameters"
+            )
+            raise ValueError(msg)
         self.validator_model = validator_model
         super(ModelDictionaryField, self).__init__(**kwargs)
 
@@ -408,7 +412,11 @@ class ModelListField(Field):
         )
         kwargs_to_disallow = ['validators', 'error']
         if dict_has_any_keys(kwargs, keys=kwargs_to_disallow):
-            raise ValueError(f"This field does not accept the following params: {kwargs_to_disallow}")
+            msg = (
+                f"This field does not accept the following params: {kwargs_to_disallow}, since"
+                " the `validator_model` handles these parameters"
+            )
+            raise ValueError(msg)
         self.validator_model = validator_model
         self.allow_empty = allow_empty
         super(ModelListField, self).__init__(**kwargs)
