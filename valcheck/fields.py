@@ -35,10 +35,12 @@ def _missing_field_error(field: Field, /, *, prefix: Optional[str] = None, suffi
     )
 
 
-def _assign_error_in_invalid_field(field: Field, /) -> None:
-    """Updates the given field's error object (in-place) for invalid field errors"""
-    field.error.validator_message = _invalid_field_error(field)
-    field.error.append_to_field_path(field.field_name)
+def _assign_invalid_field_error(field: Field, /) -> Error:
+    """Assigns invalid field error (for the given `field`) and returns a new `valcheck.models.Error` object"""
+    error_obj = field.error.copy()
+    error_obj.validator_message = _invalid_field_error(field)
+    error_obj.append_to_field_path(field.field_name)
+    return error_obj
 
 
 class ValidatedField:
@@ -218,8 +220,7 @@ class BooleanField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, bool):
             return []
-        _assign_error_in_invalid_field(self)
-        return [self.error]
+        return [_assign_invalid_field_error(self)]
 
 
 class StringField(Field):
@@ -231,8 +232,7 @@ class StringField(Field):
     def validate(self) -> List[Error]:
         if is_valid_object_of_type(self.field_value, type_=str, allow_empty=self.allow_empty):
             return []
-        _assign_error_in_invalid_field(self)
-        return [self.error]
+        return [_assign_invalid_field_error(self)]
 
 
 class JsonStringField(Field):
@@ -242,8 +242,7 @@ class JsonStringField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, str) and is_valid_json_string(self.field_value):
             return []
-        _assign_error_in_invalid_field(self)
-        return [self.error]
+        return [_assign_invalid_field_error(self)]
 
 
 class EmailIdField(Field):
@@ -253,8 +252,7 @@ class EmailIdField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, str) and is_valid_email_id(self.field_value):
             return []
-        _assign_error_in_invalid_field(self)
-        return [self.error]
+        return [_assign_invalid_field_error(self)]
 
 
 class UuidStringField(Field):
@@ -264,8 +262,7 @@ class UuidStringField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, str) and is_valid_uuid_string(self.field_value):
             return []
-        _assign_error_in_invalid_field(self)
-        return [self.error]
+        return [_assign_invalid_field_error(self)]
 
 
 class DateStringField(Field):
@@ -276,8 +273,7 @@ class DateStringField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, str) and is_valid_datetime_string(self.field_value, self.format_):
             return []
-        _assign_error_in_invalid_field(self)
-        return [self.error]
+        return [_assign_invalid_field_error(self)]
 
 
 class DatetimeStringField(Field):
@@ -288,8 +284,7 @@ class DatetimeStringField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, str) and is_valid_datetime_string(self.field_value, self.format_):
             return []
-        _assign_error_in_invalid_field(self)
-        return [self.error]
+        return [_assign_invalid_field_error(self)]
 
 
 class ChoiceField(Field):
@@ -301,8 +296,7 @@ class ChoiceField(Field):
     def validate(self) -> List[Error]:
         if self.field_value in self.choices:
             return []
-        _assign_error_in_invalid_field(self)
-        return [self.error]
+        return [_assign_invalid_field_error(self)]
 
 
 class MultiChoiceField(Field):
@@ -317,8 +311,7 @@ class MultiChoiceField(Field):
             and all([item in self.choices for item in self.field_value])
         ):
             return []
-        _assign_error_in_invalid_field(self)
-        return [self.error]
+        return [_assign_invalid_field_error(self)]
 
 
 class BytesField(Field):
@@ -328,8 +321,7 @@ class BytesField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, bytes):
             return []
-        _assign_error_in_invalid_field(self)
-        return [self.error]
+        return [_assign_invalid_field_error(self)]
 
 
 class NumberField(Field):
@@ -339,8 +331,7 @@ class NumberField(Field):
     def validate(self) -> List[Error]:
         if is_instance_of_any(obj=self.field_value, types=[int, float]):
             return []
-        _assign_error_in_invalid_field(self)
-        return [self.error]
+        return [_assign_invalid_field_error(self)]
 
 
 class IntegerField(Field):
@@ -350,8 +341,7 @@ class IntegerField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, int):
             return []
-        _assign_error_in_invalid_field(self)
-        return [self.error]
+        return [_assign_invalid_field_error(self)]
 
 
 class FloatField(Field):
@@ -361,8 +351,7 @@ class FloatField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, float):
             return []
-        _assign_error_in_invalid_field(self)
-        return [self.error]
+        return [_assign_invalid_field_error(self)]
 
 
 class ModelDictionaryField(Field):
