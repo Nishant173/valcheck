@@ -123,7 +123,7 @@ if __name__ == "__main__":
         "secondary_address": None,
         "job_history": [
             {
-                "company": "Google",
+                "company": "Amazon",
                 "start_date": "2010-01-01",
                 "end_date": "2010-06-30",
                 "is_current_company": False,
@@ -132,7 +132,7 @@ if __name__ == "__main__":
                 "reason_for_leaving": "Some reason #1",
             },
             {
-                "company": "Amazon",
+                "company": "Google",
                 "start_date": "2010-07-15",
                 "end_date": "2011-12-31",
                 "is_current_company": True,

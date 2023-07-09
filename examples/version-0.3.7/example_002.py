@@ -13,7 +13,7 @@ ITEM_UNITS = ("lbs", "kgs", "grams", "count")
 ### It is used to validate the entire model, after all individual fields are validated.
 
 
-class Item(validator.Validator):
+class ItemValidator(validator.Validator):
     name = fields.ChoiceField(
         choices=ITEM_NAMES,
         error=models.Error(details={"message": f"Item name must be one of {'|'.join(ITEM_NAMES)}"}),
@@ -37,13 +37,13 @@ class Item(validator.Validator):
         return errors
 
 
-class Cart(validator.Validator):
+class CartValidator(validator.Validator):
     customer_name = fields.StringField(allow_empty=False)
     timestamp_of_purchase = fields.DatetimeStringField(
         format_="%Y-%m-%d %H:%M:%S",
         converter_factory=lambda ts_string: datetime.strptime(ts_string, "%Y-%m-%d %H:%M:%S"),
     )
-    items = fields.ModelListField(validator_model=Item, allow_empty=False)
+    items = fields.ModelListField(validator_model=ItemValidator, allow_empty=False)
     additional_info = fields.AnyField(required=False, nullable=True, default_factory=lambda: None)
 
     def model_validator(self):
@@ -81,14 +81,12 @@ if __name__ == "__main__":
             "unit": "grams",
         },
     ]
-    cart_validator = Cart(
-        data={
-            "customer_name": "Sundar Pichai",
-            "timestamp_of_purchase": "2023-02-18 17:45:30",
-            "items": items,
-            "additional_info": None,
-        },
-    )
+    cart_validator = CartValidator(data={
+        "customer_name": "Sundar Pichai",
+        "timestamp_of_purchase": "2023-02-18 17:45:30",
+        "items": items,
+        "additional_info": None,
+    })
     print("\nField validators")
     pprint(cart_validator.list_field_validators())
 
