@@ -43,14 +43,14 @@ class Cart(validator.Validator):
         format_="%Y-%m-%d %H:%M:%S",
         converter_factory=lambda ts_string: datetime.strptime(ts_string, "%Y-%m-%d %H:%M:%S"),
     )
-    items = fields.ListOfModelsField(validator_model=Item, allow_empty=False)
+    items = fields.ModelListField(validator_model=Item, allow_empty=False)
     additional_info = fields.AnyField(required=False, nullable=True, default_factory=lambda: None)
 
     def model_validator(self):
         errors = []
-        timestamp_of_purchase = self.get_field_value('timestamp_of_purchase')
+        timestamp_of_purchase: datetime = self.get_field_value('timestamp_of_purchase')
         items = self.get_field_value('items')
-        hour_of_day = datetime.strptime(timestamp_of_purchase, "%Y-%m-%d %H:%M:%S").hour
+        hour_of_day = timestamp_of_purchase.hour
         num_items = len(items)
         if 17 <= hour_of_day < 22 and num_items < 3:
             message = f"We expect you to add atleast 3 items while shopping between 5pm - 10pm. Received only {num_items} item/s"
@@ -100,5 +100,3 @@ if __name__ == "__main__":
     else:
         print("\nValidated data")
         pprint(cart_validator.validated_data) # Dictionary having validated data (by field)
-        print("\nConverted data")
-        pprint(cart_validator.converted_data) # Dictionary having converted data (by field)
