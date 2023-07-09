@@ -165,6 +165,7 @@ class Field:
         raise NotImplementedError()
 
     def run_validations(self) -> ValidatedField:
+        error_obj = self.error.copy()
         if is_empty(self.field_value) and not self.required and self.default_factory:
             self.field_value = self.default_factory()
         validated_field = ValidatedField(
@@ -178,18 +179,18 @@ class Field:
             validated_field.field_value = self._convert_field_value_if_needed()
             return validated_field
         if is_empty(self.field_value) and self.required:
-            self.error.validator_message = _missing_field_error(self)
-            self.error.append_to_path(self.field_name)
-            validated_field.errors += [self.error]
+            error_obj.validator_message = _missing_field_error(self)
+            error_obj.append_to_path(self.field_name)
+            validated_field.errors += [error_obj]
             return validated_field
         errors = self.validate()
         if errors:
             validated_field.errors += errors
             return validated_field
         if not self._has_valid_custom_validators():
-            self.error.validator_message = _invalid_field_error(self)
-            self.error.append_to_path(self.field_name)
-            validated_field.errors += [self.error]
+            error_obj.validator_message = _invalid_field_error(self)
+            error_obj.append_to_path(self.field_name)
+            validated_field.errors += [error_obj]
             return validated_field
         validated_field.field_value = self._convert_field_value_if_needed()
         return validated_field
