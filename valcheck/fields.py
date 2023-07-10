@@ -19,30 +19,6 @@ from valcheck.utils import (
 )
 
 
-def _invalid_field_error(field: Field, /, *, prefix: Optional[str] = None, suffix: Optional[str] = None) -> str:
-    return (
-        f"{prefix if prefix else ''}"
-        f"Invalid {field.__class__.__name__} '{field.field_name}'"
-        f"{suffix if suffix else ''}"
-    )
-
-
-def _missing_field_error(field: Field, /, *, prefix: Optional[str] = None, suffix: Optional[str] = None) -> str:
-    return (
-        f"{prefix if prefix else ''}"
-        f"Missing {field.__class__.__name__} '{field.field_name}'"
-        f"{suffix if suffix else ''}"
-    )
-
-
-def _assign_invalid_field_error(field: Field, /) -> Error:
-    """Assigns invalid field error (for the given `field`) and returns a new `valcheck.models.Error` object"""
-    error_obj = field.error.copy()
-    error_obj.validator_message = _invalid_field_error(field)
-    error_obj.append_to_field_path(field.field_name)
-    return error_obj
-
-
 class ValidatedField:
     """Class that represents a validated field"""
 
@@ -173,7 +149,6 @@ class Field:
         raise NotImplementedError()
 
     def run_validations(self) -> ValidatedField:
-        error_obj = self.error.copy()
         if is_empty(self.field_value) and not self.required and self.default_factory:
             self.field_value = self.default_factory()
         validated_field = ValidatedField(
@@ -187,22 +162,42 @@ class Field:
             validated_field.field_value = self._convert_field_value_if_needed()
             return validated_field
         if is_empty(self.field_value) and self.required:
-            error_obj.validator_message = _missing_field_error(self)
-            error_obj.append_to_field_path(self.field_name)
-            validated_field.errors += [error_obj]
+            validated_field.errors += [
+                self.create_error_instance(validator_message=self.missing_field_error_message()),
+            ]
             return validated_field
         errors = self.validate()
         if errors:
             validated_field.errors += errors
             return validated_field
         if not self._has_valid_custom_validators():
-            error_obj.validator_message = _invalid_field_error(self)
-            error_obj.append_to_field_path(self.field_name)
-            validated_field.errors += [error_obj]
+            validated_field.errors += [
+                self.create_error_instance(validator_message=self.invalid_field_error_message()),
+            ]
             return validated_field
         validated_field.field_value = self._convert_field_value_if_needed()
         return validated_field
 
+    def invalid_field_error_message(self, *, prefix: Optional[str] = None, suffix: Optional[str] = None) -> str:
+        return (
+            f"{prefix if prefix else ''}"
+            f"Invalid {self.__class__.__name__} '{self.field_name}'"
+            f"{suffix if suffix else ''}"
+        )
+
+    def missing_field_error_message(self, *, prefix: Optional[str] = None, suffix: Optional[str] = None) -> str:
+        return (
+            f"{prefix if prefix else ''}"
+            f"Missing {self.__class__.__name__} '{self.field_name}'"
+            f"{suffix if suffix else ''}"
+        )
+
+    def create_error_instance(self, *, validator_message: str) -> Error:
+        """Creates and returns a new `valcheck.models.Error` instance for the field"""
+        error_copy = self.error.copy()
+        error_copy.validator_message = validator_message
+        error_copy.append_to_field_path(self.field_name)
+        return error_copy
 
 
 class AnyField(Field):
@@ -220,7 +215,7 @@ class BooleanField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, bool):
             return []
-        return [_assign_invalid_field_error(self)]
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
 
 class StringField(Field):
@@ -232,7 +227,7 @@ class StringField(Field):
     def validate(self) -> List[Error]:
         if is_valid_object_of_type(self.field_value, type_=str, allow_empty=self.allow_empty):
             return []
-        return [_assign_invalid_field_error(self)]
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
 
 class JsonStringField(Field):
@@ -242,7 +237,7 @@ class JsonStringField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, str) and is_valid_json_string(self.field_value):
             return []
-        return [_assign_invalid_field_error(self)]
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
 
 class EmailIdField(Field):
@@ -252,7 +247,7 @@ class EmailIdField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, str) and is_valid_email_id(self.field_value):
             return []
-        return [_assign_invalid_field_error(self)]
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
 
 class UuidStringField(Field):
@@ -262,7 +257,7 @@ class UuidStringField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, str) and is_valid_uuid_string(self.field_value):
             return []
-        return [_assign_invalid_field_error(self)]
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
 
 class DateStringField(Field):
@@ -273,7 +268,7 @@ class DateStringField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, str) and is_valid_datetime_string(self.field_value, self.format_):
             return []
-        return [_assign_invalid_field_error(self)]
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
 
 class DatetimeStringField(Field):
@@ -284,7 +279,7 @@ class DatetimeStringField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, str) and is_valid_datetime_string(self.field_value, self.format_):
             return []
-        return [_assign_invalid_field_error(self)]
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
 
 class ChoiceField(Field):
@@ -296,7 +291,7 @@ class ChoiceField(Field):
     def validate(self) -> List[Error]:
         if self.field_value in self.choices:
             return []
-        return [_assign_invalid_field_error(self)]
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
 
 class MultiChoiceField(Field):
@@ -311,7 +306,7 @@ class MultiChoiceField(Field):
             and all([item in self.choices for item in self.field_value])
         ):
             return []
-        return [_assign_invalid_field_error(self)]
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
 
 class BytesField(Field):
@@ -321,7 +316,7 @@ class BytesField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, bytes):
             return []
-        return [_assign_invalid_field_error(self)]
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
 
 class NumberField(Field):
@@ -331,7 +326,7 @@ class NumberField(Field):
     def validate(self) -> List[Error]:
         if is_instance_of_any(obj=self.field_value, types=[int, float]):
             return []
-        return [_assign_invalid_field_error(self)]
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
 
 class IntegerField(Field):
@@ -341,7 +336,7 @@ class IntegerField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, int):
             return []
-        return [_assign_invalid_field_error(self)]
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
 
 class FloatField(Field):
@@ -351,7 +346,7 @@ class FloatField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, float):
             return []
-        return [_assign_invalid_field_error(self)]
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
 
 class ModelDictionaryField(Field):
@@ -372,14 +367,14 @@ class ModelDictionaryField(Field):
 
     def validate(self) -> List[Error]:
         if not isinstance(self.field_value, dict):
-            error = Error()
-            error.validator_message = _invalid_field_error(self, suffix=" - Field is not a dictionary")
-            error.append_to_field_path(self.field_name)
+            error = self.create_error_instance(
+                validator_message=self.invalid_field_error_message(suffix=" - Field is not a dictionary"),
+            )
             return [error]
         validator = self.validator_model(data=self.field_value)
         error_objs = validator.run_validations()
         for error_obj in error_objs:
-            error_obj.validator_message = _invalid_field_error(self, suffix=f" - {error_obj.validator_message}")
+            error_obj.validator_message = self.invalid_field_error_message(suffix=f" - {error_obj.validator_message}")
             error_obj.append_to_field_path(self.field_name)
         if not error_objs:
             self.field_value = validator.validated_data
@@ -405,14 +400,14 @@ class ModelListField(Field):
 
     def validate(self) -> List[Error]:
         if not isinstance(self.field_value, list):
-            error = Error()
-            error.validator_message = _invalid_field_error(self, suffix=" - Field is not a list")
-            error.append_to_field_path(self.field_name)
+            error = self.create_error_instance(
+                validator_message=self.invalid_field_error_message(suffix=" - Field is not a list"),
+            )
             return [error]
         if not self.allow_empty and not self.field_value:
-            error = Error()
-            error.validator_message = _invalid_field_error(self, suffix=" - Field is an empty list")
-            error.append_to_field_path(self.field_name)
+            error = self.create_error_instance(
+                validator_message=self.invalid_field_error_message(suffix=" - Field is an empty list"),
+            )
             return [error]
         errors: List[Error] = []
         validated_field_value = []
@@ -420,20 +415,16 @@ class ModelListField(Field):
             row_number = idx + 1
             row_number_string = f"<Row number: {row_number}>"
             if not isinstance(item, dict):
-                error = Error()
-                error.validator_message = _invalid_field_error(
-                    self,
-                    suffix=f" - Row is not a dictionary {row_number_string}",
+                error = self.create_error_instance(
+                    validator_message=self.invalid_field_error_message(suffix=f" - Row is not a dictionary {row_number_string}"),
                 )
-                error.append_to_field_path(self.field_name)
                 errors.append(error)
                 continue
             validator = self.validator_model(data=item)
             error_objs = validator.run_validations()
             validated_field_value.append(validator.validated_data)
             for error_obj in error_objs:
-                error_obj.validator_message = _invalid_field_error(
-                    self,
+                error_obj.validator_message = self.invalid_field_error_message(
                     suffix=f" - {error_obj.validator_message} {row_number_string}",
                 )
                 error_obj.append_to_field_path(self.field_name)
