@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+from copy import deepcopy
 from typing import Any, Dict, Optional
 
 
@@ -18,7 +21,11 @@ class Error:
         self.code = code or ""
         self.details = details or {}
         self._validator_message = ""
-        self._path = ""
+        self._field_path = ""
+
+    def copy(self) -> Error:
+        """Returns deep-copy of current `Error` object"""
+        return deepcopy(self)
 
     @property
     def validator_message(self) -> str:
@@ -29,7 +36,16 @@ class Error:
         assert isinstance(value, str), "The param `validator_message` must be a string"
         self._validator_message = value
 
-    def append_to_path(
+    @property
+    def field_path(self) -> str:
+        return self._field_path
+
+    @field_path.setter
+    def field_path(self, value: str) -> None:
+        assert isinstance(value, str), "The param `field_path` must be a string"
+        self._field_path = value
+
+    def append_to_field_path(
             self,
             s: str,
             /,
@@ -37,32 +53,25 @@ class Error:
             at_beginning: Optional[bool] = True,
             separator: Optional[str] = ".",
         ) -> None:
-        """Updates path in-place"""
-        if not self.path:
-            self.path += s
+        """Appends the given string `s` to the `field_path` (in-place)"""
+        if not self.field_path:
+            self.field_path += s
             return
-        self.path = (
-            s + separator + self.path
+        self.field_path = (
+            s + separator + self.field_path
             if at_beginning else
-            self.path + separator + s
+            self.field_path + separator + s
         )
-
-    @property
-    def path(self) -> str:
-        return self._path
-
-    @path.setter
-    def path(self, value: str) -> None:
-        assert isinstance(value, str), "The param `path` must be a string"
-        self._path = value
 
     def as_dict(self) -> Dict[str, Any]:
         return {
             "description": self.description,
             "code": self.code,
             "details": self.details,
-            "validator_message": self.validator_message,
-            "path": self.path,
+            "validator_info": {
+                "validator_message": self.validator_message,
+                "field_path": self.field_path,
+            },
         }
 
     def __str__(self) -> str:

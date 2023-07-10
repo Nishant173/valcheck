@@ -1,17 +1,3 @@
-# valcheck
-An open-source, lightweight, highly performant library for quick data validation
-
-## Installation
-```
-pip install valcheck
-```
-
-## Usage
-- Refer to the `examples/` folder, based on the **valcheck** version you are using
-
-## Examples
-```python
-
 from pprint import pprint
 
 from valcheck import fields, models, validator
@@ -59,4 +45,4 @@ if __name__ == "__main__":
         pprint([error.as_dict() for error in errors]) # Error list
     else:
         pprint(person_validator.validated_data) # Dictionary having validated data (by field)
-```
+
