@@ -49,8 +49,7 @@ class Validator:
         self._errors.clear()
 
     def _register_errors(self, *, errors: List[Error]) -> None:
-        for error in errors:
-            self._errors.append(error.copy())
+        self._errors.extend(errors)
 
     def _register_validated_data(self, *, field_name: str, field_value: Any) -> None:
         self._validated_data[field_name] = field_value
