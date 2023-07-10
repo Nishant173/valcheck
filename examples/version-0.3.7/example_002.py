@@ -1,5 +1,6 @@
 from datetime import datetime
 from pprint import pprint
+from typing import List
 
 from valcheck import exceptions, fields, models, validator
 
@@ -27,7 +28,7 @@ class ItemValidator(validator.Validator):
         error=models.Error(details={"message": f"Item unit (of measurement) must be one of {'|'.join(ITEM_UNITS)}"}),
     )
 
-    def model_validator(self):
+    def model_validator(self) -> List[models.Error]:
         errors = []
         quantity = self.get_field_value('quantity')
         unit = self.get_field_value('unit')
@@ -59,42 +60,37 @@ class CartValidator(validator.Validator):
 
 
 if __name__ == "__main__":
-    items = [
-        {
-            "name": "Banana",
-            "quantity": 1.5,
-            "unit": "kgs",
-        },
-        {
-            "name": "Bar of chocolate (100 grams)",
-            "quantity": 2,
-            "unit": "count",
-        },
-        {
-            "name": "Orange",
-            "quantity": 200,
-            "unit": "grams",
-        },
-        {
-            "name": "Apple",
-            "quantity": 800,
-            "unit": "grams",
-        },
-    ]
-    cart_validator = CartValidator(data={
+    data = {
         "customer_name": "Sundar Pichai",
         "timestamp_of_purchase": "2023-02-18 17:45:30",
-        "items": items,
+        "items": [
+            {
+                "name": "Banana",
+                "quantity": 1.5,
+                "unit": "kgs",
+            },
+            {
+                "name": "Bar of chocolate (100 grams)",
+                "quantity": 2,
+                "unit": "count",
+            },
+            {
+                "name": "Orange",
+                "quantity": 200,
+                "unit": "grams",
+            },
+            {
+                "name": "Apple",
+                "quantity": 800,
+                "unit": "grams",
+            },
+        ],
         "additional_info": None,
-    })
-    print("\nField validators")
-    pprint(cart_validator.list_field_validators())
-
-    try:
-        cart_validator.run_validations(raise_exception=True)
-    except exceptions.ValidationException as exc:
-        print("\nError info")
-        pprint(exc.as_dict())
+    }
+    cart_validator = CartValidator(data=data)
+    errors = cart_validator.run_validations()
+    if errors:
+        pprint([error.as_dict() for error in errors]) # Error list
     else:
-        print("\nValidated data")
         pprint(cart_validator.validated_data) # Dictionary having validated data (by field)
+

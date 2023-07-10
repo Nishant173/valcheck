@@ -2,7 +2,7 @@ from datetime import datetime, date
 from pprint import pprint
 from typing import List
 
-from valcheck import exceptions, fields, models, validator
+from valcheck import fields, models, validator
 
 
 OCCUPATION_TYPE_CHOICES = (
@@ -107,7 +107,7 @@ class UserBasicDetailsValidator(validator.Validator):
 
 
 if __name__ == "__main__":
-    user_basic_details_validator = UserBasicDetailsValidator(data={
+    data = {
         "name": "James Murphy",
         "dob": "1983-02-18",
         "occupation_type": "Salaried employee (Private company)",
@@ -135,21 +135,26 @@ if __name__ == "__main__":
                 "company": "Google",
                 "start_date": "2010-07-15",
                 "end_date": "2011-12-31",
-                "is_current_company": True,
+                "is_current_company": False,
                 "designation": "SDE 2",
                 "annual_salary": None,
                 "reason_for_leaving": "Some reason #2",
             },
+            {
+                "company": "Microsoft",
+                "start_date": "2012-01-20",
+                "end_date": "2012-10-20",
+                "is_current_company": True,
+                "designation": "SDE 3",
+                "annual_salary": None,
+                "reason_for_leaving": "Some reason #3",
+            },
         ],
-    })
-    print("\nField validators")
-    pprint(user_basic_details_validator.list_field_validators())
-
-    try:
-        user_basic_details_validator.run_validations(raise_exception=True)
-    except exceptions.ValidationException as exc:
-        print("\nError info")
-        pprint(exc.as_dict())
+    }
+    user_basic_details_validator = UserBasicDetailsValidator(data=data)
+    errors = user_basic_details_validator.run_validations()
+    if errors:
+        pprint([error.as_dict() for error in errors]) # Error list
     else:
-        print("\nValidated data")
         pprint(user_basic_details_validator.validated_data) # Dictionary having validated data (by field)
+
