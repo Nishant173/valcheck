@@ -2,16 +2,11 @@ from datetime import datetime
 from pprint import pprint
 from typing import List
 
-from valcheck import exceptions, fields, models, validator
+from valcheck import fields, models, validator
 
 
 ITEM_NAMES = ("Apple", "Banana", "Lemon", "Orange", "Bar of chocolate (100 grams)")
 ITEM_UNITS = ("lbs", "kgs", "grams", "count")
-
-
-### NOTE
-### You can define the `model_validator()` method, which is inherited from `valcheck.validator.Validator`.
-### It is used to validate the entire model, after all individual fields are validated.
 
 
 class ItemValidator(validator.Validator):
