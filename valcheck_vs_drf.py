@@ -1,5 +1,5 @@
 """
-This is a snippet that compares valcheck (version 0.3.7) validators with Django (4.2.3) / DjangoRestFramework (3.14.0) serializers
+This is a snippet that compares valcheck (version 0.3.8) validators with Django (4.2.3) / DjangoRestFramework (3.14.0) serializers
 """
 
 import functools
@@ -9,7 +9,7 @@ from rest_framework import serializers
 from valcheck import fields, models, validator
 
 DATE_FORMAT = "%Y-%m-%d"
-NUM_REPITITIONS = 50_000
+NUM_REPITITIONS = 25_000
 
 
 def repeat(num_times):
