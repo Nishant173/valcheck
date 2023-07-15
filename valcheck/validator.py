@@ -51,8 +51,8 @@ class Validator:
     def _register_errors(self, *, errors: List[Error]) -> None:
         self._errors.extend(errors)
 
-    def _register_validated_data(self, *, field_name: str, field_value: Any) -> None:
-        self._validated_data[field_name] = field_value
+    def _register_validated_data(self, *, key: str, value: Any) -> None:
+        self._validated_data[key] = value
 
     @property
     def validated_data(self) -> Dict[str, Any]:
@@ -80,7 +80,7 @@ class Validator:
             self._register_errors(errors=validated_field.errors)
             return
         if not is_empty(validated_field.field_value):
-            self._register_validated_data(field_name=validated_field.field_name, field_value=validated_field.field_value)
+            self._register_validated_data(key=validated_field.field_identifier, value=validated_field.field_value)
 
     def _perform_model_validation_checks(self) -> None:
         """Performs model validation checks, and registers errors (if any)"""
@@ -109,9 +109,10 @@ class Validator:
         """
         self._clear_errors()
         self._clear_validated_data()
-        for field_name, field in self._field_info.items():
-            field.field_name = field_name
-            field.field_value = self.data.get(field_name, set_as_empty())
+        for field_identifier, field in self._field_info.items():
+            field.field_identifier = field_identifier
+            field.field_name = field.alias if field.alias else field_identifier
+            field.field_value = self.data.get(field.field_name, set_as_empty())
             self._perform_field_validation_checks(field=field)
         # Perform model validation checks only if there are no errors in field validation checks
         if not self._errors:

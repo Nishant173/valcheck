@@ -51,7 +51,7 @@ class Error:
             /,
             *,
             at_beginning: Optional[bool] = True,
-            separator: Optional[str] = ".",
+            separator: Optional[str] = " --> ",
         ) -> None:
         """Appends the given string `s` to the `field_path` (in-place)"""
         if not self.field_path:
@@ -63,16 +63,18 @@ class Error:
             self.field_path + separator + s
         )
 
-    def as_dict(self) -> Dict[str, Any]:
-        return {
+    def as_dict(self, *, include_validator_info: Optional[bool] = True) -> Dict[str, Any]:
+        dict_ = {
             "description": self.description,
             "code": self.code,
             "details": self.details,
-            "validator_info": {
+        }
+        if include_validator_info:
+            dict_["validator_info"] = {
                 "validator_message": self.validator_message,
                 "field_path": self.field_path,
-            },
-        }
+            }
+        return dict_
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.as_dict()})"

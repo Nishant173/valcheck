@@ -85,7 +85,7 @@ def is_instance_of_any(obj: Any, types: List[Type]) -> bool:
     return any((isinstance(obj, type_) for type_ in types))
 
 
-def wrap_in_quotes_if_string(obj: Any, /) -> str:
+def wrap_in_quotes_if_string(obj: Any, /) -> Any:
     if isinstance(obj, str):
         return f"'{obj}'"
-    return f"{obj}"
+    return obj
