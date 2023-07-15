@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Any, Callable, Iterable, List, Optional, Type, Union
 
 from valcheck.models import Error
@@ -16,6 +17,7 @@ from valcheck.utils import (
     is_valid_object_of_type,
     is_valid_uuid_string,
     set_as_empty,
+    wrap_in_quotes_if_string,
 )
 
 
@@ -25,21 +27,24 @@ class ValidatedField:
     def __init__(
             self,
             *,
+            field_identifier: str,
             field_name: str,
             field_value: Union[Any, Empty],
             errors: List[Error],
         ) -> None:
+        assert isinstance(field_identifier, str), "Param `field_identifier` must be of type 'str'"
         assert isinstance(field_name, str), "Param `field_name` must be of type 'str'"
         assert is_list_of_instances_of_type(errors, type_=Error, allow_empty=True), (
             "Param `errors` must be a list where each item is of type `valcheck.models.Error`"
         )
 
+        self.field_identifier = field_identifier
         self.field_name = field_name
         self._field_value = field_value
         self._errors = errors
 
     def __str__(self) -> str:
-        return f"{self.__class__.__name__}(field_name='{self.field_name}')"
+        return f"{self.__class__.__name__}(field_identifier='{self.field_identifier}', field_name='{self.field_name}')"
 
     @property
     def field_value(self) -> Union[Any, Empty]:
@@ -67,6 +72,7 @@ class Field:
     def __init__(
             self,
             *,
+            alias: Optional[str] = None,
             required: Optional[bool] = True,
             nullable: Optional[bool] = False,
             default_factory: Optional[Callable] = None,
@@ -76,6 +82,7 @@ class Field:
         ) -> None:
         """
         Parameters:
+            - alias (str): Alias for the field's name (optional)
             - required (bool): True if the field is required, else False. Default: True
             - nullable (bool): True if the field is nullable, else False. Default: False
             - default_factory (callable): Callable that returns the default value to set for the field
@@ -86,6 +93,9 @@ class Field:
             The callable returns True if validation is successful, else False.
             - error (Error instance): Instance of type `valcheck.models.Error`.
         """
+        assert alias is None or is_valid_object_of_type(alias, type_=str, allow_empty=False), (
+            "Param `alias` must be of type 'str' and must be non-empty"
+        )
         assert isinstance(required, bool), "Param `required` must be of type 'bool'"
         assert isinstance(nullable, bool), "Param `nullable` must be of type 'bool'"
         assert default_factory is None or callable(default_factory), (
@@ -101,14 +111,41 @@ class Field:
                 assert callable(validator), "Param `validators` must be a list of callables"
         assert error is None or isinstance(error, Error), "Param `error` must be of type `valcheck.models.Error`"
 
+        self._field_identifier = set_as_empty()
         self._field_name = set_as_empty()
         self._field_value = set_as_empty()
+        self.alias = alias
         self.required = required
         self.nullable = nullable
         self.default_factory = default_factory
         self.converter_factory = converter_factory
         self.validators = validators or []
         self.error = error or Error()
+
+    def copy(self) -> Field:
+        """Returns deep-copy of current `Field` object"""
+        return deepcopy(self)
+
+    def __str__(self) -> str:
+        kwargs_list = [
+            f"field_identifier={wrap_in_quotes_if_string(self.field_identifier)}",
+            f"field_name={wrap_in_quotes_if_string(self.field_name)}",
+            f"field_value={wrap_in_quotes_if_string(self.field_value)}",
+            f"alias={wrap_in_quotes_if_string(self.alias)}",
+            f"required={self.required}",
+            f"nullable={self.nullable}",
+        ]
+        kwargs_string = "(" + ", ".join(kwargs_list) + ")"
+        return f"{self.__class__.__name__}{kwargs_string}"
+
+    @property
+    def field_identifier(self) -> str:
+        return self._field_identifier
+
+    @field_identifier.setter
+    def field_identifier(self, value: str) -> None:
+        assert isinstance(value, str), "Param `field_identifier` must be of type 'str'"
+        self._field_identifier = value
 
     @property
     def field_name(self) -> str:
@@ -152,6 +189,7 @@ class Field:
         if is_empty(self.field_value) and not self.required and self.default_factory:
             self.field_value = self.default_factory()
         validated_field = ValidatedField(
+            field_identifier=self.field_identifier,
             field_name=self.field_name,
             field_value=self.field_value,
             errors=[],
