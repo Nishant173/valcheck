@@ -9,6 +9,7 @@ from valcheck.utils import Empty, is_empty, is_list_of_instances_of_type, set_as
 class Validator:
     """
     Properties:
+        - context
         - validated_data
 
     Instance methods:
@@ -18,12 +19,22 @@ class Validator:
         - run_validations()
     """
 
-    def __init__(self, *, data: Dict[str, Any]) -> None:
+    def __init__(
+            self,
+            *,
+            data: Dict[str, Any],
+            context: Optional[Dict[str, Any]] = None,
+        ) -> None:
         assert isinstance(data, dict), "Param `data` must be a dictionary"
         self.data = data
+        self._context: Dict[str, Any] = context or {}
         self._field_info: Dict[str, Field] = self._initialise_fields()
         self._errors: List[Error] = []
         self._validated_data: Dict[str, Any] = {}
+
+    @property
+    def context(self) -> Dict[str, Any]:
+        return self._context
 
     def list_field_validators(self) -> List[Dict[str, Any]]:
         return [
