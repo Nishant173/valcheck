@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 import re
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Dict, List, Optional, Type, Union
 from uuid import UUID
 
 
@@ -65,6 +65,32 @@ def is_valid_email_id(email_id: str, /) -> bool:
         string=email_id,
     )
     return True if match_obj else False
+
+
+def can_be_integer(value: Union[int, float], /) -> bool:
+    return int(value) == value
+
+
+def integerify_if_possible(value: Union[int, float], /) -> Union[int, float]:
+    return int(value) if can_be_integer(value) else value
+
+
+def is_valid_number_string(s: str, /) -> bool:
+    if not isinstance(s, str):
+        return False
+    try:
+        _ = float(s)
+        return True
+    except (TypeError, ValueError):
+        return False
+
+
+def is_valid_integer_string(s: str, /) -> bool:
+    return is_valid_number_string(s) and '.' not in s
+
+
+def is_valid_float_string(s: str, /) -> bool:
+    return is_valid_number_string(s) and '.' in s
 
 
 class Empty:

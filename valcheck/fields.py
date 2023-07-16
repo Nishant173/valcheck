@@ -4,21 +4,7 @@ from copy import deepcopy
 from typing import Any, Callable, Iterable, List, Optional, Type, Union
 
 from valcheck.models import Error
-from valcheck.utils import (
-    Empty,
-    dict_has_any_keys,
-    is_empty,
-    is_instance_of_any,
-    is_iterable,
-    is_list_of_instances_of_type,
-    is_valid_datetime_string,
-    is_valid_email_id,
-    is_valid_json_string,
-    is_valid_object_of_type,
-    is_valid_uuid_string,
-    set_as_empty,
-    wrap_in_quotes_if_string,
-)
+from valcheck import utils
 
 
 class ValidatedField:
@@ -29,12 +15,12 @@ class ValidatedField:
             *,
             field_identifier: str,
             field_name: str,
-            field_value: Union[Any, Empty],
+            field_value: Union[Any, utils.Empty],
             errors: List[Error],
         ) -> None:
         assert isinstance(field_identifier, str), "Param `field_identifier` must be of type 'str'"
         assert isinstance(field_name, str), "Param `field_name` must be of type 'str'"
-        assert is_list_of_instances_of_type(errors, type_=Error, allow_empty=True), (
+        assert utils.is_list_of_instances_of_type(errors, type_=Error, allow_empty=True), (
             "Param `errors` must be a list where each item is of type `valcheck.models.Error`"
         )
 
@@ -47,11 +33,11 @@ class ValidatedField:
         return f"{self.__class__.__name__}(field_identifier='{self.field_identifier}', field_name='{self.field_name}')"
 
     @property
-    def field_value(self) -> Union[Any, Empty]:
+    def field_value(self) -> Union[Any, utils.Empty]:
         return self._field_value
 
     @field_value.setter
-    def field_value(self, value: Union[Any, Empty]) -> None:
+    def field_value(self, value: Union[Any, utils.Empty]) -> None:
         self._field_value = value
 
     @property
@@ -60,7 +46,7 @@ class ValidatedField:
 
     @errors.setter
     def errors(self, value: List[Error]) -> None:
-        assert is_list_of_instances_of_type(value, type_=Error, allow_empty=True), (
+        assert utils.is_list_of_instances_of_type(value, type_=Error, allow_empty=True), (
             "Param `errors` must be a list where each item is of type `valcheck.models.Error`"
         )
         self._errors = value
@@ -93,7 +79,7 @@ class Field:
             The callable returns True if validation is successful, else False.
             - error (Error instance): Instance of type `valcheck.models.Error`.
         """
-        assert alias is None or is_valid_object_of_type(alias, type_=str, allow_empty=False), (
+        assert alias is None or utils.is_valid_object_of_type(alias, type_=str, allow_empty=False), (
             "Param `alias` must be of type 'str' and must be non-empty"
         )
         assert isinstance(required, bool), "Param `required` must be of type 'bool'"
@@ -111,9 +97,9 @@ class Field:
                 assert callable(validator), "Param `validators` must be a list of callables"
         assert error is None or isinstance(error, Error), "Param `error` must be of type `valcheck.models.Error`"
 
-        self._field_identifier = set_as_empty()
-        self._field_name = set_as_empty()
-        self._field_value = set_as_empty()
+        self._field_identifier = utils.set_as_empty()
+        self._field_name = utils.set_as_empty()
+        self._field_value = utils.set_as_empty()
         self.alias = alias
         self.required = required
         self.nullable = nullable
@@ -128,10 +114,10 @@ class Field:
 
     def __str__(self) -> str:
         kwargs_list = [
-            f"field_identifier={wrap_in_quotes_if_string(self.field_identifier)}",
-            f"field_name={wrap_in_quotes_if_string(self.field_name)}",
-            f"field_value={wrap_in_quotes_if_string(self.field_value)}",
-            f"alias={wrap_in_quotes_if_string(self.alias)}",
+            f"field_identifier={utils.wrap_in_quotes_if_string(self.field_identifier)}",
+            f"field_name={utils.wrap_in_quotes_if_string(self.field_name)}",
+            f"field_value={utils.wrap_in_quotes_if_string(self.field_value)}",
+            f"alias={utils.wrap_in_quotes_if_string(self.alias)}",
             f"required={self.required}",
             f"nullable={self.nullable}",
         ]
@@ -186,7 +172,7 @@ class Field:
         raise NotImplementedError()
 
     def run_validations(self) -> ValidatedField:
-        if is_empty(self.field_value) and not self.required and self.default_factory:
+        if utils.is_empty(self.field_value) and not self.required and self.default_factory:
             self.field_value = self.default_factory()
         validated_field = ValidatedField(
             field_identifier=self.field_identifier,
@@ -194,12 +180,12 @@ class Field:
             field_value=self.field_value,
             errors=[],
         )
-        if is_empty(self.field_value) and not self.required and not self.default_factory:
+        if utils.is_empty(self.field_value) and not self.required and not self.default_factory:
             return validated_field
         if self._can_be_set_to_null():
             validated_field.field_value = self._convert_field_value_if_needed()
             return validated_field
-        if is_empty(self.field_value) and self.required:
+        if utils.is_empty(self.field_value) and self.required:
             validated_field.errors += [
                 self.create_error_instance(validator_message=self.missing_field_error_message()),
             ]
@@ -257,13 +243,12 @@ class BooleanField(Field):
 
 
 class StringField(Field):
-
     def __init__(self, *, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
         self.allow_empty = allow_empty
         super(StringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if is_valid_object_of_type(self.field_value, type_=str, allow_empty=self.allow_empty):
+        if utils.is_valid_object_of_type(self.field_value, type_=str, allow_empty=self.allow_empty):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
@@ -273,7 +258,7 @@ class JsonStringField(Field):
         super(JsonStringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if isinstance(self.field_value, str) and is_valid_json_string(self.field_value):
+        if isinstance(self.field_value, str) and utils.is_valid_json_string(self.field_value):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
@@ -283,7 +268,7 @@ class EmailIdField(Field):
         super(EmailIdField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if isinstance(self.field_value, str) and is_valid_email_id(self.field_value):
+        if isinstance(self.field_value, str) and utils.is_valid_email_id(self.field_value):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
@@ -293,7 +278,7 @@ class UuidStringField(Field):
         super(UuidStringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if isinstance(self.field_value, str) and is_valid_uuid_string(self.field_value):
+        if isinstance(self.field_value, str) and utils.is_valid_uuid_string(self.field_value):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
@@ -304,7 +289,7 @@ class DateStringField(Field):
         super(DateStringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if isinstance(self.field_value, str) and is_valid_datetime_string(self.field_value, self.format_):
+        if isinstance(self.field_value, str) and utils.is_valid_datetime_string(self.field_value, self.format_):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
@@ -315,14 +300,14 @@ class DatetimeStringField(Field):
         super(DatetimeStringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if isinstance(self.field_value, str) and is_valid_datetime_string(self.field_value, self.format_):
+        if isinstance(self.field_value, str) and utils.is_valid_datetime_string(self.field_value, self.format_):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
 
 class ChoiceField(Field):
     def __init__(self, *, choices: Iterable[Any], **kwargs: Any) -> None:
-        assert is_iterable(choices), "Param `choices` must be an iterable"
+        assert utils.is_iterable(choices), "Param `choices` must be an iterable"
         self.choices = choices
         super(ChoiceField, self).__init__(**kwargs)
 
@@ -334,7 +319,7 @@ class ChoiceField(Field):
 
 class MultiChoiceField(Field):
     def __init__(self, *, choices: Iterable[Any], **kwargs: Any) -> None:
-        assert is_iterable(choices), "Param `choices` must be an iterable"
+        assert utils.is_iterable(choices), "Param `choices` must be an iterable"
         self.choices = choices
         super(MultiChoiceField, self).__init__(**kwargs)
 
@@ -362,7 +347,7 @@ class NumberField(Field):
         super(NumberField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if is_instance_of_any(obj=self.field_value, types=[int, float]):
+        if utils.is_instance_of_any(obj=self.field_value, types=[int, float]):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
@@ -387,6 +372,58 @@ class FloatField(Field):
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
 
+class NumberStringField(Field):
+    def __init__(self, **kwargs: Any) -> None:
+        super(NumberStringField, self).__init__(**kwargs)
+
+    def validate(self) -> List[Error]:
+        if utils.is_valid_number_string(self.field_value):
+            return []
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+
+class IntegerStringField(Field):
+    def __init__(self, **kwargs: Any) -> None:
+        super(IntegerStringField, self).__init__(**kwargs)
+
+    def validate(self) -> List[Error]:
+        if utils.is_valid_integer_string(self.field_value):
+            return []
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+
+class FloatStringField(Field):
+    def __init__(self, **kwargs: Any) -> None:
+        super(FloatStringField, self).__init__(**kwargs)
+
+    def validate(self) -> List[Error]:
+        if utils.is_valid_float_string(self.field_value):
+            return []
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+
+class DictionaryField(Field):
+    def __init__(self, *, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
+        self.allow_empty = allow_empty
+        super(DictionaryField, self).__init__(**kwargs)
+
+    def validate(self) -> List[Error]:
+        if utils.is_valid_object_of_type(self.field_value, type_=dict, allow_empty=self.allow_empty):
+            return []
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+
+class ListField(Field):
+    def __init__(self, *, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
+        self.allow_empty = allow_empty
+        super(ListField, self).__init__(**kwargs)
+
+    def validate(self) -> List[Error]:
+        if utils.is_valid_object_of_type(self.field_value, type_=list, allow_empty=self.allow_empty):
+            return []
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+
 class ModelDictionaryField(Field):
     def __init__(self, *, validator_model: Type, **kwargs: Any) -> None:
         from valcheck.validator import Validator
@@ -394,7 +431,7 @@ class ModelDictionaryField(Field):
             "Param `validator_model` must be a sub-class of `valcheck.validator.Validator`"
         )
         kwargs_to_disallow = ['validators', 'error']
-        if dict_has_any_keys(kwargs, keys=kwargs_to_disallow):
+        if utils.dict_has_any_keys(kwargs, keys=kwargs_to_disallow):
             msg = (
                 f"This field does not accept the following params: {kwargs_to_disallow}, since"
                 " the `validator_model` handles these parameters"
@@ -426,7 +463,7 @@ class ModelListField(Field):
             "Param `validator_model` must be a sub-class of `valcheck.validator.Validator`"
         )
         kwargs_to_disallow = ['validators', 'error']
-        if dict_has_any_keys(kwargs, keys=kwargs_to_disallow):
+        if utils.dict_has_any_keys(kwargs, keys=kwargs_to_disallow):
             msg = (
                 f"This field does not accept the following params: {kwargs_to_disallow}, since"
                 " the `validator_model` handles these parameters"
