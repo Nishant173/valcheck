@@ -21,7 +21,7 @@ class Validator:
     def __init__(self, *, data: Dict[str, Any]) -> None:
         assert isinstance(data, dict), "Param `data` must be a dictionary"
         self.data = data
-        self._field_info: Dict[str, Field] = self._get_field_info()
+        self._field_info: Dict[str, Field] = self._initialise_fields()
         self._errors: List[Error] = []
         self._validated_data: Dict[str, Any] = {}
 
@@ -29,20 +29,31 @@ class Validator:
         return [
             {
                 "field_type": field.__class__.__name__,
-                "field_name": field_name,
-            } for field_name, field in self._field_info.items()
+                "field_identifier": field_identifier,
+                "field_name": field.field_name,
+                "alias": field.alias,
+                "required": field.required,
+                "nullable": field.nullable,
+            } for field_identifier, field in self._field_info.items()
         ]
 
-    def _get_field_info(self) -> Dict[str, Field]:
-        """Returns dictionary having keys = field names, and values = field instances"""
-        return {
-            field_name : field for field_name, field in vars(self.__class__).items() if (
-                not field_name.startswith("__")
-                and isinstance(field_name, str)
+    def _initialise_fields(self) -> Dict[str, Field]:
+        """Returns dictionary having keys = field identifiers, and values = initialised field instances"""
+        field_info = {}
+        vars_dict = vars(self.__class__)
+        for field_identifier in vars_dict:
+            field: Field = vars_dict[field_identifier]
+            if (
+                not field_identifier.startswith("__")
+                and isinstance(field_identifier, str)
                 and field.__class__ is not Field
                 and issubclass(field.__class__, Field)
-            )
-        }
+            ):
+                field.field_identifier = field_identifier
+                field.field_name = field.alias if field.alias else field_identifier
+                field.field_value = self.data.get(field.field_name, set_as_empty())
+                field_info[field_identifier] = field
+        return field_info
 
     def _clear_errors(self) -> None:
         """Clears out the list of errors"""
@@ -109,10 +120,7 @@ class Validator:
         """
         self._clear_errors()
         self._clear_validated_data()
-        for field_identifier, field in self._field_info.items():
-            field.field_identifier = field_identifier
-            field.field_name = field.alias if field.alias else field_identifier
-            field.field_value = self.data.get(field.field_name, set_as_empty())
+        for _, field in self._field_info.items():
             self._perform_field_validation_checks(field=field)
         # Perform model validation checks only if there are no errors in field validation checks
         if not self._errors:
