@@ -1,5 +1,5 @@
 """
-This is a snippet that compares valcheck (version 0.4.0) validators with Django (4.2.3) / DjangoRestFramework (3.14.0) serializers
+This is a snippet that compares valcheck (version 0.5.0) validators with Django (4.2.3) / DjangoRestFramework (3.14.0) serializers
 """
 
 import functools
