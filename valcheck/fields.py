@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from copy import deepcopy
+import copy
 from typing import Any, Callable, Iterable, List, Optional, Type, Union
 
 from valcheck.models import Error
@@ -13,32 +13,37 @@ class ValidatedField:
     def __init__(
             self,
             *,
-            field_identifier: str,
-            field_name: str,
-            field_value: Union[Any, utils.Empty],
+            field: Field,
             errors: List[Error],
         ) -> None:
-        assert isinstance(field_identifier, str), "Param `field_identifier` must be of type 'str'"
-        assert isinstance(field_name, str), "Param `field_name` must be of type 'str'"
+        assert isinstance(field, Field), "Param `field` must be of type `valcheck.fields.Field`"
         assert utils.is_list_of_instances_of_type(errors, type_=Error, allow_empty=True), (
             "Param `errors` must be a list where each item is of type `valcheck.models.Error`"
         )
-
-        self.field_identifier = field_identifier
-        self.field_name = field_name
-        self._field_value = field_value
+        self._field = field
         self._errors = errors
 
     def __str__(self) -> str:
-        return f"{self.__class__.__name__}(field_identifier='{self.field_identifier}', field_name='{self.field_name}')"
+        kwargs_list = [
+            f"is_valid={not bool(self.errors)}",
+            f"field_identifier={utils.wrap_in_quotes_if_string(self.field.field_identifier)}",
+            f"field_value={utils.wrap_in_quotes_if_string(self.field.field_value)}",
+            f"source={utils.wrap_in_quotes_if_string(self.field.source)}",
+            f"target={utils.wrap_in_quotes_if_string(self.field.target)}",
+            f"required={self.field.required}",
+            f"nullable={self.field.nullable}",
+        ]
+        kwargs_string = "(" + ", ".join(kwargs_list) + ")"
+        return f"{self.__class__.__name__}{kwargs_string}"
 
     @property
-    def field_value(self) -> Union[Any, utils.Empty]:
-        return self._field_value
+    def field(self) -> Field:
+        return self._field
 
-    @field_value.setter
-    def field_value(self, value: Union[Any, utils.Empty]) -> None:
-        self._field_value = value
+    @field.setter
+    def field(self, value: Field) -> None:
+        assert isinstance(value, Field), "Param `field` must be of type `valcheck.fields.Field`"
+        self._field = value
 
     @property
     def errors(self) -> List[Error]:
@@ -58,7 +63,8 @@ class Field:
     def __init__(
             self,
             *,
-            alias: Optional[str] = None,
+            source: Optional[str] = None,
+            target: Optional[str] = None,
             required: Optional[bool] = True,
             nullable: Optional[bool] = False,
             default_factory: Optional[Callable] = None,
@@ -68,7 +74,8 @@ class Field:
         ) -> None:
         """
         Parameters:
-            - alias (str): Alias for the field's name (optional)
+            - source (str): Field name used in the input data (optional)
+            - target (str): Field name used in the validated data (optional)
             - required (bool): True if the field is required, else False. Default: True
             - nullable (bool): True if the field is nullable, else False. Default: False
             - default_factory (callable): Callable that returns the default value to set for the field
@@ -79,8 +86,11 @@ class Field:
             The callable returns True if validation is successful, else False.
             - error (Error instance): Instance of type `valcheck.models.Error`.
         """
-        assert alias is None or utils.is_valid_object_of_type(alias, type_=str, allow_empty=False), (
-            "Param `alias` must be of type 'str' and must be non-empty"
+        assert source is None or utils.is_valid_object_of_type(source, type_=str, allow_empty=False), (
+            "Param `source` must be of type 'str' and must be non-empty"
+        )
+        assert target is None or utils.is_valid_object_of_type(target, type_=str, allow_empty=False), (
+            "Param `target` must be of type 'str' and must be non-empty"
         )
         assert isinstance(required, bool), "Param `required` must be of type 'bool'"
         assert isinstance(nullable, bool), "Param `nullable` must be of type 'bool'"
@@ -98,9 +108,9 @@ class Field:
         assert error is None or isinstance(error, Error), "Param `error` must be of type `valcheck.models.Error`"
 
         self._field_identifier = utils.set_as_empty()
-        self._field_name = utils.set_as_empty()
         self._field_value = utils.set_as_empty()
-        self.alias = alias
+        self.source = source
+        self.target = target
         self.required = required
         self.nullable = nullable
         self.default_factory = default_factory
@@ -110,14 +120,14 @@ class Field:
 
     def copy(self) -> Field:
         """Returns deep-copy of current `Field` object"""
-        return deepcopy(self)
+        return copy.deepcopy(self)
 
     def __str__(self) -> str:
         kwargs_list = [
             f"field_identifier={utils.wrap_in_quotes_if_string(self.field_identifier)}",
-            f"field_name={utils.wrap_in_quotes_if_string(self.field_name)}",
             f"field_value={utils.wrap_in_quotes_if_string(self.field_value)}",
-            f"alias={utils.wrap_in_quotes_if_string(self.alias)}",
+            f"source={utils.wrap_in_quotes_if_string(self.source)}",
+            f"target={utils.wrap_in_quotes_if_string(self.target)}",
             f"required={self.required}",
             f"nullable={self.nullable}",
         ]
@@ -134,20 +144,11 @@ class Field:
         self._field_identifier = value
 
     @property
-    def field_name(self) -> str:
-        return self._field_name
-
-    @field_name.setter
-    def field_name(self, value: str) -> None:
-        assert isinstance(value, str), "Param `field_name` must be of type 'str'"
-        self._field_name = value
-
-    @property
-    def field_value(self) -> Any:
+    def field_value(self) -> Union[Any, utils.Empty]:
         return self._field_value
 
     @field_value.setter
-    def field_value(self, value: Any) -> None:
+    def field_value(self, value: Union[Any, utils.Empty]) -> None:
         self._field_value = value
 
     def _can_be_set_to_null(self) -> bool:
@@ -174,16 +175,11 @@ class Field:
     def run_validations(self) -> ValidatedField:
         if utils.is_empty(self.field_value) and not self.required and self.default_factory:
             self.field_value = self.default_factory()
-        validated_field = ValidatedField(
-            field_identifier=self.field_identifier,
-            field_name=self.field_name,
-            field_value=self.field_value,
-            errors=[],
-        )
+        validated_field = ValidatedField(field=self, errors=[])
         if utils.is_empty(self.field_value) and not self.required and not self.default_factory:
             return validated_field
         if self._can_be_set_to_null():
-            validated_field.field_value = self._convert_field_value_if_needed()
+            validated_field.field.field_value = self._convert_field_value_if_needed()
             return validated_field
         if utils.is_empty(self.field_value) and self.required:
             validated_field.errors += [
@@ -199,20 +195,20 @@ class Field:
                 self.create_error_instance(validator_message=self.invalid_field_error_message()),
             ]
             return validated_field
-        validated_field.field_value = self._convert_field_value_if_needed()
+        validated_field.field.field_value = self._convert_field_value_if_needed()
         return validated_field
 
     def invalid_field_error_message(self, *, prefix: Optional[str] = None, suffix: Optional[str] = None) -> str:
         return (
             f"{prefix if prefix else ''}"
-            f"Invalid {self.__class__.__name__} '{self.field_name}'"
+            f"Invalid {self.__class__.__name__} '{self.source}'"
             f"{suffix if suffix else ''}"
         )
 
     def missing_field_error_message(self, *, prefix: Optional[str] = None, suffix: Optional[str] = None) -> str:
         return (
             f"{prefix if prefix else ''}"
-            f"Missing {self.__class__.__name__} '{self.field_name}'"
+            f"Missing {self.__class__.__name__} '{self.source}'"
             f"{suffix if suffix else ''}"
         )
 
@@ -220,7 +216,7 @@ class Field:
         """Creates and returns a new `valcheck.models.Error` instance for the field"""
         error_copy = self.error.copy()
         error_copy.validator_message = validator_message
-        error_copy.append_to_field_path(self.field_name)
+        error_copy.append_to_field_path(self.source)
         return error_copy
 
 
@@ -450,7 +446,7 @@ class ModelDictionaryField(Field):
         error_objs = validator.run_validations()
         for error_obj in error_objs:
             error_obj.validator_message = self.invalid_field_error_message(suffix=f" - {error_obj.validator_message}")
-            error_obj.append_to_field_path(self.field_name)
+            error_obj.append_to_field_path(self.source)
         if not error_objs:
             self.field_value = validator.validated_data
         return error_objs
@@ -502,7 +498,7 @@ class ModelListField(Field):
                 error_obj.validator_message = self.invalid_field_error_message(
                     suffix=f" - {error_obj.validator_message} {row_number_string}",
                 )
-                error_obj.append_to_field_path(self.field_name)
+                error_obj.append_to_field_path(self.source)
             errors.extend(error_objs)
         if not errors:
             self.field_value = validated_field_value

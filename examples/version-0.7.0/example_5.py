@@ -1,3 +1,5 @@
+## Writing a validator having the `model_validator()` method and/or `context` property
+
 from pprint import pprint
 from typing import List
 
@@ -14,11 +16,12 @@ class PersonValidator(validator.Validator):
         if user_id and isinstance(user_id, int):
             user_id_is_odd = user_id % 2 != 0
             gender = self.get_field_value("gender")
-            if (
-                user_id_is_odd
-                and gender not in ("Female", "Male")
-            ):
-                errors.append(models.Error(description="Invalid `gender` for an odd user ID"))
+            if user_id_is_odd and gender not in ("Female", "Male"):
+                errors.append(
+                    models.Error(
+                        description="Invalid `gender` - Please use one of ('Female', 'Male') for an odd user ID"
+                    )
+                )
         return errors
 
 
@@ -36,4 +39,3 @@ if __name__ == "__main__":
         pprint([error.as_dict() for error in errors]) # Error list
     else:
         pprint(person_validator.validated_data) # Dictionary having validated data (by field)
-
