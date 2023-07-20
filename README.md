@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
 ## Performance benchmarks
 - On comparison of the performance of Django Rest Framework's (version 3.14.0) serializer with Valcheck's
-validator, we found that Valcheck (version 0.6.0) is ~3.8 times faster for cases where the data is
+validator, we found that Valcheck (version 0.7.0) is ~3.8 times faster for cases where the data is
 valid, and ~2.7 times faster for cases where the data is invalid.
 - These numbers are averaged over 25,000 iterations.
 
