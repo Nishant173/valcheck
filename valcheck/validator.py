@@ -41,8 +41,8 @@ class Validator:
             {
                 "field_type": field.__class__.__name__,
                 "field_identifier": field_identifier,
-                "field_name": field.field_name,
-                "alias": field.alias,
+                "source": field.source,
+                "target": field.target,
                 "required": field.required,
                 "nullable": field.nullable,
             } for field_identifier, field in self._field_info.items()
@@ -53,16 +53,18 @@ class Validator:
         field_info = {}
         vars_dict = vars(self.__class__)
         for field_identifier in vars_dict:
-            field: Field = vars_dict[field_identifier]
+            temp_field: Field = vars_dict[field_identifier]
             if (
                 not field_identifier.startswith("__")
                 and isinstance(field_identifier, str)
-                and field.__class__ is not Field
-                and issubclass(field.__class__, Field)
+                and temp_field.__class__ is not Field
+                and issubclass(temp_field.__class__, Field)
             ):
+                field = temp_field.copy()
                 field.field_identifier = field_identifier
-                field.field_name = field.alias if field.alias else field_identifier
-                field.field_value = self.data.get(field.field_name, set_as_empty())
+                field.source = field.source if field.source else field_identifier
+                field.target = field.target if field.target else field_identifier
+                field.field_value = self.data.get(field.source, set_as_empty())
                 field_info[field_identifier] = field
         return field_info
 
@@ -101,8 +103,11 @@ class Validator:
         if validated_field.errors:
             self._register_errors(errors=validated_field.errors)
             return
-        if not is_empty(validated_field.field_value):
-            self._register_validated_data(key=validated_field.field_identifier, value=validated_field.field_value)
+        if not is_empty(validated_field.field.field_value):
+            self._register_validated_data(
+                key=validated_field.field.target,
+                value=validated_field.field.field_value,
+            )
 
     def _perform_model_validation_checks(self) -> None:
         """Performs model validation checks, and registers errors (if any)"""
