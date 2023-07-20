@@ -1,6 +1,11 @@
 from typing import Any, Dict, List, Optional, Union
 
-from valcheck.exceptions import MissingFieldException, ValidationException
+from valcheck.exceptions import (
+    DuplicateSourcesException,
+    DuplicateTargetsException,
+    MissingFieldException,
+    ValidationException,
+)
 from valcheck.fields import Field
 from valcheck.models import Error
 from valcheck.utils import Empty, is_empty, is_list_of_instances_of_type, set_as_empty
@@ -48,6 +53,22 @@ class Validator:
             } for field_identifier, field in self._field_info.items()
         ]
 
+    def _validate_uniqueness_of_sources_and_targets(self, field_info: Dict[str, Field], /) -> None:
+        """
+        If duplicate sources/targets are found, raises `valcheck.exceptions.DuplicateSourcesException`
+        or `valcheck.exceptions.DuplicateTargetsException`
+        """
+        sources, targets = [], []
+        for _, field in field_info.items():
+            if field.source:
+                sources.append(field.source)
+            if field.target:
+                targets.append(field.target)
+        if len(sources) != len(set(sources)):
+            raise DuplicateSourcesException(f"Received duplicate values for `source`: {sorted(sources)}")
+        if len(targets) != len(set(targets)):
+            raise DuplicateTargetsException(f"Received duplicate values for `target`: {sorted(targets)}")
+
     def _initialise_fields(self) -> Dict[str, Field]:
         """Returns dictionary having keys = field identifiers, and values = initialised field instances"""
         field_info = {}
@@ -66,6 +87,7 @@ class Validator:
                 field.target = field.target if field.target else field_identifier
                 field.field_value = self.data.get(field.source, set_as_empty())
                 field_info[field_identifier] = field
+        self._validate_uniqueness_of_sources_and_targets(field_info)
         return field_info
 
     def _clear_errors(self) -> None:

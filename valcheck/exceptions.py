@@ -10,6 +10,16 @@ def _validate_list_of_errors(obj: Any, /) -> None:
         raise ValueError("Must be list of errors (each of type `valcheck.models.Error`)")
 
 
+class DuplicateSourcesException(Exception):
+    """Exception to be raised when a validator finds duplicate sources for it's fields"""
+    pass
+
+
+class DuplicateTargetsException(Exception):
+    """Exception to be raised when a validator finds duplicate targets for it's fields"""
+    pass
+
+
 class MissingFieldException(Exception):
     """Exception to be raised when a field is missing"""
     pass
