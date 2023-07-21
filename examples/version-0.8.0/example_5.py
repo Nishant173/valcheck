@@ -15,7 +15,7 @@ class PersonValidator(validator.Validator):
         user_id = self.context.get("user_id")
         if user_id and isinstance(user_id, int):
             user_id_is_odd = user_id % 2 != 0
-            gender = self.get_field_value("gender")
+            gender = self.get_validated_value("gender")
             if user_id_is_odd and gender not in ("Female", "Male"):
                 errors.append(
                     models.Error(
