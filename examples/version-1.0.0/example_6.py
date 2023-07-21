@@ -32,6 +32,7 @@ if __name__ == "__main__":
         "name": "james murphy",
         "gender": "N/A",
     }
+    ## Any context can be passed into the validator to aid validations
     context = {
         "user_id": 2,
     }
