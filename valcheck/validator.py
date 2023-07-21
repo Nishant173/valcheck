@@ -1,8 +1,10 @@
+import string
 from typing import Any, Dict, List, Optional, Union
 
 from valcheck.exceptions import (
     DuplicateSourcesException,
     DuplicateTargetsException,
+    InvalidFieldIdentifierException,
     MissingFieldException,
     ValidationException,
 )
@@ -55,6 +57,25 @@ class Validator:
             } for field_identifier, field in self._field_info.items()
         ]
 
+    def _validate_field_identifier(self, field_identifier: str, /) -> None:
+        """If an invalid field-identifier is found, raises `valcheck.exceptions.InvalidFieldIdentifierException`"""
+        error_message = (
+            f"Invalid field identifier '{field_identifier}'."
+            " The first character must be a lowercase alphabet."
+            " Can only contain lowercase alphabets, numbers, and underscores."
+        )
+        if not (
+            isinstance(field_identifier, str)
+            and bool(field_identifier)
+        ):
+            raise InvalidFieldIdentifierException(error_message)
+        allowed_chars = string.ascii_lowercase + string.digits + '_'
+        for idx, char in enumerate(field_identifier):
+            if idx == 0 and char not in string.ascii_lowercase:
+                raise InvalidFieldIdentifierException(error_message)
+            if char not in allowed_chars:
+                raise InvalidFieldIdentifierException(error_message)
+
     def _validate_uniqueness_of_sources_and_targets(self, field_info: Dict[str, Field], /) -> None:
         """
         If duplicate sources/targets are found, raises `valcheck.exceptions.DuplicateSourcesException`
@@ -78,11 +99,11 @@ class Validator:
         for field_identifier in vars_dict:
             temp_field: Field = vars_dict[field_identifier]
             if (
-                not field_identifier.startswith("__")
-                and isinstance(field_identifier, str)
+                isinstance(field_identifier, str)
                 and temp_field.__class__ is not Field
                 and issubclass(temp_field.__class__, Field)
             ):
+                self._validate_field_identifier(field_identifier)
                 field = temp_field.copy()
                 field.field_identifier = field_identifier
                 field.source = field.source if field.source else field_identifier
