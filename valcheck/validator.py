@@ -8,7 +8,7 @@ from valcheck.exceptions import (
 )
 from valcheck.fields import Field
 from valcheck.models import Error
-from valcheck.utils import Empty, is_empty, is_list_of_instances_of_type, set_as_empty
+from valcheck import utils
 
 
 class Validator:
@@ -18,7 +18,7 @@ class Validator:
         - validated_data
 
     Instance methods:
-        - get_field_value()
+        - get_validated_value()
         - list_field_validators()
         - model_validator()
         - run_validations()
@@ -31,6 +31,7 @@ class Validator:
             context: Optional[Dict[str, Any]] = None,
         ) -> None:
         assert isinstance(data, dict), "Param `data` must be a dictionary"
+        assert context is None or isinstance(context, dict), "Param `context` must be a dictionary"
         self.data = data
         self._context: Dict[str, Any] = context or {}
         self._field_info: Dict[str, Field] = self._initialise_fields()
@@ -42,6 +43,7 @@ class Validator:
         return self._context
 
     def list_field_validators(self) -> List[Dict[str, Any]]:
+        """Returns list of all the registered field validators"""
         return [
             {
                 "field_type": field.__class__.__name__,
@@ -85,7 +87,7 @@ class Validator:
                 field.field_identifier = field_identifier
                 field.source = field.source if field.source else field_identifier
                 field.target = field.target if field.target else field_identifier
-                field.field_value = self.data.get(field.source, set_as_empty())
+                field.field_value = self.data.get(field.source, utils.set_as_empty())
                 field_info[field_identifier] = field
         self._validate_uniqueness_of_sources_and_targets(field_info)
         return field_info
@@ -108,16 +110,21 @@ class Validator:
         """Clears out the dictionary having validated data"""
         self._validated_data.clear()
 
-    def get_field_value(self, field: str, default: Union[Any, Empty] = set_as_empty(), /) -> Any:
+    def get_validated_value(
+            self,
+            field_target: str,
+            default: Union[Any, utils.Empty] = utils.set_as_empty(),
+            /,
+        ) -> Any:
         """
         Returns the validated field value. Raises `valcheck.exceptions.MissingFieldException` if the field
         is missing, and no default is provided.
         """
-        if field in self.validated_data:
-            return self.validated_data[field]
-        if not is_empty(default):
+        if field_target in self.validated_data:
+            return self.validated_data[field_target]
+        if not utils.is_empty(default):
             return default
-        raise MissingFieldException(f"The field '{field}' is missing from the validated data")
+        raise MissingFieldException(f"The field target '{field_target}' is missing from the validated data")
 
     def _perform_field_validation_checks(self, *, field: Field) -> None:
         """Performs validation checks for the given field, and registers errors (if any) and validated-data"""
@@ -125,7 +132,7 @@ class Validator:
         if validated_field.errors:
             self._register_errors(errors=validated_field.errors)
             return
-        if not is_empty(validated_field.field.field_value):
+        if not utils.is_empty(validated_field.field.field_value):
             self._register_validated_data(
                 key=validated_field.field.target,
                 value=validated_field.field.field_value,
@@ -134,7 +141,7 @@ class Validator:
     def _perform_model_validation_checks(self) -> None:
         """Performs model validation checks, and registers errors (if any)"""
         errors = self.model_validator()
-        assert is_list_of_instances_of_type(errors, type_=Error, allow_empty=True), (
+        assert utils.is_list_of_instances_of_type(errors, type_=Error, allow_empty=True), (
             "The output of the model validator method must be a list of errors (each of type `valcheck.models.Error`)."
             " Must be an empty list if there are no errors."
         )

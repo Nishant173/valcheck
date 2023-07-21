@@ -63,17 +63,21 @@ class Error:
             self.field_path + separator + s
         )
 
-    def as_dict(self, *, include_validator_info: Optional[bool] = True) -> Dict[str, Any]:
+    def as_dict(
+            self,
+            *,
+            include_validator_message: Optional[bool] = True,
+            include_field_path: Optional[bool] = True,
+        ) -> Dict[str, Any]:
         dict_ = {
             "description": self.description,
             "code": self.code,
             "details": self.details,
         }
-        if include_validator_info:
-            dict_["validator_info"] = {
-                "validator_message": self.validator_message,
-                "field_path": self.field_path,
-            }
+        if include_validator_message:
+            dict_["validator_message"] = self.validator_message
+        if include_field_path:
+            dict_["field_path"] = self.field_path
         return dict_
 
     def __str__(self) -> str:
