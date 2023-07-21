@@ -1,4 +1,4 @@
-## Writing a validator having the `model_validator()` method and/or `context` property
+## Writing a validator having the `context` property
 
 from pprint import pprint
 from typing import List
@@ -8,27 +8,29 @@ from valcheck import fields, models, validator
 
 class PersonValidator(validator.Validator):
     name = fields.StringField(allow_empty=False)
-    gender = fields.ChoiceField(choices=("Female", "Male", "Other"))
+    gender = fields.ChoiceField(choices=("Female", "Male", "N/A"))
 
     def model_validator(self) -> List[models.Error]:
+        """
+        Used to validate the entire model, after all individual fields are validated.
+        The output of the model validator method must be a list of errors (each of type `valcheck.models.Error`).
+        Must be an empty list if there are no errors.
+        """
         errors = []
         user_id = self.context.get("user_id")
         if user_id and isinstance(user_id, int):
-            user_id_is_odd = user_id % 2 != 0
-            gender = self.get_validated_value("gender")
+            user_id_is_odd: bool = user_id % 2 != 0
+            gender: str = self.get_validated_value("gender")
             if user_id_is_odd and gender not in ("Female", "Male"):
-                errors.append(
-                    models.Error(
-                        description="Invalid `gender` - Please use one of ('Female', 'Male') for an odd user ID"
-                    )
-                )
+                error_message = "Invalid gender - Please use one of ('Female', 'Male') for an odd user ID"
+                errors.append(models.Error(description=error_message))
         return errors
 
 
 if __name__ == "__main__":
     data = {
         "name": "james murphy",
-        "gender": "Other",
+        "gender": "N/A",
     }
     context = {
         "user_id": 2,
