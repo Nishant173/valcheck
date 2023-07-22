@@ -24,7 +24,7 @@ class AdminUserValidator(BaseUserValidator):
     )
 
 
-class UserAddressValidator(BaseUserValidator):
+class RegularUserValidator(BaseUserValidator):
     pass
 
 
@@ -35,7 +35,7 @@ if __name__ == "__main__":
         "gender": "Male",
     }
     validator_class: Type[BaseUserValidator] = AdminUserValidator
-    # validator_class: Type[BaseUserValidator] = UserAddressValidator
+    # validator_class: Type[BaseUserValidator] = RegularUserValidator
     user_validator = validator_class(data=data)
     print("\nField validators")
     pprint(user_validator.list_field_validators())
