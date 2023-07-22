@@ -94,8 +94,10 @@ class Validator:
 
     def _initialise_fields(self) -> Dict[str, Field]:
         """Returns dictionary having keys = field identifiers, and values = initialised field instances"""
+        vars_dict: Dict[str, Any] = {}
+        for class_ in reversed(self.__class__.__mro__):
+            vars_dict.update(**vars(class_))
         field_info = {}
-        vars_dict = vars(self.__class__)
         for field_identifier in vars_dict:
             temp_field: Field = vars_dict[field_identifier]
             if (
