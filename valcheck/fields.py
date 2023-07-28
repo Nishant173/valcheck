@@ -32,6 +32,7 @@ class ValidatedField:
             f"target={utils.wrap_in_quotes_if_string(self.field.target)}",
             f"required={self.field.required}",
             f"nullable={self.field.nullable}",
+            f"type_alias={utils.wrap_in_quotes_if_string(self.field.type_alias)}",
         ]
         kwargs_string = "(" + ", ".join(kwargs_list) + ")"
         return f"{self.__class__.__name__}{kwargs_string}"
@@ -71,6 +72,7 @@ class Field:
             converter_factory: Optional[Callable] = None,
             validators: Optional[List[Callable]] = None,
             error: Optional[Error] = None,
+            type_alias: Optional[str] = None,
         ) -> None:
         """
         Parameters:
@@ -85,6 +87,7 @@ class Field:
             - validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
             The callable returns True if validation is successful, else False.
             - error (Error instance): Instance of type `valcheck.models.Error`.
+            - type_alias (str): Alias of the field type (optional).
         """
         assert source is None or utils.is_valid_object_of_type(source, type_=str, allow_empty=False), (
             "Param `source` must be of type 'str' and must be non-empty"
@@ -106,6 +109,9 @@ class Field:
             for validator in validators:
                 assert callable(validator), "Param `validators` must be a list of callables"
         assert error is None or isinstance(error, Error), "Param `error` must be of type `valcheck.models.Error`"
+        assert type_alias is None or utils.is_valid_object_of_type(type_alias, type_=str, allow_empty=False), (
+            "Param `type_alias` must be of type 'str' and must be non-empty"
+        )
 
         self._field_identifier = utils.set_as_empty()
         self._field_value = utils.set_as_empty()
@@ -117,6 +123,7 @@ class Field:
         self.converter_factory = converter_factory
         self.validators = validators or []
         self.error = error or Error()
+        self.type_alias = type_alias or self.__class__.__name__
 
     def copy(self) -> Field:
         """Returns deep-copy of current `Field` object"""
@@ -130,6 +137,7 @@ class Field:
             f"target={utils.wrap_in_quotes_if_string(self.target)}",
             f"required={self.required}",
             f"nullable={self.nullable}",
+            f"type_alias={utils.wrap_in_quotes_if_string(self.type_alias)}",
         ]
         kwargs_string = "(" + ", ".join(kwargs_list) + ")"
         return f"{self.__class__.__name__}{kwargs_string}"
@@ -201,14 +209,14 @@ class Field:
     def invalid_field_error_message(self, *, prefix: Optional[str] = None, suffix: Optional[str] = None) -> str:
         return (
             f"{prefix if prefix else ''}"
-            f"Invalid {self.__class__.__name__} '{self.source}'"
+            f"Invalid {self.type_alias} '{self.source}'"
             f"{suffix if suffix else ''}"
         )
 
     def missing_field_error_message(self, *, prefix: Optional[str] = None, suffix: Optional[str] = None) -> str:
         return (
             f"{prefix if prefix else ''}"
-            f"Missing {self.__class__.__name__} '{self.source}'"
+            f"Missing {self.type_alias} '{self.source}'"
             f"{suffix if suffix else ''}"
         )
 
