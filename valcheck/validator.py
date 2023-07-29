@@ -163,7 +163,10 @@ class Validator:
 
     def _perform_model_validation_checks(self) -> None:
         """Performs model validation checks, and registers errors (if any)"""
-        errors = self.model_validator()
+        errors: List[Error] = []
+        for class_ in self.__class__.__mro__:
+            if issubclass(class_, Validator):
+                errors += class_.model_validator(self)
         assert utils.is_list_of_instances_of_type(errors, type_=Error, allow_empty=True), (
             "The output of the model validator method must be a list of errors (each of type `valcheck.models.Error`)."
             " Must be an empty list if there are no errors."
