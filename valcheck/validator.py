@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import string
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Type, Union
 
 from valcheck.exceptions import (
     DuplicateSourcesException,
@@ -23,6 +25,7 @@ class Validator:
         - get_validated_value()
         - list_field_validators()
         - model_validator()
+        - model_validators_to_ignore()
         - run_validations()
     """
 
@@ -164,8 +167,9 @@ class Validator:
     def _perform_model_validation_checks(self) -> None:
         """Performs model validation checks, and registers errors (if any)"""
         errors: List[Error] = []
+        model_validator_classes_to_ignore = self.model_validators_to_ignore()
         for class_ in self.__class__.__mro__:
-            if issubclass(class_, Validator):
+            if issubclass(class_, Validator) and class_ not in model_validator_classes_to_ignore:
                 errors += class_.model_validator(self)
         assert utils.is_list_of_instances_of_type(errors, type_=Error, allow_empty=True), (
             "The output of the model validator method must be a list of errors (each of type `valcheck.models.Error`)."
@@ -175,6 +179,13 @@ class Validator:
         for error in errors:
             error.validator_message = INVALID_MODEL_ERROR_MESSAGE
         self._register_errors(errors=errors)
+
+    def model_validators_to_ignore(self) -> List[Type[Validator]]:
+        """
+        Returns list of class references of type `valcheck.validator.Validator` for which the `model_validator()`
+        method call must be ignored.
+        """
+        return []
 
     def model_validator(self) -> List[Error]:
         """
