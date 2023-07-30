@@ -6,7 +6,7 @@ from typing import List
 from valcheck import fields, models, validator
 
 
-class A(validator.Validator):
+class ValidatorA(validator.Validator):
     a1 = fields.IntegerField()
     a2 = fields.IntegerField()
 
@@ -16,7 +16,7 @@ class A(validator.Validator):
         return []
 
 
-class B(validator.Validator):
+class ValidatorB(validator.Validator):
     b1 = fields.IntegerField()
     b2 = fields.IntegerField()
 
@@ -26,7 +26,7 @@ class B(validator.Validator):
         return []
 
 
-class C(validator.Validator):
+class ValidatorC(validator.Validator):
     c1 = fields.IntegerField()
     c2 = fields.IntegerField()
 
@@ -36,7 +36,7 @@ class C(validator.Validator):
         return []
 
 
-class X(A, B, C):
+class ValidatorX(ValidatorA, ValidatorB, ValidatorC):
     x1 = fields.IntegerField()
     x2 = fields.IntegerField()
 
@@ -57,7 +57,7 @@ if __name__ == "__main__":
         "x1": 1,
         "x2": 2,
     }
-    validator_instance = X(data=data)
+    validator_instance = ValidatorX(data=data)
     print("\nField validators")
     pprint(validator_instance.list_field_validators())
     errors = validator_instance.run_validations()
