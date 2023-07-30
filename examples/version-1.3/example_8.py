@@ -1,7 +1,7 @@
 ## Writing validators with multiple inheritance
 
 from pprint import pprint
-from typing import List
+from typing import List, Type
 
 from valcheck import fields, models, validator
 
@@ -45,13 +45,16 @@ class ValidatorX(ValidatorA, ValidatorB, ValidatorC):
             return [models.Error(description="x1 must be < x2")]
         return []
 
+    def model_validators_to_ignore(self) -> List[Type[validator.Validator]]:
+        return [ValidatorB]
+
 
 if __name__ == "__main__":
     data = {
         "a1": 1,
         "a2": 2,
         "b1": 1,
-        "b2": 2,
+        "b2": -2,
         "c1": 1,
         "c2": 2,
         "x1": 1,
