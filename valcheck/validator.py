@@ -168,7 +168,11 @@ class Validator:
         """Performs model validation checks, and registers errors (if any)"""
         errors: List[Error] = []
         model_validator_classes_to_ignore = self.model_validators_to_ignore()
-        assert utils.is_list_of_instances_of_type(model_validator_classes_to_ignore, type_=type, allow_empty=True), (
+        assert utils.is_list_of_subclasses_of_type(
+            model_validator_classes_to_ignore,
+            type_=Validator,
+            allow_empty=True,
+        ), (
             "The output of the `model_validators_to_ignore()` method must be a list of types, each"
             " being a sub-class `valcheck.validator.Validator`."
             " Must be an empty list if there are no classes to ignore."
