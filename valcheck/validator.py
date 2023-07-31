@@ -168,11 +168,16 @@ class Validator:
         """Performs model validation checks, and registers errors (if any)"""
         errors: List[Error] = []
         model_validator_classes_to_ignore = self.model_validators_to_ignore()
+        assert utils.is_list_of_instances_of_type(model_validator_classes_to_ignore, type_=type, allow_empty=True), (
+            "The output of the `model_validators_to_ignore()` method must be a list of types, each"
+            " being a sub-class `valcheck.validator.Validator`."
+            " Must be an empty list if there are no classes to ignore."
+        )
         for class_ in self.__class__.__mro__:
             if issubclass(class_, Validator) and class_ not in model_validator_classes_to_ignore:
                 errors += class_.model_validator(self)
         assert utils.is_list_of_instances_of_type(errors, type_=Error, allow_empty=True), (
-            "The output of the model validator method must be a list of errors (each of type `valcheck.models.Error`)."
+            "The output of the `model_validator()` method must be a list of errors (each of type `valcheck.models.Error`)."
             " Must be an empty list if there are no errors."
         )
         INVALID_MODEL_ERROR_MESSAGE = "Invalid model - Validation failed"
@@ -190,7 +195,7 @@ class Validator:
     def model_validator(self) -> List[Error]:
         """
         Used to validate the entire model, after all individual fields are validated.
-        The output of the model validator method must be a list of errors (each of type `valcheck.models.Error`).
+        The output of this method must be a list of errors (each of type `valcheck.models.Error`).
         Must be an empty list if there are no errors.
         """
         return []
