@@ -26,6 +26,15 @@ def is_list_of_instances_of_type(obj: Any, /, *, type_: Type, allow_empty: Optio
     return all((isinstance(item, type_) for item in obj))
 
 
+def is_list_of_subclasses_of_type(obj: Any, /, *, type_: Type, allow_empty: Optional[bool] = True) -> bool:
+    """Returns True if `obj` is a list of sub-classes of type `type_`"""
+    if not isinstance(obj, list):
+        return False
+    if not allow_empty and not obj:
+        return False
+    return all((bool(isinstance(item, type) and issubclass(item, type_)) for item in obj))
+
+
 def is_valid_object_of_type(obj: Any, /, *, type_: Type, allow_empty: Optional[bool] = True) -> bool:
     if not isinstance(obj, type_):
         return False
