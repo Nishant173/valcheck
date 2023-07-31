@@ -39,7 +39,7 @@ if __name__ == "__main__":
         "items": [
             {
                 "name": "Banana",
-                "quantity": 1.5,
+                "quantity": 1.2,
                 "unit": "kgs",
             },
             {
