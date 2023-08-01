@@ -174,7 +174,7 @@ class Validator:
             allow_empty=True,
         ), (
             "The output of the `model_validators_to_ignore()` method must be a list of types, each"
-            " being a sub-class `valcheck.validator.Validator`."
+            " being a sub-class of `valcheck.validator.Validator`."
             " Must be an empty list if there are no classes to ignore."
         )
         for class_ in self.__class__.__mro__:
