@@ -1,5 +1,5 @@
 # valcheck
-An open-source, lightweight, highly performant library for quick data validation
+An open-source, lightweight, highly performant, and **predictable** library for quick data validation
 
 ## Installation
 ```
