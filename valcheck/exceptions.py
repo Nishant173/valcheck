@@ -49,6 +49,7 @@ class ValidationException(Exception):
     def as_dict(self) -> Dict[str, Any]:
         return {
             "errors": [error.as_dict() for error in self.errors],
+            "count": len(self.errors),
         }
 
     def __str__(self) -> str:

@@ -13,15 +13,17 @@ class Error:
             description: Optional[str] = None,
             code: Optional[str] = None,
             details: Optional[Dict[str, Any]] = None,
+            initial_field_path: Optional[str] = None,
         ) -> None:
         assert (description is None or isinstance(description, str)), "Param `description` must be a string"
         assert (code is None or isinstance(code, str)), "Param `code` must be a string"
         assert (details is None or isinstance(details, dict)), "Param `details` must be a dictionary"
+        assert (initial_field_path is None or isinstance(initial_field_path, str)), "Param `initial_field_path` must be a string"
         self.description = description or ""
         self.code = code or ""
         self.details = details or {}
         self._validator_message = ""
-        self._field_path = ""
+        self._field_path = initial_field_path or ""
 
     def copy(self) -> Error:
         """Returns deep-copy of current `Error` object"""
