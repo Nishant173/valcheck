@@ -1,5 +1,5 @@
 # valcheck
-An open-source, lightweight, highly performant, and **predictable** library for quick data validation
+An open-source, lightweight, highly performant, and **predictable** library for quick data validation.
 
 ## Installation
 ```
@@ -7,7 +7,7 @@ pip install valcheck
 ```
 
 ## Usage
-- Refer to the `examples/` folder, based on the **valcheck** version you are using
+- Refer to the `examples/` folder, based on the **valcheck** version you are using.
 
 ## Performance benchmarks
 - On comparison of the performance of Django Rest Framework's (version 3.14.0) serializer with Valcheck's
