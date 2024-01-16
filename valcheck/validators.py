@@ -174,7 +174,7 @@ class Validator:
             allow_empty=True,
         ), (
             "The output of the `model_validators_to_ignore()` method must be a list of types, each"
-            " being a sub-class of `valcheck.validator.Validator`."
+            " being a sub-class of `valcheck.validators.Validator`."
             " Must be an empty list if there are no classes to ignore."
         )
         for class_ in self.__class__.__mro__:
@@ -191,7 +191,7 @@ class Validator:
 
     def model_validators_to_ignore(self) -> List[Type[Validator]]:
         """
-        Returns list of class references of type `valcheck.validator.Validator` for which the `model_validator()`
+        Returns list of class references of type `valcheck.validators.Validator` for which the `model_validator()`
         method call must be ignored.
         """
         return []

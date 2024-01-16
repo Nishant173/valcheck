@@ -3,7 +3,7 @@ from typing import List, Optional
 from valcheck.apis import status_codes
 from valcheck.apis.exceptions import ApiException
 from valcheck.models import Error
-from valcheck.validator import Validator
+from valcheck.validators import Validator
 
 
 class ApiRequestValidator(Validator):
