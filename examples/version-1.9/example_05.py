@@ -4,12 +4,12 @@ from datetime import datetime, date
 from pprint import pprint
 from typing import List
 
-from valcheck import fields, models, validator
+from valcheck import fields, models, validators
 
 DATE_FORMAT = "%Y-%m-%d"
 
 
-class PersonValidator(validator.Validator):
+class PersonValidator(validators.Validator):
     name = fields.StringField(allow_empty=False)
     date_of_birth = fields.DateStringField(
         format_=DATE_FORMAT,
@@ -24,12 +24,21 @@ class PersonValidator(validator.Validator):
         Must be an empty list if there are no errors.
         """
         errors = []
+        name: str = self.get_validated_value("name")
         date_of_birth: date = self.get_validated_value("date_of_birth")
         gender: str = self.get_validated_value("gender")
-        if gender == "Male" and date_of_birth.month == 12:
-            errors.append(
-                models.Error(description="Invalid - We don't allow males born in the month of December")
+        if name.replace(" ", "") == "":
+            error = models.Error(
+                description="Invalid - The given name only has whitespaces. Please pass in an actual name",
+                initial_field_path="name",
             )
+            errors.append(error)
+        if gender == "Male" and date_of_birth.month == 12:
+            error = models.Error(
+                description="Invalid - We don't allow males born in the month of December",
+                initial_field_path="date_of_birth/gender", # the error is in either `date_of_birth` or `gender`
+            )
+            errors.append(error)
         return errors
 
 

@@ -7,6 +7,7 @@ class ApiException(ValidationException):
     """Exception to be raised when an API error occurs"""
 
     def __init__(self, *, http_status_code: int, **kwargs: Any) -> None:
+        assert isinstance(http_status_code, int), "Param `http_status_code` must be an integer"
         self._http_status_code = http_status_code
         super(ApiException, self).__init__(**kwargs)
 

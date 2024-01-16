@@ -3,10 +3,10 @@
 from pprint import pprint
 from typing import Type
 
-from valcheck import fields, models, validator
+from valcheck import fields, models, validators
 
 
-class BaseUserValidator(validator.Validator):
+class BaseUserValidator(validators.Validator):
     name = fields.StringField(allow_empty=False)
     age = fields.IntegerField(
         validators=[lambda x: x >= 18],

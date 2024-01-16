@@ -3,10 +3,10 @@
 from pprint import pprint
 from typing import List
 
-from valcheck import fields, models, validator
+from valcheck import fields, models, validators
 
 
-class PersonValidator(validator.Validator):
+class PersonValidator(validators.Validator):
     name = fields.StringField(allow_empty=False)
     gender = fields.ChoiceField(choices=("Female", "Male", "N/A"))
 
@@ -22,8 +22,11 @@ class PersonValidator(validator.Validator):
             user_id_is_odd: bool = user_id % 2 != 0
             gender: str = self.get_validated_value("gender")
             if user_id_is_odd and gender not in ("Female", "Male"):
-                error_message = "Invalid gender - Please use one of ('Female', 'Male') for an odd user ID"
-                errors.append(models.Error(description=error_message))
+                error = models.Error(
+                    description="Invalid gender - Please use one of ('Female', 'Male') for an odd user ID",
+                    initial_field_path="gender",
+                )
+                errors.append(error)
         return errors
 
 

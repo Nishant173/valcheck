@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 from pprint import pprint
 
-from valcheck import fields, models, validator
+from valcheck import fields, models, validators
 
 
 DATETIME_STRING_FORMAT = "%Y-%m-%d %H:%M:%S %z"
@@ -11,7 +11,7 @@ ITEM_NAMES = ("Apple", "Banana", "Lemon", "Orange")
 ITEM_UNITS = ("kgs", "grams")
 
 
-class ItemValidator(validator.Validator):
+class ItemValidator(validators.Validator):
     name = fields.ChoiceField(
         choices=ITEM_NAMES,
         error=models.Error(details={"message": f"Item name must be one of {'|'.join(ITEM_NAMES)}"}),
@@ -26,7 +26,7 @@ class ItemValidator(validator.Validator):
     )
 
 
-class CartValidator(validator.Validator):
+class CartValidator(validators.Validator):
     timestamp_of_purchase = fields.DatetimeStringField(
         format_=DATETIME_STRING_FORMAT,
         converter_factory=lambda ts_string: datetime.strptime(ts_string, DATETIME_STRING_FORMAT).astimezone(timezone.utc),

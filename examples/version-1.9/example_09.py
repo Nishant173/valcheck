@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from pprint import pprint
 from typing import List
 
-from valcheck import fields, models, validator
+from valcheck import fields, models, validators
 
 
 DATETIME_UTC_FIELD = fields.AnyField(
@@ -16,7 +16,7 @@ DATETIME_UTC_FIELD = fields.AnyField(
 )
 
 
-class TimestampValidator(validator.Validator):
+class TimestampValidator(validators.Validator):
     start_timestamp = DATETIME_UTC_FIELD
     end_timestamp = DATETIME_UTC_FIELD
 

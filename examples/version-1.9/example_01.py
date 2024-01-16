@@ -2,13 +2,13 @@
 
 from pprint import pprint
 
-from valcheck import fields, validator
+from valcheck import fields, validators
 
 DATE_FORMAT = "%Y-%m-%d"
 GENDER_CHOICES = ("Female", "Male", "Other")
 
 
-class PersonValidator(validator.Validator):
+class PersonValidator(validators.Validator):
     name = fields.StringField(allow_empty=False)
     age = fields.IntegerField()
     gender = fields.ChoiceField(choices=GENDER_CHOICES)

@@ -1,12 +1,12 @@
 """
-This is a snippet that compares valcheck (version 1.8) validators with Django (4.2.3) / DjangoRestFramework (3.14.0) serializers
+This is a snippet that compares valcheck (version 1.9) validators with Django (4.2.3) / DjangoRestFramework (3.14.0) serializers
 """
 
 import functools
 import time
 
 from rest_framework import serializers
-from valcheck import fields, models, validator
+from valcheck import fields, models, validators
 
 DATE_FORMAT = "%Y-%m-%d"
 NUM_REPITITIONS = 25_000
@@ -44,7 +44,7 @@ class PersonDrf(serializers.Serializer):
     dob = serializers.DateField(format=DATE_FORMAT)
 
 
-class PersonValcheck(validator.Validator):
+class PersonValcheck(validators.Validator):
     name = fields.StringField(
         allow_empty=False,
         error=models.Error(description="The name should include first and last name. Eg: `Sundar Pichai`"),

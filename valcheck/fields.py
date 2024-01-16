@@ -430,9 +430,9 @@ class ListField(Field):
 
 class ModelDictionaryField(Field):
     def __init__(self, *, validator_model: Type, **kwargs: Any) -> None:
-        from valcheck.validator import Validator
+        from valcheck.validators import Validator
         assert validator_model is not Validator and issubclass(validator_model, Validator), (
-            "Param `validator_model` must be a sub-class of `valcheck.validator.Validator`"
+            "Param `validator_model` must be a sub-class of `valcheck.validators.Validator`"
         )
         kwargs_to_disallow = ['validators', 'error']
         if utils.dict_has_any_keys(kwargs, keys=kwargs_to_disallow):
@@ -462,9 +462,9 @@ class ModelDictionaryField(Field):
 
 class ModelListField(Field):
     def __init__(self, *, validator_model: Type, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
-        from valcheck.validator import Validator
+        from valcheck.validators import Validator
         assert validator_model is not Validator and issubclass(validator_model, Validator), (
-            "Param `validator_model` must be a sub-class of `valcheck.validator.Validator`"
+            "Param `validator_model` must be a sub-class of `valcheck.validators.Validator`"
         )
         kwargs_to_disallow = ['validators', 'error']
         if utils.dict_has_any_keys(kwargs, keys=kwargs_to_disallow):

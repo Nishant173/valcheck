@@ -2,10 +2,10 @@
 
 from pprint import pprint
 
-from valcheck import fields, models, validator
+from valcheck import fields, models, validators
 
 
-class AddressValidator(validator.Validator):
+class AddressValidator(validators.Validator):
     country = fields.StringField(allow_empty=False)
     state = fields.StringField(allow_empty=False)
     city = fields.StringField(allow_empty=False)
@@ -21,7 +21,7 @@ class AddressValidator(validator.Validator):
     is_mailing_address = fields.BooleanField()
 
 
-class PersonValidator(validator.Validator):
+class PersonValidator(validators.Validator):
     name = fields.StringField(allow_empty=False)
     address = fields.ModelDictionaryField(validator_model=AddressValidator)
 

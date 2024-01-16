@@ -3,7 +3,7 @@
 from pprint import pprint
 
 from valcheck import fields
-from valcheck.apis.validator import ApiRequestValidator
+from valcheck.apis.validators import ApiRequestValidator
 from valcheck.apis.exceptions import ApiException
 from valcheck.apis import status_codes
 

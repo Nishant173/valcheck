@@ -4,13 +4,13 @@
 from datetime import datetime
 from pprint import pprint
 
-from valcheck import fields, models, validator
+from valcheck import fields, models, validators
 
 DATE_FORMAT = "%Y-%m-%d"
 GENDER_CHOICES = ("Female", "Male", "N/A")
 
 
-class PersonValidator(validator.Validator):
+class PersonValidator(validators.Validator):
     name = fields.StringField(allow_empty=False)
     age = fields.IntegerField()
     gender = fields.ChoiceField(
@@ -21,7 +21,7 @@ class PersonValidator(validator.Validator):
     date_of_birth = fields.DateStringField(
         format_=DATE_FORMAT,
         source="Date of birth",
-        target="Date of birth",
+        target="date-of-birth",
         required=True,
         nullable=False,
         converter_factory=lambda x: datetime.strptime(x, DATE_FORMAT).date(),
