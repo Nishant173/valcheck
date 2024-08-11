@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import string
-from typing import Any, Dict, List, Optional, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 
 from valcheck.exceptions import (
     DuplicateSourcesException,
@@ -10,7 +10,7 @@ from valcheck.exceptions import (
     MissingFieldException,
     ValidationException,
 )
-from valcheck.fields import Field
+from valcheck.fields import Field, ModelDictionaryField, ModelListField
 from valcheck.models import Error
 from valcheck import utils
 
@@ -22,6 +22,7 @@ class Validator:
         - validated_data
 
     Instance methods:
+        - get_representation()
         - get_validated_value()
         - list_field_validators()
         - model_validator()
@@ -59,6 +60,40 @@ class Validator:
                 "nullable": field.nullable,
             } for field_identifier, field in self._field_info.items()
         ]
+
+    def _get_field_key_picker(self, *, key: str) -> Callable[[Field], str]:
+        """
+        Validates the `key` and returns a callable.
+        The callable takes in a field and returns the field's attribute based on `key`.
+        """
+        key_mapper = {
+            "field_identifier": lambda field_obj: field_obj.field_identifier,
+            "source": lambda field_obj: field_obj.source,
+            "target": lambda field_obj: field_obj.target,
+        }
+        assert key in key_mapper, f"Param `key` must be one of {list(key_mapper.keys())}"
+        return key_mapper[key]
+
+    def get_representation(self, *, key: Optional[str] = "field_identifier") -> Dict[str, Any]:
+        """
+        Returns dictionary having the representation of the expected data format.
+        Options for `key` are: `['field_identifier', 'source', 'target']`.
+        """
+        field_key_picker = self._get_field_key_picker(key=key)
+        representation = {}
+        for _, field in self._field_info.items():
+            field_key = field_key_picker(field)
+            if isinstance(field, ModelDictionaryField):
+                representation[field_key] = {
+                    **field.validator_model(data={}).get_representation(key=key),
+                }
+            elif isinstance(field, ModelListField):
+                representation[field_key] = [
+                    field.validator_model(data={}).get_representation(key=key),
+                ]
+            else:
+                representation[field_key] = None
+        return representation
 
     def _validate_field_identifier(self, field_identifier: str, /) -> None:
         """If an invalid field-identifier is found, raises `valcheck.exceptions.InvalidFieldIdentifierException`"""
