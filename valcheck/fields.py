@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import copy
+from datetime import datetime, timezone
+import random
 from typing import Any, Callable, Iterable, List, Optional, Type, Union
+import uuid
 
 from valcheck.models import Error
 from valcheck import utils
@@ -180,6 +183,10 @@ class Field:
         """Returns list of errors (each of type `valcheck.models.Error`)"""
         raise NotImplementedError()
 
+    def sample_value(self) -> Union[Any, None]:
+        """Returns a sample value for the field"""
+        return None
+
     def run_validations(self) -> ValidatedField:
         if utils.is_empty(self.field_value) and not self.required and self.default_factory:
             self.field_value = self.default_factory()
@@ -235,6 +242,9 @@ class AnyField(Field):
     def validate(self) -> List[Error]:
         return []
 
+    def sample_value(self) -> Union[Any, None]:
+        return super().sample_value()
+
 
 class BooleanField(Field):
     def __init__(self, **kwargs: Any) -> None:
@@ -244,6 +254,9 @@ class BooleanField(Field):
         if isinstance(self.field_value, bool):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+    def sample_value(self) -> Union[Any, None]:
+        return True
 
 
 class StringField(Field):
@@ -256,6 +269,9 @@ class StringField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
+    def sample_value(self) -> Union[Any, None]:
+        return ""
+
 
 class JsonStringField(Field):
     def __init__(self, **kwargs: Any) -> None:
@@ -265,6 +281,9 @@ class JsonStringField(Field):
         if isinstance(self.field_value, str) and utils.is_valid_json_string(self.field_value):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+    def sample_value(self) -> Union[Any, None]:
+        return '{"key1": "value1", "key2": "value2"}'
 
 
 class EmailIdField(Field):
@@ -276,6 +295,9 @@ class EmailIdField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
+    def sample_value(self) -> Union[Any, None]:
+        return "hello@example.com"
+
 
 class UuidStringField(Field):
     def __init__(self, **kwargs: Any) -> None:
@@ -285,6 +307,9 @@ class UuidStringField(Field):
         if isinstance(self.field_value, str) and utils.is_valid_uuid_string(self.field_value):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+    def sample_value(self) -> Union[Any, None]:
+        return str(uuid.uuid4())
 
 
 class DateStringField(Field):
@@ -297,6 +322,9 @@ class DateStringField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
+    def sample_value(self) -> Union[Any, None]:
+        return datetime.now(tz=timezone.utc).date().strftime(self.format_)
+
 
 class DatetimeStringField(Field):
     def __init__(self, *, format_: Optional[str] = "%Y-%m-%d %H:%M:%S", **kwargs: Any) -> None:
@@ -307,6 +335,9 @@ class DatetimeStringField(Field):
         if isinstance(self.field_value, str) and utils.is_valid_datetime_string(self.field_value, self.format_):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+    def sample_value(self) -> Union[Any, None]:
+        return datetime.now(tz=timezone.utc).strftime(self.format_)
 
 
 class ChoiceField(Field):
@@ -319,6 +350,9 @@ class ChoiceField(Field):
         if self.field_value in self.choices:
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+    def sample_value(self) -> Union[Any, None]:
+        return random.choice(self.choices)
 
 
 class MultiChoiceField(Field):
@@ -335,6 +369,11 @@ class MultiChoiceField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
+    def sample_value(self) -> Union[Any, None]:
+        return (
+            random.sample(self.choices, k=2) if len(self.choices) > 1 else random.sample(self.choices, k=1)
+        )
+
 
 class BytesField(Field):
     def __init__(self, **kwargs: Any) -> None:
@@ -344,6 +383,9 @@ class BytesField(Field):
         if isinstance(self.field_value, bytes):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+    def sample_value(self) -> Union[Any, None]:
+        return b''
 
 
 class NumberField(Field):
@@ -355,6 +397,9 @@ class NumberField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
+    def sample_value(self) -> Union[Any, None]:
+        return 3.14
+
 
 class IntegerField(Field):
     def __init__(self, **kwargs: Any) -> None:
@@ -364,6 +409,9 @@ class IntegerField(Field):
         if isinstance(self.field_value, int):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+    def sample_value(self) -> Union[Any, None]:
+        return 314
 
 
 class FloatField(Field):
@@ -375,6 +423,9 @@ class FloatField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
+    def sample_value(self) -> Union[Any, None]:
+        return 3.14
+
 
 class NumberStringField(Field):
     def __init__(self, **kwargs: Any) -> None:
@@ -384,6 +435,9 @@ class NumberStringField(Field):
         if utils.is_valid_number_string(self.field_value):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+    def sample_value(self) -> Union[Any, None]:
+        return "3.14"
 
 
 class IntegerStringField(Field):
@@ -395,6 +449,9 @@ class IntegerStringField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
+    def sample_value(self) -> Union[Any, None]:
+        return "314"
+
 
 class FloatStringField(Field):
     def __init__(self, **kwargs: Any) -> None:
@@ -404,6 +461,9 @@ class FloatStringField(Field):
         if utils.is_valid_float_string(self.field_value):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+    def sample_value(self) -> Union[Any, None]:
+        return "3.14"
 
 
 class DictionaryField(Field):
@@ -416,6 +476,9 @@ class DictionaryField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
+    def sample_value(self) -> Union[Any, None]:
+        return {}
+
 
 class ListField(Field):
     def __init__(self, *, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
@@ -426,6 +489,9 @@ class ListField(Field):
         if utils.is_valid_object_of_type(self.field_value, type_=list, allow_empty=self.allow_empty):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+    def sample_value(self) -> Union[Any, None]:
+        return []
 
 
 class ModelDictionaryField(Field):
@@ -458,6 +524,9 @@ class ModelDictionaryField(Field):
         if not error_objs:
             self.field_value = validator.validated_data
         return error_objs
+
+    def sample_value(self) -> Union[Any, None]:
+        return super().sample_value()
 
 
 class ModelListField(Field):
@@ -511,4 +580,7 @@ class ModelListField(Field):
         if not errors:
             self.field_value = validated_field_value
         return errors
+
+    def sample_value(self) -> Union[Any, None]:
+        return super().sample_value()
 
