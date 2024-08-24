@@ -74,7 +74,7 @@ class Validator:
         assert key in key_mapper, f"Param `key` must be one of {list(key_mapper.keys())}"
         return key_mapper[key]
 
-    def get_representation(self, *, key: Optional[str] = "field_identifier") -> Dict[str, Any]:
+    def get_representation(self, *, key: str) -> Dict[str, Any]:
         """
         Returns dictionary having the representation of the expected data format.
         Options for `key` are: `['field_identifier', 'source', 'target']`.
