@@ -58,6 +58,11 @@ class Validator:
                 "target": field.target,
                 "required": field.required,
                 "nullable": field.nullable,
+                "field_validators_of_model": (
+                    field.validator_model(data={}).list_field_validators()
+                    if utils.is_instance_of_any(obj=field, types=[ModelDictionaryField, ModelListField])
+                    else []
+                ),
             } for field_identifier, field in self._field_info.items()
         ]
 
@@ -74,7 +79,7 @@ class Validator:
         assert key in key_mapper, f"Param `key` must be one of {list(key_mapper.keys())}"
         return key_mapper[key]
 
-    def get_representation(self, *, key: Optional[str] = "field_identifier") -> Dict[str, Any]:
+    def get_representation(self, *, key: str) -> Dict[str, Any]:
         """
         Returns dictionary having the representation of the expected data format.
         Options for `key` are: `['field_identifier', 'source', 'target']`.
