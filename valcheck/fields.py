@@ -371,7 +371,7 @@ class MultiChoiceField(Field):
 
     def sample_value(self) -> Union[Any, None]:
         return (
-            random.choices(self.choices, k=2) if len(self.choices) > 1 else random.choices(self.choices, k=1)
+            random.sample(self.choices, k=2) if len(self.choices) > 1 else random.sample(self.choices, k=1)
         )
 
 
