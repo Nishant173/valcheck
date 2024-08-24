@@ -6,6 +6,12 @@ from pprint import pprint
 from valcheck import fields, validators
 
 
+NOT_REQUIRED_AND_NULLABLE = dict(
+    required=False,
+    nullable=True,
+    default_factory=lambda: None,
+)
+
 GENDERS = (
     "Male",
     "Female",
@@ -25,42 +31,51 @@ COLORS = (
 
 
 class HobbyValidator(validators.Validator):
-    id = fields.UuidStringField()
-    name = fields.StringField(allow_empty=False, source="hobby_name")
+    id = fields.UuidStringField(
+        source="hobby_id",
+        target="hobby_id_target",
+        converter_factory=lambda x: f"<ID: {x}>",
+    )
+    name = fields.StringField(allow_empty=False)
 
 
 class PersonalInfoValidator(validators.Validator):
     full_name = fields.StringField(allow_empty=False)
     favourite_hobby = fields.ModelDictionaryField(validator_model=HobbyValidator)
     other_hobbies = fields.ModelListField(validator_model=HobbyValidator, allow_empty=False)
-    extra_info = fields.JsonStringField(required=False, nullable=True, default_factory=lambda: None, converter_factory=lambda x: json.loads(x))
-    gpa = fields.FloatStringField(required=False, nullable=True, default_factory=lambda: None)
-    date_of_birth = fields.DateStringField(format_="%d %B, %Y", required=False, nullable=True, default_factory=lambda: None)
-    datetime_of_birth = fields.DatetimeStringField(format_="%Y-%m-%d %H:%M:%S %z", required=False, nullable=True, default_factory=lambda: None)
-    is_disabled = fields.BooleanField(required=False, nullable=True, default_factory=lambda: None)
-    gender = fields.ChoiceField(choices=GENDERS, required=False, nullable=True, default_factory=lambda: None)
-    favourite_colors = fields.MultiChoiceField(choices=COLORS, required=False, nullable=True, default_factory=lambda: None)
+    extra_info = fields.JsonStringField(converter_factory=json.loads, **NOT_REQUIRED_AND_NULLABLE)
+    gpa = fields.FloatStringField(**NOT_REQUIRED_AND_NULLABLE)
+    date_of_birth = fields.DateStringField(format_="%d %B, %Y", **NOT_REQUIRED_AND_NULLABLE)
+    datetime_of_birth = fields.DatetimeStringField(format_="%Y-%m-%d %H:%M:%S %z", **NOT_REQUIRED_AND_NULLABLE)
+    is_disabled = fields.BooleanField(**NOT_REQUIRED_AND_NULLABLE)
+    gender = fields.ChoiceField(choices=GENDERS, **NOT_REQUIRED_AND_NULLABLE)
+    favourite_colors = fields.MultiChoiceField(choices=COLORS, **NOT_REQUIRED_AND_NULLABLE)
 
 
 if __name__ == "__main__":
+    representation = PersonalInfoValidator(data={}).get_representation(key="source")
+    print("------------------\n------------------")
+    print("Representation")
+    pprint(representation)
+    print("------------------\n------------------")
     data = {
         "full_name": "James Murphy",
         "favourite_hobby": {
-            "id": "7e41ffc5-1106-4ad0-8aee-4a56c8d39ed6",
-            "hobby_name": "coding",
+            "hobby_id": "7e41ffc5-1106-4ad0-8aee-4a56c8d39ed6",
+            "name": "coding",
         },
         "other_hobbies": [
             {
-                "id": "9876dda8-c58d-43fd-8358-8c21a9a26613",
-                "hobby_name": "hobby #1",
+                "hobby_id": "9876dda8-c58d-43fd-8358-8c21a9a26613",
+                "name": "hobby #1",
             },
             {
-                "id": "9876dda8-c58d-43fd-8358-8c21a9a26614",
-                "hobby_name": "hobby #2",
+                "hobby_id": "9876dda8-c58d-43fd-8358-8c21a9a26614",
+                "name": "hobby #2",
             },
             {
-                "id": "9876dda8-c58d-43fd-8358-8c21a9a26615",
-                "hobby_name": "hobby #3",
+                "hobby_id": "9876dda8-c58d-43fd-8358-8c21a9a26615",
+                "name": "hobby #3",
             },
         ],
         "extra_info": '{"key1": "value1", "key2": "value2"}',
@@ -72,10 +87,6 @@ if __name__ == "__main__":
         "favourite_colors": ["red", "orange"],
     }
     personal_info_validator = PersonalInfoValidator(data=data)
-    representation = personal_info_validator.get_representation(key="source")
-    print("Representation")
-    pprint(representation)
-    print("\n\n")
     errors = personal_info_validator.run_validations()
     if errors:
         print("Errors")
