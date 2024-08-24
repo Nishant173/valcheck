@@ -92,7 +92,7 @@ class Validator:
                     field.validator_model(data={}).get_representation(key=key),
                 ]
             else:
-                representation[field_key] = None
+                representation[field_key] = field.sample_value()
         return representation
 
     def _validate_field_identifier(self, field_identifier: str, /) -> None:
