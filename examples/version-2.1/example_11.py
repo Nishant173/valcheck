@@ -53,11 +53,14 @@ class PersonalInfoValidator(validators.Validator):
 
 
 if __name__ == "__main__":
+    # View the representation for the Validator
+    print("-" * 100, "\n", sep="")
     representation = PersonalInfoValidator(data={}).get_representation(key="source")
-    print("------------------\n------------------")
     print("Representation")
     pprint(representation)
-    print("------------------\n------------------")
+
+    # Validate the data
+    print("-" * 100, "\n", sep="")
     data = {
         "full_name": "James Murphy",
         "favourite_hobby": {
