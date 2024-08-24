@@ -58,6 +58,11 @@ class Validator:
                 "target": field.target,
                 "required": field.required,
                 "nullable": field.nullable,
+                "field_validators_of_model": (
+                    field.validator_model(data={}).list_field_validators()
+                    if utils.is_instance_of_any(field, [ModelDictionaryField, ModelListField])
+                    else []
+                ),
             } for field_identifier, field in self._field_info.items()
         ]
 
