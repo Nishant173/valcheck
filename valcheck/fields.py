@@ -363,7 +363,8 @@ class MultiChoiceField(Field):
 
     def validate(self) -> List[Error]:
         if (
-            isinstance(self.field_value, list)
+            utils.is_iterable(self.field_value)
+            and bool(self.field_value)
             and all([item in self.choices for item in self.field_value])
         ):
             return []
