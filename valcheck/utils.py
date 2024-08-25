@@ -41,22 +41,36 @@ def is_valid_object_of_type(obj: Any, /, *, type_: Type, allow_empty: Optional[b
     return True if allow_empty else bool(obj)
 
 
-def is_valid_uuid_string(string: str, /) -> bool:
-    if len(string) != 36:
+def is_valid_uuid_string(s: str, /) -> bool:
+    if len(s) != 36:
         return False
     try:
-        _ = UUID(string)
+        _ = UUID(s)
         return True
+    except (ValueError, TypeError):
+        return False
     except Exception:
         return False
 
 
-def is_valid_datetime_string(string: str, format_: str, /) -> bool:
-    """Returns True if given date/datetime string is valid; otherwise returns False"""
+def is_valid_date_string(s: str, format_: str, /) -> bool:
+    """Returns True if given date string is valid; otherwise returns False"""
     try:
-        _ = datetime.strptime(string, format_)
+        return datetime.strptime(s, format_).date().strftime(format_) == s
+    except (ValueError, TypeError):
+        return False
+    except Exception:
+        return False
+
+
+def is_valid_datetime_string(s: str, format_: str, /) -> bool:
+    """Returns True if given datetime string is valid; otherwise returns False"""
+    try:
+        _ = datetime.strptime(s, format_)
         return True
     except (ValueError, TypeError):
+        return False
+    except Exception:
         return False
 
 
@@ -65,6 +79,8 @@ def is_valid_json_string(string: str, /) -> bool:
         _ = json.loads(string)
         return True
     except (json.decoder.JSONDecodeError, TypeError):
+        return False
+    except Exception:
         return False
 
 
@@ -91,6 +107,8 @@ def is_valid_number_string(s: str, /) -> bool:
         _ = float(s)
         return True
     except (TypeError, ValueError):
+        return False
+    except Exception:
         return False
 
 
@@ -124,3 +142,4 @@ def wrap_in_quotes_if_string(obj: Any, /) -> Any:
     if isinstance(obj, str):
         return f"'{obj}'"
     return obj
+

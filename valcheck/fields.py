@@ -318,7 +318,7 @@ class DateStringField(Field):
         super(DateStringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if isinstance(self.field_value, str) and utils.is_valid_datetime_string(self.field_value, self.format_):
+        if isinstance(self.field_value, str) and utils.is_valid_date_string(self.field_value, self.format_):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
@@ -363,7 +363,8 @@ class MultiChoiceField(Field):
 
     def validate(self) -> List[Error]:
         if (
-            isinstance(self.field_value, list)
+            utils.is_iterable(self.field_value)
+            and bool(self.field_value)
             and all([item in self.choices for item in self.field_value])
         ):
             return []
