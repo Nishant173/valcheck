@@ -85,3 +85,4 @@ if __name__ == "__main__":
     invalid_data = {"name": 123, "age": "hello", "gender": "haha", "dob": "2000-01-16 --"}
     d2 = drf_serializer(invalid_data)
     v2 = valcheck_validator(invalid_data)
+
