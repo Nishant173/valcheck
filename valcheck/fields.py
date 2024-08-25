@@ -342,7 +342,7 @@ class DatetimeStringField(Field):
 
 class ChoiceField(Field):
     def __init__(self, *, choices: Iterable[Any], **kwargs: Any) -> None:
-        assert utils.is_iterable(choices), "Param `choices` must be an iterable"
+        assert utils.is_iterable(choices) and bool(choices), "Param `choices` must be a non-empty iterable"
         self.choices = choices
         super(ChoiceField, self).__init__(**kwargs)
 
@@ -357,7 +357,7 @@ class ChoiceField(Field):
 
 class MultiChoiceField(Field):
     def __init__(self, *, choices: Iterable[Any], **kwargs: Any) -> None:
-        assert utils.is_iterable(choices), "Param `choices` must be an iterable"
+        assert utils.is_iterable(choices) and bool(choices), "Param `choices` must be a non-empty iterable"
         self.choices = choices
         super(MultiChoiceField, self).__init__(**kwargs)
 
