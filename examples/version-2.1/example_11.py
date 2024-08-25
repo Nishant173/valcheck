@@ -53,6 +53,12 @@ class PersonalInfoValidator(validators.Validator):
 
 
 if __name__ == "__main__":
+    # List the registered field validators
+    print("-" * 100, "\n", sep="")
+    field_validators = PersonalInfoValidator(data={}).list_field_validators()
+    print("Field Validators")
+    pprint(field_validators)
+
     # View the representation for the Validator
     print("-" * 100, "\n", sep="")
     representation = PersonalInfoValidator(data={}).get_representation(key="source")
