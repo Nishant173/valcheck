@@ -1,6 +1,7 @@
 import os
 from setuptools import find_packages, setup
 
+
 # Constants
 PACKAGE_NAME = "valcheck"
 PACKAGE_VERSION = "2.1"
