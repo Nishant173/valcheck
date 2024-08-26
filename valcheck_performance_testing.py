@@ -1,6 +1,6 @@
 """
 Snippet that compares the performance of valcheck to other data-validation libraries.
-Versions used: Please refer to the `requirements_for_performance_testing.txt` file
+Versions used: Please refer to the `requirements-for-performance-testing.txt` file
 """
 
 
