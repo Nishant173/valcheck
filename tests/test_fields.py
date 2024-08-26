@@ -103,23 +103,23 @@ class TestField(unittest.TestCase):
         """Helper method that checks if the inputs passed to the given `validator_model` are valid"""
         for item in io:
             data: Dict[str, Any] = item["data"]
-            is_error_expected: bool = item["is_error_expected"]
+            should_be_valid: bool = item["should_be_valid"]
             errors = validator_model(data=data).run_validations(raise_exception=False)
             message = {
                 "validator_model": validator_model.__name__,
                 "data": data,
-                "is_error_expected": is_error_expected,
+                "should_be_valid": should_be_valid,
                 "errors": [error.as_dict() for error in errors],
                 "is_valid": not has_errors(errors),
             }
-            if is_error_expected:
+            if should_be_valid:
                 self.assertTrue(
-                    expr=has_errors(errors),
+                    expr=not has_errors(errors),
                     msg=message,
                 )
             else:
                 self.assertTrue(
-                    expr=not has_errors(errors),
+                    expr=has_errors(errors),
                     msg=message,
                 )
 
@@ -129,23 +129,23 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"boolean_field": True},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"boolean_field": False},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"boolean_field": None},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"boolean_field": 1},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"boolean_field": 0},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
             ],
         )
@@ -156,15 +156,15 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"string_field": "hello"},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"string_field": ""},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"string_field": None},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
             ],
         )
@@ -175,15 +175,15 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"json_string_field": '{"key1": "value1", "key2": "value2", "key3": [1, 2, 3, null]}'},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"json_string_field": '[1, 2, 3, null]'},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"json_string_field": None},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
             ],
         )
@@ -194,15 +194,15 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"email_id_field": "hello@example.com"},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"email_id_field": "hello@example.com."},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"email_id_field": ""},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
             ],
         )
@@ -213,19 +213,19 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"uuid_string_field": "09179144-e336-4797-a957-8640ac9ba367"},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"uuid_string_field": "09179144e3364797a9578640ac9ba367"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"uuid_string_field": "09179144-e336-4797-a957-8640ac9ba367 "},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"uuid_string_field": "09179144-e336-4797-a957-8640ac9ba367."},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
             ],
         )
@@ -236,15 +236,15 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"date_string_field": "01 January, 2020"},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"date_string_field": "01 January 2020"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"date_string_field": "01 January 2020 17:45:00"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
             ],
         )
@@ -255,15 +255,15 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"datetime_string_field": "2020-05-25 17:30:00 +0530"},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"datetime_string_field": "2020-05-25 17:30:00+0530"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"datetime_string_field": "2020-05-25 17:30:00"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
             ],
         )
@@ -274,19 +274,19 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"choice_field": "A"},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"choice_field": "F"},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"choice_field": "G"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"choice_field": "Z"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
             ],
         )
@@ -297,27 +297,27 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"multi_choice_field": CHOICES},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"multi_choice_field": ["A", "C", "E"]},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"multi_choice_field": ["B", "D", "F"]},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"multi_choice_field": ["G", "H"]},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"multi_choice_field": ["G"]},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"multi_choice_field": []},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
             ],
         )
@@ -328,23 +328,23 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"bytes_field": b"hello"},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"bytes_field": b""},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"bytes_field": "".encode()},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"bytes_field": "hello"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"bytes_field": ""},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
             ],
         )
@@ -355,31 +355,31 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"number_field": 0},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"number_field": 0.01},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"number_field": -0.01},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"number_field": 1},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"number_field": -1},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"number_field": "1"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"number_field": "-1"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
             ],
         )
@@ -390,31 +390,31 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"integer_field": 0},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"integer_field": 0.01},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"integer_field": -0.01},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"integer_field": 1},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"integer_field": -1},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"integer_field": "1"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"integer_field": "-1"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
             ],
         )
@@ -425,31 +425,31 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"float_field": 0},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"float_field": 0.01},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"float_field": -0.01},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"float_field": 1},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"float_field": -1},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"float_field": "1"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"float_field": "-1"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
             ],
         )
@@ -460,31 +460,31 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"number_string_field": 0},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"number_string_field": 0.01},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"number_string_field": "0.01"},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"number_string_field": 1},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"number_string_field": -1},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"number_string_field": "1"},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"number_string_field": "-1"},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
             ],
         )
@@ -495,27 +495,27 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"integer_string_field": 0},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"integer_string_field": 0.01},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"integer_string_field": "0.01"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"integer_string_field": 1},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"integer_string_field": "1"},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"integer_string_field": "-1"},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
             ],
         )
@@ -526,27 +526,27 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"float_string_field": 0},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"float_string_field": 0.01},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"float_string_field": "0.01"},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"float_string_field": 1},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"float_string_field": "1"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"float_string_field": "-1.01"},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
             ],
         )
@@ -557,23 +557,23 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"dictionary_field": {}},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"dictionary_field": {"a": 1, "b": 2}},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"dictionary_field": dict(a=1, b=2)},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"dictionary_field": {"hello", "world"}},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
                 {
                     "data": {"dictionary_field": "{}"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
             ],
         )
@@ -584,19 +584,19 @@ class TestField(unittest.TestCase):
             io=[
                 {
                     "data": {"list_field": []},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"list_field": ["a", "b", "c", "d"]},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"list_field": list("abcd")},
-                    "is_error_expected": False,
+                    "should_be_valid": True,
                 },
                 {
                     "data": {"list_field": "[]"},
-                    "is_error_expected": True,
+                    "should_be_valid": False,
                 },
             ],
         )
