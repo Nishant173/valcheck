@@ -17,7 +17,7 @@ from valcheck import fields, models, validators
 
 DictionaryType = Dict[str, Any]
 DATE_FORMAT = "%Y-%m-%d"
-NUM_REPITITIONS = 10_000
+NUM_REPITITIONS = 25_000
 
 
 def repeat(*, num_times):
