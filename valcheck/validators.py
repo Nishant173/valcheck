@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import string
 from typing import Any, Callable, Dict, List, Optional, Type, Union
 
@@ -19,6 +20,7 @@ class Validator:
     """
     Properties:
         - context
+        - extra_data
         - validated_data
 
     Instance methods:
@@ -38,8 +40,8 @@ class Validator:
         ) -> None:
         assert isinstance(data, dict), "Param `data` must be a dictionary"
         assert context is None or isinstance(context, dict), "Param `context` must be a dictionary"
-        self.data = data
-        self._context: Dict[str, Any] = context or {}
+        self.data = copy.deepcopy(data)
+        self._context: Dict[str, Any] = copy.deepcopy(context) if context else {}
         self._field_info: Dict[str, Field] = self._initialise_fields()
         self._errors: List[Error] = []
         self._validated_data: Dict[str, Any] = {}
@@ -175,6 +177,23 @@ class Validator:
     def _clear_validated_data(self) -> None:
         """Clears out the dictionary having validated data"""
         self._validated_data.clear()
+
+    @property
+    def extra_data(self) -> Dict[str, Any]:
+        """
+        Returns dictionary containing the extra data (key-value pairs) which is present in the `data` dictionary, but not a part of
+        the fields being validated by the validator.
+        """
+        sources = set(
+            filter(
+                None,
+                (
+                    field_instance.source if field_instance.source else None for _, field_instance in self._field_info.items()
+                ),
+            )
+        )
+        extra_keys_in_data = set(self.data.keys()).difference(sources)
+        return { key : value for key, value in self.data.items() if key in extra_keys_in_data }
 
     def get_validated_value(
             self,
