@@ -40,7 +40,8 @@ if __name__ == "__main__":
         "Date of birth": "1980-05-25",
     }
     person_validator = PersonValidator(data=data)
-    errors = person_validator.run_validations()
+    person_validator.run_validations()
+    errors = person_validator.errors
     if errors:
         pprint([error.as_dict() for error in errors]) # Error list
     else:

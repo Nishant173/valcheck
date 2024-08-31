@@ -116,7 +116,8 @@ def valcheck_validator(data: DictionaryType) -> DictionaryType:
         "errors": None,
     }
     person_validator = PersonValcheck(data=data)
-    errors = person_validator.run_validations()
+    person_validator.run_validations()
+    errors = person_validator.errors
     if errors:
         result["errors"] = [error.as_dict() for error in errors]
     else:
@@ -138,3 +139,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

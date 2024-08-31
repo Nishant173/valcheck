@@ -39,7 +39,8 @@ if __name__ == "__main__":
     user_validator = validator_class(data=data)
     print("\nField validators")
     pprint(user_validator.list_field_validators())
-    errors = user_validator.run_validations()
+    user_validator.run_validations()
+    errors = user_validator.errors
     if errors:
         print("\nErrors")
         pprint([e.as_dict() for e in errors])

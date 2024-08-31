@@ -96,7 +96,8 @@ if __name__ == "__main__":
         "favourite_colors": ["red", "orange"],
     }
     personal_info_validator = PersonalInfoValidator(data=data)
-    errors = personal_info_validator.run_validations()
+    personal_info_validator.run_validations()
+    errors = personal_info_validator.errors
     if errors:
         print("Errors")
         pprint([error.as_dict() for error in errors]) # Error list

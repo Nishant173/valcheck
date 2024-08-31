@@ -56,7 +56,8 @@ if __name__ == "__main__":
         ],
     }
     cart_validator = CartValidator(data=data)
-    errors = cart_validator.run_validations()
+    cart_validator.run_validations()
+    errors = cart_validator.errors
     if errors:
         pprint([error.as_dict() for error in errors]) # Error list
     else:

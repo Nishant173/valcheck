@@ -104,7 +104,9 @@ class TestField(unittest.TestCase):
         for item in io:
             data: Dict[str, Any] = item["data"]
             should_be_valid: bool = item["should_be_valid"]
-            errors = validator_model(data=data).run_validations(raise_exception=False)
+            val = validator_model(data=data)
+            val.run_validations()
+            errors = val.errors
             message = {
                 "validator_model": validator_model.__name__,
                 "data": data,

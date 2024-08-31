@@ -32,7 +32,7 @@ if __name__ == "__main__":
     }
     person_validator = PersonValidator(data=data)
     try:
-        errors = person_validator.run_validations(raise_exception=True)
+        person_validator.run_validations(raise_exception=True)
     except ApiException as exc:
         pprint([error.as_dict() for error in exc.errors]) # Error list
         print(f"HTTP status code: {exc.http_status_code}")

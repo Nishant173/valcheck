@@ -186,7 +186,7 @@ class Field:
         """Returns a sample value for the field"""
         return None
 
-    def run_validations(self) -> ValidatedField:
+    def validate_entire_field(self) -> ValidatedField:
         if utils.is_empty(self.field_value) and not self.required and self.default_factory:
             self.field_value = self.default_factory()
         validated_field = ValidatedField(field=self, errors=[])
@@ -517,7 +517,8 @@ class ModelDictionaryField(Field):
             )
             return [error]
         validator = self.validator_model(data=self.field_value)
-        error_objs = validator.run_validations()
+        validator.run_validations()
+        error_objs = validator.errors
         for error_obj in error_objs:
             error_obj.validator_message = self.invalid_field_error_message(suffix=f" - {error_obj.validator_message}")
             error_obj.append_to_field_path(self.source)
@@ -569,7 +570,8 @@ class ModelListField(Field):
                 errors.append(error)
                 continue
             validator = self.validator_model(data=item)
-            error_objs = validator.run_validations()
+            validator.run_validations()
+            error_objs = validator.errors
             validated_field_value.append(validator.validated_data)
             for error_obj in error_objs:
                 error_obj.validator_message = self.invalid_field_error_message(

@@ -1,7 +1,5 @@
-## Writing validators with multiple inheritance
-
-from pprint import pprint
 from typing import List, Type
+import unittest
 
 from valcheck import fields, models, validators
 
@@ -45,28 +43,25 @@ class ValidatorX(ValidatorA, ValidatorB, ValidatorC):
             return [models.Error(description="x1 must be < x2", initial_field_path="x1/x2")]
         return []
 
-    def model_validators_to_ignore(self) -> List[Type[validators.Validator]]:
-        return [ValidatorB]
+    def model_validators_to_consider(self) -> List[Type[validators.Validator]]:
+        return [ValidatorA, ValidatorB, ValidatorC]
 
 
-if __name__ == "__main__":
-    data = {
-        "a1": 1,
-        "a2": 2,
-        "b1": 1,
-        "b2": -2,
-        "c1": 1,
-        "c2": 2,
-        "x1": 1,
-        "x2": 2,
-    }
-    validator_instance = ValidatorX(data=data)
-    print("\nField validators")
-    pprint(validator_instance.list_field_validators())
-    errors = validator_instance.run_validations()
-    if errors:
-        print("\nErrors")
-        pprint([e.as_dict() for e in errors])
-    else:
-        print("\nValidated data")
-        pprint(validator_instance.validated_data)
+class TestModelValidator(unittest.TestCase):
+
+    def test_model_validator_hierarchy(self):
+        data = {
+            "a1": 3,
+            "a2": 2,
+            "b1": 3,
+            "b2": 2,
+            "c1": 3,
+            "c2": 2,
+            "x1": 3,
+            "x2": 2,
+        }
+        val = ValidatorX(data=data)
+        val.run_validations()
+        # count of errors must be 4, since all the `model_validator()` calls in the hierarchy (of 4 classes) fail once for each class
+        self.assertTrue(len(val.errors) == 4)
+

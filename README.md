@@ -16,9 +16,9 @@ DATE_FORMAT = "%Y-%m-%d"
 GENDER_CHOICES = ("Female", "Male")
 
 
-class PersonValcheck(validators.Validator):
-    name = fields.StringField()
-    age = fields.IntegerField()
+class PersonValidator(validators.Validator):
+    name = fields.StringField(allow_empty=False)
+    date_of_birth = fields.DateStringField(format_=DATE_FORMAT)
     gender = fields.ChoiceField(choices=GENDER_CHOICES)
-    dob = fields.DateStringField(format_=DATE_FORMAT)
+    num_friends = fields.IntegerField()
 ```

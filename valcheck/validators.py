@@ -19,6 +19,8 @@ class Validator:
     """
     Properties:
         - context
+        - data
+        - errors
         - extra_data
         - validated_data
 
@@ -27,7 +29,7 @@ class Validator:
         - get_validated_value()
         - list_field_validators()
         - model_validator()
-        - model_validators_to_ignore()
+        - model_validators_to_consider()
         - run_validations()
     """
 
@@ -41,11 +43,15 @@ class Validator:
         assert isinstance(data, dict), "Param `data` must be a dictionary"
         assert context is None or isinstance(context, dict), "Param `context` must be a dictionary"
         context = context if context else {}
-        self.data = utils.make_deep_copy(data) if deep_copy else data
+        self._data: Dict[str, Any] = utils.make_deep_copy(data) if deep_copy else data
         self._context: Dict[str, Any] = utils.make_deep_copy(context) if deep_copy else context
         self._field_info: Dict[str, Field] = self._initialise_fields()
         self._errors: List[Error] = []
         self._validated_data: Dict[str, Any] = {}
+
+    @property
+    def data(self) -> Dict[str, Any]:
+        return self._data
 
     @property
     def context(self) -> Dict[str, Any]:
@@ -161,6 +167,10 @@ class Validator:
         self._validate_uniqueness_of_sources_and_targets(field_info)
         return field_info
 
+    @property
+    def errors(self) -> List[Error]:
+        return self._errors
+
     def _clear_errors(self) -> None:
         """Clears out the list of errors"""
         self._errors.clear()
@@ -214,7 +224,7 @@ class Validator:
 
     def _perform_field_validation_checks(self, *, field: Field) -> None:
         """Performs validation checks for the given field, and registers errors (if any) and validated-data"""
-        validated_field = field.run_validations()
+        validated_field = field.validate_entire_field()
         if validated_field.errors:
             self._register_errors(errors=validated_field.errors)
             return
@@ -227,18 +237,25 @@ class Validator:
     def _perform_model_validation_checks(self) -> None:
         """Performs model validation checks, and registers errors (if any)"""
         errors: List[Error] = []
-        model_validator_classes_to_ignore = self.model_validators_to_ignore()
+        model_validator_classes_to_consider = self.model_validators_to_consider()
         assert utils.is_list_of_subclasses_of_type(
-            model_validator_classes_to_ignore,
+            model_validator_classes_to_consider,
             type_=Validator,
             allow_empty=True,
         ), (
-            "The output of the `model_validators_to_ignore()` method must be a list of types, each"
+            "The output of the `model_validators_to_consider()` method must be a list of types, each"
             " being a sub-class of `valcheck.validators.Validator`."
-            " Must be an empty list if there are no classes to ignore."
+            " Must be an empty list if there are no parent classes to consider."
         )
+        if self.__class__ not in model_validator_classes_to_consider:
+            model_validator_classes_to_consider += [self.__class__]
         for class_ in self.__class__.__mro__:
-            if issubclass(class_, Validator) and class_ not in model_validator_classes_to_ignore:
+            if (
+                class_ is not Validator
+                and issubclass(class_, Validator)
+                and class_ in model_validator_classes_to_consider
+                and "model_validator" in class_.__dict__  # the `model_validator()` method must be implemented in said class
+            ):
                 errors += class_.model_validator(self)
         assert utils.is_list_of_instances_of_type(errors, type_=Error, allow_empty=True), (
             "The output of the `model_validator()` method must be a list of errors (each of type `valcheck.models.Error`)."
@@ -249,10 +266,11 @@ class Validator:
             error.validator_message = INVALID_MODEL_ERROR_MESSAGE
         self._register_errors(errors=errors)
 
-    def model_validators_to_ignore(self) -> List[Type[Validator]]:
+    def model_validators_to_consider(self) -> List[Type[Validator]]:
         """
-        Returns list of class references of type `valcheck.validators.Validator` for which the `model_validator()`
-        method call must be ignored.
+        Used to determine which classes in the hierarchy need to be considered while calling the `model_validator()` method.
+        The output of this method must be a list of class references of type `valcheck.validators.Validator`.
+        Must be an empty list if there are no parent classes to consider.
         """
         return []
 
@@ -264,9 +282,9 @@ class Validator:
         """
         return []
 
-    def run_validations(self, *, raise_exception: Optional[bool] = False) -> List[Error]:
+    def run_validations(self, *, raise_exception: Optional[bool] = False) -> None:
         """
-        Runs validations and registers errors/validated-data. Returns list of errors.
+        Runs validations and registers errors/validated-data.
         If `raise_exception=True` and validations fail, raises `valcheck.exceptions.ValidationException`.
         """
         self._clear_errors()
@@ -274,11 +292,9 @@ class Validator:
         for _, field in self._field_info.items():
             self._perform_field_validation_checks(field=field)
         # Perform model validation checks only if there are no errors in field validation checks
-        if not self._errors:
+        if not self.errors:
             self._perform_model_validation_checks()
-        if self._errors:
+        if self.errors:
             self._clear_validated_data()
-        if raise_exception and self._errors:
-            raise ValidationException(errors=self._errors)
-        return self._errors
-
+        if raise_exception and self.errors:
+            raise ValidationException(errors=self.errors)

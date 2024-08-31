@@ -45,8 +45,8 @@ class ValidatorX(ValidatorA, ValidatorB, ValidatorC):
             return [models.Error(description="x1 must be < x2", initial_field_path="x1/x2")]
         return []
 
-    def model_validators_to_ignore(self) -> List[Type[validators.Validator]]:
-        return [ValidatorB]
+    def model_validators_to_consider(self) -> List[Type[validators.Validator]]:
+        return [ValidatorA, ValidatorB, ValidatorC]
 
 
 if __name__ == "__main__":
@@ -54,7 +54,7 @@ if __name__ == "__main__":
         "a1": 1,
         "a2": 2,
         "b1": 1,
-        "b2": -2,
+        "b2": 2,
         "c1": 1,
         "c2": 2,
         "x1": 1,
@@ -63,7 +63,8 @@ if __name__ == "__main__":
     validator_instance = ValidatorX(data=data)
     print("\nField validators")
     pprint(validator_instance.list_field_validators())
-    errors = validator_instance.run_validations()
+    validator_instance.run_validations()
+    errors = validator_instance.errors
     if errors:
         print("\nErrors")
         pprint([e.as_dict() for e in errors])

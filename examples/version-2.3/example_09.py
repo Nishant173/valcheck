@@ -45,7 +45,8 @@ if __name__ == "__main__":
         "end_timestamp": dt_obj + timedelta(hours=10),
     }
     timestamp_validator = TimestampValidator(data=data)
-    errors = timestamp_validator.run_validations()
+    timestamp_validator.run_validations()
+    errors = timestamp_validator.errors
     if errors:
         print("\nErrors")
         pprint([e.as_dict() for e in errors])
