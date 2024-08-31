@@ -298,4 +298,3 @@ class Validator:
             self._clear_validated_data()
         if raise_exception and self.errors:
             raise ValidationException(errors=self.errors)
-

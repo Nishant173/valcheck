@@ -34,4 +34,3 @@ if __name__ == "__main__":
     print("\n")
     print("Extra data")
     pprint(val.extra_data)
-
