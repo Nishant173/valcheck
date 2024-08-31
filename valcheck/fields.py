@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 from datetime import datetime, timezone
 import random
 from typing import Any, Callable, Iterable, List, Optional, Type, Union
@@ -130,7 +129,7 @@ class Field:
 
     def copy(self) -> Field:
         """Returns deep-copy of current `Field` object"""
-        return copy.deepcopy(self)
+        return utils.make_deep_copy(self)
 
     def __str__(self) -> str:
         kwargs_list = [

@@ -1,6 +1,6 @@
 """
 Snippet that compares the performance of valcheck to other data-validation libraries.
-Versions used: Please refer to the `requirements-for-performance-testing.txt` file
+Versions used: Please refer to the `performance_testing/requirements.txt` file.
 """
 
 
@@ -43,6 +43,7 @@ def timer(func):
         end = time.time()
         time_taken_in_secs = round(end - start, 3)
         print(f"Executed `{func.__name__}` in: {time_taken_in_secs} seconds")
+        print("\n")
         return result
     return wrapper_timer
 

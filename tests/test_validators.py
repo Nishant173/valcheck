@@ -12,6 +12,44 @@ class ValidatorA(validators.Validator):
 
 class TestValidator(unittest.TestCase):
 
+    def test_deep_copy_in_validator(self):
+        # case 1
+        data = {
+            "a": 1,
+            "b": 2,
+            "c": 3,
+            "d": 4,
+        }
+        context = {"key": "value"}
+        val = ValidatorA(data=data, context=context, deep_copy=False)
+        self.assertTrue(
+            val.data is data,
+        )
+        self.assertTrue(
+            id(val.data) == id(data),
+        )
+        self.assertTrue(
+            val.context is context,
+        )
+        self.assertTrue(
+            id(val.context) == id(context),
+        )
+
+        # case 2
+        val = ValidatorA(data=data, context=context, deep_copy=True)
+        self.assertTrue(
+            val.data is not data,
+        )
+        self.assertTrue(
+            id(val.data) != id(data),
+        )
+        self.assertTrue(
+            val.context is not context,
+        )
+        self.assertTrue(
+            id(val.context) != id(context),
+        )
+
     def test_validated_data_vs_extra_data(self):
         data = {
             "a": 1,
