@@ -13,7 +13,6 @@ class ValidatorA(validators.Validator):
 class TestValidator(unittest.TestCase):
 
     def test_deep_copy_in_validator(self):
-        # case 1
         data = {
             "a": 1,
             "b": 2,
@@ -21,6 +20,8 @@ class TestValidator(unittest.TestCase):
             "d": 4,
         }
         context = {"key": "value"}
+
+        # case 1
         val = ValidatorA(data=data, context=context, deep_copy=False)
         self.assertTrue(
             val.data is data,
@@ -70,7 +71,8 @@ class TestValidator(unittest.TestCase):
             "f": 6,
         }
         val = ValidatorA(data=data)
-        errors = val.run_validations(raise_exception=False)
+        val.run_validations()
+        errors = val.errors
         self.assertTrue(not errors)
         self.assertEqual(
             val.validated_data,
