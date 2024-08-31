@@ -1,8 +1,14 @@
+import copy
 from datetime import datetime
 import json
 import re
 from typing import Any, Dict, List, Optional, Type, Union
 from uuid import UUID
+
+
+def make_deep_copy(obj: Any, /) -> Any:
+    """Returns a deep-copy of the given object"""
+    return copy.deepcopy(obj)
 
 
 def dict_has_any_keys(d: Dict, /, *, keys: List) -> bool:

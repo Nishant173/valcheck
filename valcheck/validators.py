@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import string
 from typing import Any, Callable, Dict, List, Optional, Type, Union
 
@@ -37,11 +36,13 @@ class Validator:
             *,
             data: Dict[str, Any],
             context: Optional[Dict[str, Any]] = None,
+            deep_copy: Optional[bool] = False,
         ) -> None:
         assert isinstance(data, dict), "Param `data` must be a dictionary"
         assert context is None or isinstance(context, dict), "Param `context` must be a dictionary"
-        self.data = copy.deepcopy(data)
-        self._context: Dict[str, Any] = copy.deepcopy(context) if context else {}
+        context = context if context else {}
+        self.data = utils.make_deep_copy(data) if deep_copy else data
+        self._context: Dict[str, Any] = utils.make_deep_copy(context) if deep_copy else context
         self._field_info: Dict[str, Field] = self._initialise_fields()
         self._errors: List[Error] = []
         self._validated_data: Dict[str, Any] = {}
