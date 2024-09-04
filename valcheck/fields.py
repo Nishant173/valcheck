@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import date, datetime
 import random
 from typing import Any, Callable, Iterable, List, Optional, Type, Union
 import uuid
@@ -164,6 +164,9 @@ class Field:
     def _can_be_set_to_null(self) -> bool:
         return self.nullable and self.field_value is None
 
+    def _cannot_be_set_to_null(self) -> bool:
+        return not self.nullable and self.field_value is None
+
     def _has_valid_custom_validators(self) -> bool:
         if not self.validators:
             return True
@@ -200,6 +203,11 @@ class Field:
                 self.create_error_instance(validator_message=self.missing_field_error_message()),
             ]
             return validated_field
+        if self._cannot_be_set_to_null():
+            validated_field.errors += [
+                self.create_error_instance(validator_message=self.invalid_field_error_message()),
+            ]
+            return validated_field
         errors = self.validate()
         if errors:
             validated_field.errors += errors
@@ -212,18 +220,32 @@ class Field:
         validated_field.field.field_value = self._convert_field_value_if_needed()
         return validated_field
 
-    def invalid_field_error_message(self, *, prefix: Optional[str] = None, suffix: Optional[str] = None) -> str:
-        return (
-            f"{prefix if prefix else ''}"
-            f"Invalid {self.type_alias} '{self.source}'"
-            f"{suffix if suffix else ''}"
+    def invalid_field_error_message(
+            self,
+            *,
+            prefix: Optional[str] = None,
+            suffix: Optional[str] = None,
+            sep: Optional[str] = None,
+        ) -> str:
+        return utils.make_message(
+            f"Invalid {self.type_alias} '{self.source}'",
+            prefix=prefix,
+            suffix=suffix,
+            sep=sep,
         )
 
-    def missing_field_error_message(self, *, prefix: Optional[str] = None, suffix: Optional[str] = None) -> str:
-        return (
-            f"{prefix if prefix else ''}"
-            f"Missing {self.type_alias} '{self.source}'"
-            f"{suffix if suffix else ''}"
+    def missing_field_error_message(
+            self,
+            *,
+            prefix: Optional[str] = None,
+            suffix: Optional[str] = None,
+            sep: Optional[str] = None,
+        ) -> str:
+        return utils.make_message(
+            f"Missing {self.type_alias} '{self.source}'",
+            prefix=prefix,
+            suffix=suffix,
+            sep=sep,
         )
 
     def create_error_instance(self, *, validator_message: str) -> Error:
@@ -242,7 +264,13 @@ class AnyField(Field):
         return []
 
     def sample_value(self) -> Union[Any, None]:
-        return super().sample_value()
+        options = (
+            {},
+            [],
+            "",
+            '{"key1": "value1", "key2": "value2"}',
+        )  # could be any value
+        return random.choice(options)
 
 
 class BooleanField(Field):
@@ -311,6 +339,19 @@ class UuidStringField(Field):
         return str(uuid.uuid4())
 
 
+class UuidField(Field):
+    def __init__(self, **kwargs: Any) -> None:
+        super(UuidField, self).__init__(**kwargs)
+
+    def validate(self) -> List[Error]:
+        if isinstance(self.field_value, uuid.UUID):
+            return []
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+    def sample_value(self) -> Union[Any, None]:
+        return uuid.uuid4()
+
+
 class DateStringField(Field):
     def __init__(self, *, format_: Optional[str] = "%Y-%m-%d", **kwargs: Any) -> None:
         self.format_ = format_
@@ -322,11 +363,24 @@ class DateStringField(Field):
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
     def sample_value(self) -> Union[Any, None]:
-        return datetime.now(tz=timezone.utc).date().strftime(self.format_)
+        return utils.get_current_date().strftime(self.format_)
+
+
+class DateField(Field):
+    def __init__(self, **kwargs: Any) -> None:
+        super(DateField, self).__init__(**kwargs)
+
+    def validate(self) -> List[Error]:
+        if isinstance(self.field_value, date) and self.field_value.__class__ is date:
+            return []
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+    def sample_value(self) -> Union[Any, None]:
+        return utils.get_current_date()
 
 
 class DatetimeStringField(Field):
-    def __init__(self, *, format_: Optional[str] = "%Y-%m-%d %H:%M:%S", **kwargs: Any) -> None:
+    def __init__(self, *, format_: Optional[str] = "%Y-%m-%d %H:%M:%S.%f%z", **kwargs: Any) -> None:
         self.format_ = format_
         super(DatetimeStringField, self).__init__(**kwargs)
 
@@ -336,7 +390,26 @@ class DatetimeStringField(Field):
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
     def sample_value(self) -> Union[Any, None]:
-        return datetime.now(tz=timezone.utc).strftime(self.format_)
+        return utils.get_current_datetime(timezone_aware=True).strftime(self.format_)
+
+
+class DatetimeField(Field):
+    def __init__(self, *, timezone_aware: Optional[bool] = False, **kwargs: Any) -> None:
+        assert isinstance(timezone_aware, bool), "Param `timezone_aware` must be of type 'bool'"
+        self.timezone_aware = timezone_aware
+        super(DatetimeField, self).__init__(**kwargs)
+
+    def validate(self) -> List[Error]:
+        if (
+            isinstance(self.field_value, datetime)
+            and self.field_value.__class__ is datetime
+            and (self.field_value.tzinfo is not None if self.timezone_aware else self.field_value.tzinfo is None)
+        ):
+            return []
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+    def sample_value(self) -> Union[Any, None]:
+        return utils.get_current_datetime(timezone_aware=self.timezone_aware)
 
 
 class ChoiceField(Field):
@@ -526,8 +599,10 @@ class ModelDictionaryField(Field):
             self.field_value = validator.validated_data
         return error_objs
 
-    def sample_value(self) -> Union[Any, None]:
-        return super().sample_value()
+    def sample_value(self, *, key: str) -> Union[Any, None]:
+        return {
+            **self.validator_model(data={}).get_representation(key=key),
+        }
 
 
 class ModelListField(Field):
@@ -583,6 +658,8 @@ class ModelListField(Field):
             self.field_value = validated_field_value
         return errors
 
-    def sample_value(self) -> Union[Any, None]:
-        return super().sample_value()
+    def sample_value(self, *, key: str) -> Union[Any, None]:
+        return [
+            self.validator_model(data={}).get_representation(key=key),
+        ]
 

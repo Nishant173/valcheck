@@ -98,13 +98,9 @@ class Validator:
         for _, field in self._field_info.items():
             field_key = field_key_picker(field)
             if isinstance(field, ModelDictionaryField):
-                representation[field_key] = {
-                    **field.validator_model(data={}).get_representation(key=key),
-                }
+                representation[field_key] = field.sample_value(key=key)
             elif isinstance(field, ModelListField):
-                representation[field_key] = [
-                    field.validator_model(data={}).get_representation(key=key),
-                ]
+                representation[field_key] = field.sample_value(key=key)
             else:
                 representation[field_key] = field.sample_value()
         return representation

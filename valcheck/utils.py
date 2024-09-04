@@ -1,9 +1,23 @@
 import copy
-from datetime import datetime
+from datetime import date, datetime, timezone
 import json
 import re
 from typing import Any, Dict, List, Optional, Type, Union
 from uuid import UUID
+
+
+def get_current_datetime(*, timezone_aware: Optional[bool] = False) -> datetime:
+    """
+    Returns the current datetime (timezone-naive).
+    If `timezone_aware=True`, returns a timezone-aware UTC datetime.
+    """
+    assert isinstance(timezone_aware, bool), "Param `timezone_aware` must be of type 'bool'"
+    tz = timezone.utc if timezone_aware else None
+    return datetime.now(tz=tz)
+
+
+def get_current_date(*, timezone_aware: Optional[bool] = False) -> date:
+    return get_current_datetime(timezone_aware=timezone_aware).date()
 
 
 def make_deep_copy(obj: Any, /) -> Any:
@@ -17,6 +31,24 @@ def dict_has_any_keys(d: Dict, /, *, keys: List) -> bool:
 
 def dict_has_all_keys(d: Dict, /, *, keys: List) -> bool:
     return all((key in keys for key in d))
+
+
+def make_message(
+        message: str,
+        /,
+        *,
+        prefix: Optional[str] = None,
+        suffix: Optional[str] = None,
+        sep: Optional[str] = None,
+    ) -> str:
+    sep = "" if sep is None else sep
+    components = []
+    if prefix:
+        components.append(prefix)
+    components.append(message)
+    if suffix:
+        components.append(suffix)
+    return f"{sep}".join(components)
 
 
 def is_iterable(obj: Any, /) -> bool:

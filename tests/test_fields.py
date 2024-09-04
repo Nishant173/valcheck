@@ -1,7 +1,8 @@
 from typing import Any, Dict, List, Type
 import unittest
+import uuid
 
-from valcheck import fields, models, validators
+from valcheck import fields, models, utils, validators
 
 
 DATE_FORMAT = "%d %B, %Y"
@@ -18,6 +19,14 @@ CHOICES = (
 
 def has_errors(errors: List[models.Error], /) -> bool:
     return bool(errors)
+
+
+class AnyFieldValidator1(validators.Validator):
+    any_field_1 = fields.AnyField()
+
+
+class AnyFieldValidator2(validators.Validator):
+    any_field_2 = fields.AnyField(required=False, nullable=True)
 
 
 class BooleanFieldValidator(validators.Validator):
@@ -40,12 +49,25 @@ class UuidStringFieldValidator(validators.Validator):
     uuid_string_field = fields.UuidStringField()
 
 
+class UuidFieldValidator(validators.Validator):
+    uuid_field = fields.UuidField()
+
+
 class DateStringValidator(validators.Validator):
     date_string_field = fields.DateStringField(format_=DATE_FORMAT)
 
 
+class DateValidator(validators.Validator):
+    date_field = fields.DateField()
+
+
 class DatetimeStringValidator(validators.Validator):
     datetime_string_field = fields.DatetimeStringField(format_=DATETIME_FORMAT)
+
+
+class DatetimeValidator(validators.Validator):
+    datetime_field_tz_aware = fields.DatetimeField(timezone_aware=True, required=False)
+    datetime_field_tz_naive = fields.DatetimeField(timezone_aware=False, required=False)
 
 
 class ChoiceFieldValidator(validators.Validator):
@@ -124,6 +146,60 @@ class TestField(unittest.TestCase):
                     expr=has_errors(errors),
                     msg=message,
                 )
+
+    def test_any_field_1(self):
+        self.assert_validations(
+            validator_model=AnyFieldValidator1,
+            io=[
+                {
+                    "data": {"any_field_1": True},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"any_field_1": False},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"any_field_1": 1},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"any_field_1": 0},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"any_field_1": {}},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"any_field_1": []},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"any_field_1": None},
+                    "should_be_valid": False,
+                },
+                {
+                    "data": {},
+                    "should_be_valid": False,
+                },
+            ],
+        )
+
+    def test_any_field_2(self):
+        self.assert_validations(
+            validator_model=AnyFieldValidator2,
+            io=[
+                {
+                    "data": {},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"any_field_2": None},
+                    "should_be_valid": True,
+                },
+            ],
+        )
 
     def test_boolean_field(self):
         self.assert_validations(
@@ -232,6 +308,21 @@ class TestField(unittest.TestCase):
             ],
         )
 
+    def test_uuid_field(self):
+        self.assert_validations(
+            validator_model=UuidFieldValidator,
+            io=[
+                {
+                    "data": {"uuid_field": uuid.uuid4()},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"uuid_field": str(uuid.uuid4())},
+                    "should_be_valid": False,
+                },
+            ],
+        )
+
     def test_date_string_field(self):
         self.assert_validations(
             validator_model=DateStringValidator,
@@ -251,6 +342,25 @@ class TestField(unittest.TestCase):
             ],
         )
 
+    def test_date_field(self):
+        self.assert_validations(
+            validator_model=DateValidator,
+            io=[
+                {
+                    "data": {"date_field": utils.get_current_date()},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"date_field": utils.get_current_date().strftime(DATE_FORMAT)},
+                    "should_be_valid": False,
+                },
+                {
+                    "data": {"date_field": utils.get_current_date().strftime("%Y-%m-%d")},
+                    "should_be_valid": False,
+                },
+            ],
+        )
+
     def test_datetime_string_field(self):
         self.assert_validations(
             validator_model=DatetimeStringValidator,
@@ -265,6 +375,37 @@ class TestField(unittest.TestCase):
                 },
                 {
                     "data": {"datetime_string_field": "2020-05-25 17:30:00"},
+                    "should_be_valid": False,
+                },
+            ],
+        )
+
+    def test_datetime_field(self):
+        self.assert_validations(
+            validator_model=DatetimeValidator,
+            io=[
+                {
+                    "data": {"datetime_field_tz_aware": utils.get_current_datetime(timezone_aware=True)},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"datetime_field_tz_aware": utils.get_current_datetime(timezone_aware=False)},
+                    "should_be_valid": False,
+                },
+                {
+                    "data": {"datetime_field_tz_aware": utils.get_current_datetime(timezone_aware=True).strftime(DATETIME_FORMAT)},
+                    "should_be_valid": False,
+                },
+                {
+                    "data": {"datetime_field_tz_naive": utils.get_current_datetime(timezone_aware=False)},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"datetime_field_tz_naive": utils.get_current_datetime(timezone_aware=True)},
+                    "should_be_valid": False,
+                },
+                {
+                    "data": {"datetime_field_tz_naive": utils.get_current_datetime(timezone_aware=False).strftime(DATETIME_FORMAT)},
                     "should_be_valid": False,
                 },
             ],
