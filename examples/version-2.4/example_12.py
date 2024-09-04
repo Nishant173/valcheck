@@ -12,7 +12,7 @@ class SomeValidator(validators.Validator):
     d = fields.IntegerField()
 
 
-if __name__ == "__main__":
+def main():
     data = {
         "a": 1,
         "b": 2,
@@ -34,3 +34,8 @@ if __name__ == "__main__":
     print("\n")
     print("Extra data")
     pprint(val.extra_data)
+
+
+if __name__ == "__main__":
+    main()
+

@@ -34,7 +34,7 @@ class CartValidator(validators.Validator):
     items = fields.ModelListField(validator_model=ItemValidator, allow_empty=False)
 
 
-if __name__ == "__main__":
+def main():
     data = {
         "timestamp_of_purchase": "2023-02-18 17:45:30 +0530",
         "items": [
@@ -62,3 +62,8 @@ if __name__ == "__main__":
         pprint([error.as_dict() for error in errors]) # Error list
     else:
         pprint(cart_validator.validated_data) # Dictionary having validated data (by field)
+
+
+if __name__ == "__main__":
+    main()
+

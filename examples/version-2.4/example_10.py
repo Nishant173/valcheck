@@ -23,7 +23,7 @@ class PersonValidator(ApiRequestValidator):
     date_of_birth = fields.DateStringField(format_=DATE_FORMAT)
 
 
-if __name__ == "__main__":
+def main():
     data = {
         "name": "james murphy",
         "age": 30,
@@ -38,4 +38,8 @@ if __name__ == "__main__":
         print(f"HTTP status code: {exc.http_status_code}")
     else:
         pprint(person_validator.validated_data) # Dictionary having validated data (by field)
+
+
+if __name__ == "__main__":
+    main()
 

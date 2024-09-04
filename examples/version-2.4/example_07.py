@@ -28,7 +28,7 @@ class RegularUserValidator(BaseUserValidator):
     pass
 
 
-if __name__ == "__main__":
+def main():
     data = {
         "name": "james murphy",
         "age": 30,
@@ -47,3 +47,8 @@ if __name__ == "__main__":
     else:
         print("\nValidated data")
         pprint(user_validator.validated_data)
+
+
+if __name__ == "__main__":
+    main()
+
