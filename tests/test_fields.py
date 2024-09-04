@@ -114,7 +114,65 @@ class ListFieldValidator(validators.Validator):
     list_field = fields.ListField()
 
 
+class FieldParamsValidator(validators.Validator):
+    five_letter_word = fields.StringField(
+        allow_empty=False,
+        source="five_letter_word_source",
+        target="five_letter_word_target",
+        required=False,
+        nullable=True,
+        default_factory=lambda: "hello",
+        converter_factory=lambda value: value.upper() if isinstance(value, str) else None,
+        validators=[
+            lambda value: len(value) == 5,
+            lambda value: all((char.islower() for char in value)),
+        ],
+        error=models.Error(
+            description="The given custom string field is invalid. Must contain exactly 5 lower-case characters",
+        ),
+        type_alias="CustomStringField",
+    )
+
+
 class TestField(unittest.TestCase):
+
+    def field_params_validator_helper(self, *, data: Dict[str, Any], should_be_valid: bool) -> None:
+        val = FieldParamsValidator(data=data)
+        self.assertTrue(val.five_letter_word.type_alias == "CustomStringField")
+        self.assertTrue(val.five_letter_word.required is False)
+        self.assertTrue(val.five_letter_word.nullable is True)
+        val.run_validations()
+        errors = val.errors
+        num_errors = len(errors)
+        if should_be_valid:
+            self.assertTrue(num_errors == 0)
+        else:
+            self.assertTrue(num_errors > 0)
+        if num_errors > 0:
+            expected_error_description = (
+                "The given custom string field is invalid. Must contain exactly 5 lower-case characters"
+            )
+            self.assertTrue(all([
+                error.description == expected_error_description for error in errors
+            ]))
+        if num_errors == 0:
+            self.assertTrue(
+                len(val.validated_data) == 1,
+            )
+            target_value = val.get_validated_value("five_letter_word_target")
+            if "five_letter_word_source" in data and data["five_letter_word_source"] is None:
+                self.assertTrue(target_value is None)
+            if "five_letter_word_source" in data and isinstance(data["five_letter_word_source"], str):
+                self.assertTrue(target_value == data["five_letter_word_source"].upper())
+            if "five_letter_word_source" not in data:
+                self.assertTrue(target_value == "HELLO")
+
+    def test_field_params_validator(self):
+        self.field_params_validator_helper(data={"five_letter_word_source": "abcde"}, should_be_valid=True)
+        self.field_params_validator_helper(data={}, should_be_valid=True)
+        self.field_params_validator_helper(data={"five_letter_word_source": None}, should_be_valid=True)
+        self.field_params_validator_helper(data={"five_letter_word_source": "abcdef"}, should_be_valid=False)
+        self.field_params_validator_helper(data={"five_letter_word_source": "aBcDe"}, should_be_valid=False)
 
     def assert_validations(
             self,
