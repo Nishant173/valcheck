@@ -52,7 +52,7 @@ class PersonalInfoValidator(validators.Validator):
     favourite_colors = fields.MultiChoiceField(choices=COLORS, **NOT_REQUIRED_AND_NULLABLE)
 
 
-if __name__ == "__main__":
+def main():
     # List the registered field validators
     print("-" * 100, "\n", sep="")
     field_validators = PersonalInfoValidator(data={}).list_field_validators()
@@ -104,4 +104,8 @@ if __name__ == "__main__":
     else:
         print("Validated data")
         pprint(personal_info_validator.validated_data) # Dictionary having validated data (by field)
+
+
+if __name__ == "__main__":
+    main()
 

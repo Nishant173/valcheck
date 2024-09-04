@@ -26,7 +26,7 @@ class PersonValidator(validators.Validator):
     address = fields.ModelDictionaryField(validator_model=AddressValidator)
 
 
-if __name__ == "__main__":
+def main():
     data = {
         "name": "james murphy",
         "address": {
@@ -45,4 +45,8 @@ if __name__ == "__main__":
         pprint([error.as_dict() for error in errors]) # Error list
     else:
         pprint(person_validator.validated_data) # Dictionary having validated data (by field)
+
+
+if __name__ == "__main__":
+    main()
 

@@ -49,7 +49,7 @@ class ValidatorX(ValidatorA, ValidatorB, ValidatorC):
         return [ValidatorA, ValidatorB, ValidatorC]
 
 
-if __name__ == "__main__":
+def main():
     data = {
         "a1": 1,
         "a2": 2,
@@ -71,3 +71,8 @@ if __name__ == "__main__":
     else:
         print("\nValidated data")
         pprint(validator_instance.validated_data)
+
+
+if __name__ == "__main__":
+    main()
+

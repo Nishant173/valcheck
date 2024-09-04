@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import date, datetime
 import random
 from typing import Any, Callable, Iterable, List, Optional, Type, Union
 import uuid
@@ -164,6 +164,9 @@ class Field:
     def _can_be_set_to_null(self) -> bool:
         return self.nullable and self.field_value is None
 
+    def _cannot_be_set_to_null(self) -> bool:
+        return not self.nullable and self.field_value is None
+
     def _has_valid_custom_validators(self) -> bool:
         if not self.validators:
             return True
@@ -200,30 +203,51 @@ class Field:
                 self.create_error_instance(validator_message=self.missing_field_error_message()),
             ]
             return validated_field
+        if self._cannot_be_set_to_null():
+            suffix = "Cannot be null"
+            validated_field.errors += [
+                self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix)),
+            ]
+            return validated_field
         errors = self.validate()
         if errors:
             validated_field.errors += errors
             return validated_field
         if not self._has_valid_custom_validators():
+            suffix = "Custom validations failed"
             validated_field.errors += [
-                self.create_error_instance(validator_message=self.invalid_field_error_message()),
+                self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix)),
             ]
             return validated_field
         validated_field.field.field_value = self._convert_field_value_if_needed()
         return validated_field
 
-    def invalid_field_error_message(self, *, prefix: Optional[str] = None, suffix: Optional[str] = None) -> str:
-        return (
-            f"{prefix if prefix else ''}"
-            f"Invalid {self.type_alias} '{self.source}'"
-            f"{suffix if suffix else ''}"
+    def invalid_field_error_message(
+            self,
+            *,
+            prefix: Optional[str] = None,
+            suffix: Optional[str] = None,
+            sep: Optional[str] = None,
+        ) -> str:
+        return utils.make_message(
+            f"Invalid {self.type_alias} '{self.source}'",
+            prefix=prefix,
+            suffix=suffix,
+            sep=sep or " || ",
         )
 
-    def missing_field_error_message(self, *, prefix: Optional[str] = None, suffix: Optional[str] = None) -> str:
-        return (
-            f"{prefix if prefix else ''}"
-            f"Missing {self.type_alias} '{self.source}'"
-            f"{suffix if suffix else ''}"
+    def missing_field_error_message(
+            self,
+            *,
+            prefix: Optional[str] = None,
+            suffix: Optional[str] = None,
+            sep: Optional[str] = None,
+        ) -> str:
+        return utils.make_message(
+            f"Missing {self.type_alias} '{self.source}'",
+            prefix=prefix,
+            suffix=suffix,
+            sep=sep or " || ",
         )
 
     def create_error_instance(self, *, validator_message: str) -> Error:
@@ -242,7 +266,13 @@ class AnyField(Field):
         return []
 
     def sample_value(self) -> Union[Any, None]:
-        return super().sample_value()
+        options = (
+            {},
+            [],
+            "",
+            '{"key1": "value1", "key2": "value2"}',
+        )  # could be any value
+        return random.choice(options)
 
 
 class BooleanField(Field):
@@ -260,6 +290,7 @@ class BooleanField(Field):
 
 class StringField(Field):
     def __init__(self, *, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
+        assert isinstance(allow_empty, bool), "Param `allow_empty` must be of type 'bool'"
         self.allow_empty = allow_empty
         super(StringField, self).__init__(**kwargs)
 
@@ -279,7 +310,8 @@ class JsonStringField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, str) and utils.is_valid_json_string(self.field_value):
             return []
-        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+        suffix = "Must be a valid JSON string"
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
 
     def sample_value(self) -> Union[Any, None]:
         return '{"key1": "value1", "key2": "value2"}'
@@ -305,50 +337,101 @@ class UuidStringField(Field):
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, str) and utils.is_valid_uuid_string(self.field_value):
             return []
-        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+        suffix = "Must be a valid UUID string"
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
 
     def sample_value(self) -> Union[Any, None]:
         return str(uuid.uuid4())
 
 
+class UuidField(Field):
+    def __init__(self, **kwargs: Any) -> None:
+        super(UuidField, self).__init__(**kwargs)
+
+    def validate(self) -> List[Error]:
+        if isinstance(self.field_value, uuid.UUID):
+            return []
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+
+    def sample_value(self) -> Union[Any, None]:
+        return uuid.uuid4()
+
+
 class DateStringField(Field):
     def __init__(self, *, format_: Optional[str] = "%Y-%m-%d", **kwargs: Any) -> None:
+        assert isinstance(format_, str), "Param `format_` must be of type 'str'"
         self.format_ = format_
         super(DateStringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, str) and utils.is_valid_date_string(self.field_value, self.format_):
             return []
+        suffix = f"Must be a valid date-string of format '{self.format_}'"
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
+
+    def sample_value(self) -> Union[Any, None]:
+        return utils.get_current_date().strftime(self.format_)
+
+
+class DateField(Field):
+    def __init__(self, **kwargs: Any) -> None:
+        super(DateField, self).__init__(**kwargs)
+
+    def validate(self) -> List[Error]:
+        if isinstance(self.field_value, date) and self.field_value.__class__ is date:
+            return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
     def sample_value(self) -> Union[Any, None]:
-        return datetime.now(tz=timezone.utc).date().strftime(self.format_)
+        return utils.get_current_date()
 
 
 class DatetimeStringField(Field):
-    def __init__(self, *, format_: Optional[str] = "%Y-%m-%d %H:%M:%S", **kwargs: Any) -> None:
+    def __init__(self, *, format_: Optional[str] = "%Y-%m-%d %H:%M:%S.%f%z", **kwargs: Any) -> None:
+        assert isinstance(format_, str), "Param `format_` must be of type 'str'"
         self.format_ = format_
         super(DatetimeStringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
         if isinstance(self.field_value, str) and utils.is_valid_datetime_string(self.field_value, self.format_):
             return []
+        suffix = f"Must be a valid datetime-string of format '{self.format_}'"
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
+
+    def sample_value(self) -> Union[Any, None]:
+        return utils.get_current_datetime(timezone_aware=True).strftime(self.format_)
+
+
+class DatetimeField(Field):
+    def __init__(self, *, timezone_aware: Optional[bool] = True, **kwargs: Any) -> None:
+        assert isinstance(timezone_aware, bool), "Param `timezone_aware` must be of type 'bool'"
+        self.timezone_aware = timezone_aware
+        super(DatetimeField, self).__init__(**kwargs)
+
+    def validate(self) -> List[Error]:
+        if (
+            isinstance(self.field_value, datetime)
+            and self.field_value.__class__ is datetime
+            and (self.field_value.tzinfo is not None if self.timezone_aware else self.field_value.tzinfo is None)
+        ):
+            return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
     def sample_value(self) -> Union[Any, None]:
-        return datetime.now(tz=timezone.utc).strftime(self.format_)
+        return utils.get_current_datetime(timezone_aware=self.timezone_aware)
 
 
 class ChoiceField(Field):
     def __init__(self, *, choices: Iterable[Any], **kwargs: Any) -> None:
-        assert utils.is_iterable(choices) and bool(choices), "Param `choices` must be a non-empty iterable"
+        assert utils.is_collection_of_items(choices) and bool(choices), "Param `choices` must be a non-empty iterable"
         self.choices = choices
         super(ChoiceField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
         if self.field_value in self.choices:
             return []
-        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+        suffix = f"Must be a valid choice i.e; one of {list(self.choices)}"
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
 
     def sample_value(self) -> Union[Any, None]:
         return random.choice(self.choices)
@@ -356,18 +439,19 @@ class ChoiceField(Field):
 
 class MultiChoiceField(Field):
     def __init__(self, *, choices: Iterable[Any], **kwargs: Any) -> None:
-        assert utils.is_iterable(choices) and bool(choices), "Param `choices` must be a non-empty iterable"
+        assert utils.is_collection_of_items(choices) and bool(choices), "Param `choices` must be a non-empty iterable"
         self.choices = choices
         super(MultiChoiceField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
         if (
-            utils.is_iterable(self.field_value)
+            utils.is_collection_of_items(self.field_value)
             and bool(self.field_value)
             and all([item in self.choices for item in self.field_value])
         ):
             return []
-        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+        suffix = f"Must be a valid list of choices i.e; one or more of {list(self.choices)}"
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
 
     def sample_value(self) -> Union[Any, None]:
         return (
@@ -395,7 +479,8 @@ class NumberField(Field):
     def validate(self) -> List[Error]:
         if utils.is_instance_of_any(obj=self.field_value, types=[int, float]):
             return []
-        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+        suffix = "Must be a valid number (either integer or float)"
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
 
     def sample_value(self) -> Union[Any, None]:
         return 3.14
@@ -434,7 +519,8 @@ class NumberStringField(Field):
     def validate(self) -> List[Error]:
         if utils.is_valid_number_string(self.field_value):
             return []
-        return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
+        suffix = "Must be a valid number cast as a string (either integer or float)"
+        return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
 
     def sample_value(self) -> Union[Any, None]:
         return "3.14"
@@ -468,6 +554,7 @@ class FloatStringField(Field):
 
 class DictionaryField(Field):
     def __init__(self, *, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
+        assert isinstance(allow_empty, bool), "Param `allow_empty` must be of type 'bool'"
         self.allow_empty = allow_empty
         super(DictionaryField, self).__init__(**kwargs)
 
@@ -482,6 +569,7 @@ class DictionaryField(Field):
 
 class ListField(Field):
     def __init__(self, *, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
+        assert isinstance(allow_empty, bool), "Param `allow_empty` must be of type 'bool'"
         self.allow_empty = allow_empty
         super(ListField, self).__init__(**kwargs)
 
@@ -512,22 +600,26 @@ class ModelDictionaryField(Field):
 
     def validate(self) -> List[Error]:
         if not isinstance(self.field_value, dict):
+            suffix = "Field is not a dictionary"
             error = self.create_error_instance(
-                validator_message=self.invalid_field_error_message(suffix=" - Field is not a dictionary"),
+                validator_message=self.invalid_field_error_message(suffix=suffix),
             )
             return [error]
         validator = self.validator_model(data=self.field_value)
         validator.run_validations()
         error_objs = validator.errors
         for error_obj in error_objs:
-            error_obj.validator_message = self.invalid_field_error_message(suffix=f" - {error_obj.validator_message}")
+            suffix = error_obj.validator_message
+            error_obj.validator_message = self.invalid_field_error_message(suffix=suffix)
             error_obj.append_to_field_path(self.source)
         if not error_objs:
             self.field_value = validator.validated_data
         return error_objs
 
-    def sample_value(self) -> Union[Any, None]:
-        return super().sample_value()
+    def sample_value(self, *, key: str) -> Union[Any, None]:
+        return {
+            **self.validator_model(data={}).get_representation(key=key),
+        }
 
 
 class ModelListField(Field):
@@ -543,19 +635,22 @@ class ModelListField(Field):
                 " the `validator_model` handles these parameters"
             )
             raise ValueError(msg)
+        assert isinstance(allow_empty, bool), "Param `allow_empty` must be of type 'bool'"
         self.validator_model = validator_model
         self.allow_empty = allow_empty
         super(ModelListField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
         if not isinstance(self.field_value, list):
+            suffix = "Field is not a list"
             error = self.create_error_instance(
-                validator_message=self.invalid_field_error_message(suffix=" - Field is not a list"),
+                validator_message=self.invalid_field_error_message(suffix=suffix),
             )
             return [error]
         if not self.allow_empty and not self.field_value:
+            suffix = "Field is an empty list"
             error = self.create_error_instance(
-                validator_message=self.invalid_field_error_message(suffix=" - Field is an empty list"),
+                validator_message=self.invalid_field_error_message(suffix=suffix),
             )
             return [error]
         errors: List[Error] = []
@@ -564,8 +659,9 @@ class ModelListField(Field):
             row_number = idx + 1
             row_number_string = f"<Row number: {row_number}>"
             if not isinstance(item, dict):
+                suffix = f"Row is not a dictionary {row_number_string}"
                 error = self.create_error_instance(
-                    validator_message=self.invalid_field_error_message(suffix=f" - Row is not a dictionary {row_number_string}"),
+                    validator_message=self.invalid_field_error_message(suffix=suffix),
                 )
                 errors.append(error)
                 continue
@@ -574,15 +670,16 @@ class ModelListField(Field):
             error_objs = validator.errors
             validated_field_value.append(validator.validated_data)
             for error_obj in error_objs:
-                error_obj.validator_message = self.invalid_field_error_message(
-                    suffix=f" - {error_obj.validator_message} {row_number_string}",
-                )
+                suffix = f"{error_obj.validator_message} {row_number_string}"
+                error_obj.validator_message = self.invalid_field_error_message(suffix=suffix)
                 error_obj.append_to_field_path(self.source)
             errors.extend(error_objs)
         if not errors:
             self.field_value = validated_field_value
         return errors
 
-    def sample_value(self) -> Union[Any, None]:
-        return super().sample_value()
+    def sample_value(self, *, key: str) -> Union[Any, None]:
+        return [
+            self.validator_model(data={}).get_representation(key=key),
+        ]
 

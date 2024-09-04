@@ -42,7 +42,7 @@ class PersonValidator(validators.Validator):
         return errors
 
 
-if __name__ == "__main__":
+def main():
     data = {
         "name": "james murphy",
         "date_of_birth": "1980-05-25",
@@ -55,3 +55,8 @@ if __name__ == "__main__":
         pprint([error.as_dict() for error in errors]) # Error list
     else:
         pprint(person_validator.validated_data) # Dictionary having validated data (by field)
+
+
+if __name__ == "__main__":
+    main()
+

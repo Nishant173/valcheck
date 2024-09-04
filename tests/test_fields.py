@@ -1,7 +1,8 @@
 from typing import Any, Dict, List, Type
 import unittest
+import uuid
 
-from valcheck import fields, models, validators
+from valcheck import fields, models, utils, validators
 
 
 DATE_FORMAT = "%d %B, %Y"
@@ -18,6 +19,14 @@ CHOICES = (
 
 def has_errors(errors: List[models.Error], /) -> bool:
     return bool(errors)
+
+
+class AnyFieldValidator1(validators.Validator):
+    any_field_1 = fields.AnyField()
+
+
+class AnyFieldValidator2(validators.Validator):
+    any_field_2 = fields.AnyField(required=False, nullable=True)
 
 
 class BooleanFieldValidator(validators.Validator):
@@ -40,12 +49,25 @@ class UuidStringFieldValidator(validators.Validator):
     uuid_string_field = fields.UuidStringField()
 
 
+class UuidFieldValidator(validators.Validator):
+    uuid_field = fields.UuidField()
+
+
 class DateStringValidator(validators.Validator):
     date_string_field = fields.DateStringField(format_=DATE_FORMAT)
 
 
+class DateValidator(validators.Validator):
+    date_field = fields.DateField()
+
+
 class DatetimeStringValidator(validators.Validator):
     datetime_string_field = fields.DatetimeStringField(format_=DATETIME_FORMAT)
+
+
+class DatetimeValidator(validators.Validator):
+    datetime_field_tz_aware = fields.DatetimeField(timezone_aware=True, required=False)
+    datetime_field_tz_naive = fields.DatetimeField(timezone_aware=False, required=False)
 
 
 class ChoiceFieldValidator(validators.Validator):
@@ -92,7 +114,65 @@ class ListFieldValidator(validators.Validator):
     list_field = fields.ListField()
 
 
+class FieldParamsValidator(validators.Validator):
+    five_letter_word = fields.StringField(
+        allow_empty=False,
+        source="five_letter_word_source",
+        target="five_letter_word_target",
+        required=False,
+        nullable=True,
+        default_factory=lambda: "hello",
+        converter_factory=lambda value: value.upper() if isinstance(value, str) else None,
+        validators=[
+            lambda value: len(value) == 5,
+            lambda value: all((char.islower() for char in value)),
+        ],
+        error=models.Error(
+            description="The given custom string field is invalid. Must contain exactly 5 lower-case characters",
+        ),
+        type_alias="CustomStringField",
+    )
+
+
 class TestField(unittest.TestCase):
+
+    def field_params_validator_helper(self, *, data: Dict[str, Any], should_be_valid: bool) -> None:
+        val = FieldParamsValidator(data=data)
+        self.assertTrue(val.five_letter_word.type_alias == "CustomStringField")
+        self.assertTrue(val.five_letter_word.required is False)
+        self.assertTrue(val.five_letter_word.nullable is True)
+        val.run_validations()
+        errors = val.errors
+        num_errors = len(errors)
+        if should_be_valid:
+            self.assertTrue(num_errors == 0)
+        else:
+            self.assertTrue(num_errors > 0)
+        if num_errors > 0:
+            expected_error_description = (
+                "The given custom string field is invalid. Must contain exactly 5 lower-case characters"
+            )
+            self.assertTrue(all([
+                error.description == expected_error_description for error in errors
+            ]))
+        if num_errors == 0:
+            self.assertTrue(
+                len(val.validated_data) == 1,
+            )
+            target_value = val.get_validated_value("five_letter_word_target")
+            if "five_letter_word_source" in data and data["five_letter_word_source"] is None:
+                self.assertTrue(target_value is None)
+            if "five_letter_word_source" in data and isinstance(data["five_letter_word_source"], str):
+                self.assertTrue(target_value == data["five_letter_word_source"].upper())
+            if "five_letter_word_source" not in data:
+                self.assertTrue(target_value == "HELLO")
+
+    def test_field_params_validator(self):
+        self.field_params_validator_helper(data={"five_letter_word_source": "abcde"}, should_be_valid=True)
+        self.field_params_validator_helper(data={}, should_be_valid=True)
+        self.field_params_validator_helper(data={"five_letter_word_source": None}, should_be_valid=True)
+        self.field_params_validator_helper(data={"five_letter_word_source": "abcdef"}, should_be_valid=False)
+        self.field_params_validator_helper(data={"five_letter_word_source": "aBcDe"}, should_be_valid=False)
 
     def assert_validations(
             self,
@@ -124,6 +204,60 @@ class TestField(unittest.TestCase):
                     expr=has_errors(errors),
                     msg=message,
                 )
+
+    def test_any_field_1(self):
+        self.assert_validations(
+            validator_model=AnyFieldValidator1,
+            io=[
+                {
+                    "data": {"any_field_1": True},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"any_field_1": False},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"any_field_1": 1},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"any_field_1": 0},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"any_field_1": {}},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"any_field_1": []},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"any_field_1": None},
+                    "should_be_valid": False,
+                },
+                {
+                    "data": {},
+                    "should_be_valid": False,
+                },
+            ],
+        )
+
+    def test_any_field_2(self):
+        self.assert_validations(
+            validator_model=AnyFieldValidator2,
+            io=[
+                {
+                    "data": {},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"any_field_2": None},
+                    "should_be_valid": True,
+                },
+            ],
+        )
 
     def test_boolean_field(self):
         self.assert_validations(
@@ -232,6 +366,21 @@ class TestField(unittest.TestCase):
             ],
         )
 
+    def test_uuid_field(self):
+        self.assert_validations(
+            validator_model=UuidFieldValidator,
+            io=[
+                {
+                    "data": {"uuid_field": uuid.uuid4()},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"uuid_field": str(uuid.uuid4())},
+                    "should_be_valid": False,
+                },
+            ],
+        )
+
     def test_date_string_field(self):
         self.assert_validations(
             validator_model=DateStringValidator,
@@ -251,6 +400,25 @@ class TestField(unittest.TestCase):
             ],
         )
 
+    def test_date_field(self):
+        self.assert_validations(
+            validator_model=DateValidator,
+            io=[
+                {
+                    "data": {"date_field": utils.get_current_date()},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"date_field": utils.get_current_date().strftime(DATE_FORMAT)},
+                    "should_be_valid": False,
+                },
+                {
+                    "data": {"date_field": utils.get_current_date().strftime("%Y-%m-%d")},
+                    "should_be_valid": False,
+                },
+            ],
+        )
+
     def test_datetime_string_field(self):
         self.assert_validations(
             validator_model=DatetimeStringValidator,
@@ -265,6 +433,37 @@ class TestField(unittest.TestCase):
                 },
                 {
                     "data": {"datetime_string_field": "2020-05-25 17:30:00"},
+                    "should_be_valid": False,
+                },
+            ],
+        )
+
+    def test_datetime_field(self):
+        self.assert_validations(
+            validator_model=DatetimeValidator,
+            io=[
+                {
+                    "data": {"datetime_field_tz_aware": utils.get_current_datetime(timezone_aware=True)},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"datetime_field_tz_aware": utils.get_current_datetime(timezone_aware=False)},
+                    "should_be_valid": False,
+                },
+                {
+                    "data": {"datetime_field_tz_aware": utils.get_current_datetime(timezone_aware=True).strftime(DATETIME_FORMAT)},
+                    "should_be_valid": False,
+                },
+                {
+                    "data": {"datetime_field_tz_naive": utils.get_current_datetime(timezone_aware=False)},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"datetime_field_tz_naive": utils.get_current_datetime(timezone_aware=True)},
+                    "should_be_valid": False,
+                },
+                {
+                    "data": {"datetime_field_tz_naive": utils.get_current_datetime(timezone_aware=False).strftime(DATETIME_FORMAT)},
                     "should_be_valid": False,
                 },
             ],

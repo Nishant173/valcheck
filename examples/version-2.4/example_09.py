@@ -31,7 +31,7 @@ class TimestampValidator(validators.Validator):
         return errors
 
 
-if __name__ == "__main__":
+def main():
     dt_obj = datetime(
         year=2020,
         month=5,
@@ -53,3 +53,8 @@ if __name__ == "__main__":
     else:
         print("\nValidated data")
         pprint(timestamp_validator.validated_data)
+
+
+if __name__ == "__main__":
+    main()
+
