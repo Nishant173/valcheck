@@ -288,6 +288,7 @@ class BooleanField(Field):
 
 class StringField(Field):
     def __init__(self, *, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
+        assert isinstance(allow_empty, bool), "Param `allow_empty` must be of type 'bool'"
         self.allow_empty = allow_empty
         super(StringField, self).__init__(**kwargs)
 
@@ -354,6 +355,7 @@ class UuidField(Field):
 
 class DateStringField(Field):
     def __init__(self, *, format_: Optional[str] = "%Y-%m-%d", **kwargs: Any) -> None:
+        assert isinstance(format_, str), "Param `format_` must be of type 'str'"
         self.format_ = format_
         super(DateStringField, self).__init__(**kwargs)
 
@@ -381,6 +383,7 @@ class DateField(Field):
 
 class DatetimeStringField(Field):
     def __init__(self, *, format_: Optional[str] = "%Y-%m-%d %H:%M:%S.%f%z", **kwargs: Any) -> None:
+        assert isinstance(format_, str), "Param `format_` must be of type 'str'"
         self.format_ = format_
         super(DatetimeStringField, self).__init__(**kwargs)
 
@@ -394,7 +397,7 @@ class DatetimeStringField(Field):
 
 
 class DatetimeField(Field):
-    def __init__(self, *, timezone_aware: Optional[bool] = False, **kwargs: Any) -> None:
+    def __init__(self, *, timezone_aware: Optional[bool] = True, **kwargs: Any) -> None:
         assert isinstance(timezone_aware, bool), "Param `timezone_aware` must be of type 'bool'"
         self.timezone_aware = timezone_aware
         super(DatetimeField, self).__init__(**kwargs)
@@ -541,6 +544,7 @@ class FloatStringField(Field):
 
 class DictionaryField(Field):
     def __init__(self, *, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
+        assert isinstance(allow_empty, bool), "Param `allow_empty` must be of type 'bool'"
         self.allow_empty = allow_empty
         super(DictionaryField, self).__init__(**kwargs)
 
@@ -555,6 +559,7 @@ class DictionaryField(Field):
 
 class ListField(Field):
     def __init__(self, *, allow_empty: Optional[bool] = True, **kwargs: Any) -> None:
+        assert isinstance(allow_empty, bool), "Param `allow_empty` must be of type 'bool'"
         self.allow_empty = allow_empty
         super(ListField, self).__init__(**kwargs)
 
@@ -618,6 +623,7 @@ class ModelListField(Field):
                 " the `validator_model` handles these parameters"
             )
             raise ValueError(msg)
+        assert isinstance(allow_empty, bool), "Param `allow_empty` must be of type 'bool'"
         self.validator_model = validator_model
         self.allow_empty = allow_empty
         super(ModelListField, self).__init__(**kwargs)
