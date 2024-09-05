@@ -185,7 +185,7 @@ class Field:
         """Returns list of errors (each of type `valcheck.models.Error`)"""
         raise NotImplementedError()
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         """Returns a sample value for the field"""
         return None
 
@@ -265,7 +265,7 @@ class AnyField(Field):
     def validate(self) -> List[Error]:
         return []
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         options = (
             {},
             [],
@@ -284,7 +284,7 @@ class BooleanField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return True
 
 
@@ -299,7 +299,7 @@ class StringField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return ""
 
 
@@ -313,7 +313,7 @@ class JsonStringField(Field):
         suffix = "Must be a valid JSON string"
         return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return '{"key1": "value1", "key2": "value2"}'
 
 
@@ -326,7 +326,7 @@ class EmailIdField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return "hello@example.com"
 
 
@@ -340,7 +340,7 @@ class UuidStringField(Field):
         suffix = "Must be a valid UUID string"
         return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return str(uuid.uuid4())
 
 
@@ -353,7 +353,7 @@ class UuidField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return uuid.uuid4()
 
 
@@ -369,7 +369,7 @@ class DateStringField(Field):
         suffix = f"Must be a valid date-string of format '{self.format_}'"
         return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return utils.get_current_date().strftime(self.format_)
 
 
@@ -382,7 +382,7 @@ class DateField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return utils.get_current_date()
 
 
@@ -398,7 +398,7 @@ class DatetimeStringField(Field):
         suffix = f"Must be a valid datetime-string of format '{self.format_}'"
         return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return utils.get_current_datetime(timezone_aware=True).strftime(self.format_)
 
 
@@ -417,7 +417,7 @@ class DatetimeField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return utils.get_current_datetime(timezone_aware=self.timezone_aware)
 
 
@@ -433,7 +433,7 @@ class ChoiceField(Field):
         suffix = f"Must be a valid choice i.e; one of {list(self.choices)}"
         return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return random.choice(self.choices)
 
 
@@ -453,7 +453,7 @@ class MultiChoiceField(Field):
         suffix = f"Must be a valid list of choices i.e; one or more of {list(self.choices)}"
         return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return (
             random.sample(self.choices, k=2) if len(self.choices) > 1 else random.sample(self.choices, k=1)
         )
@@ -468,7 +468,7 @@ class BytesField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return b''
 
 
@@ -482,7 +482,7 @@ class NumberField(Field):
         suffix = "Must be a valid number (either integer or float)"
         return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return 3.14
 
 
@@ -495,7 +495,7 @@ class IntegerField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return 314
 
 
@@ -508,7 +508,7 @@ class FloatField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return 3.14
 
 
@@ -522,7 +522,7 @@ class NumberStringField(Field):
         suffix = "Must be a valid number cast as a string (either integer or float)"
         return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return "3.14"
 
 
@@ -535,7 +535,7 @@ class IntegerStringField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return "314"
 
 
@@ -548,7 +548,7 @@ class FloatStringField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return "3.14"
 
 
@@ -563,7 +563,7 @@ class DictionaryField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return {}
 
 
@@ -578,7 +578,7 @@ class ListField(Field):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
-    def sample_value(self) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         return []
 
 
@@ -616,7 +616,8 @@ class ModelDictionaryField(Field):
             self.field_value = validator.validated_data
         return error_objs
 
-    def sample_value(self, *, key: str) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        key = kwargs.get("key", None)
         return {
             **self.validator_model(data={}).get_representation(key=key),
         }
@@ -678,7 +679,8 @@ class ModelListField(Field):
             self.field_value = validated_field_value
         return errors
 
-    def sample_value(self, *, key: str) -> Union[Any, None]:
+    def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        key = kwargs.get("key", None)
         return [
             self.validator_model(data={}).get_representation(key=key),
         ]
