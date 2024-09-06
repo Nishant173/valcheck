@@ -17,6 +17,8 @@ from valcheck import utils
 
 class Validator:
     """
+    Class that represents a Validator.
+
     Properties:
         - context
         - data
