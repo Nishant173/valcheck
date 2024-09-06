@@ -57,4 +57,3 @@ class TestJsonSerializer(unittest.TestCase):
         json_serializer.register(type_=datetime, func=lambda value: value.strftime("%d %B, %Y || %I:%M:%S %p"))
         json_string = json_serializer.to_json_string(obj)
         self.assertTrue(isinstance(json_string, str))
-

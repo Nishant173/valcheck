@@ -84,4 +84,3 @@ class JsonSerializer:
                         if utils.is_instance_of_any(obj[idx], types=[dict, list]):
                             obj[idx] = self._make_json_serializable(obj[idx])
         return obj
-
