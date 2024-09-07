@@ -12,7 +12,7 @@ class Person:
         self.name = name
 
     def greet(self) -> str:
-        return f"<Class: {self.__class__.__name__}> || Hello from '{self.name}'"
+        return f"<{self.__class__.__name__}: '{self.name}'>"
 
 
 def main():
@@ -58,7 +58,7 @@ def main():
         ]),
         "m": '{"key1": "value1", "key2": "value2"}',
     }
-    json_serializer = JsonSerializer()
+    json_serializer = JsonSerializer(include_default_serializers=True)
     json_serializer.register(type_=Person, func=lambda value: value.greet())
     json_string = json_serializer.to_json_string(some_dictionary)
     print("\n")
