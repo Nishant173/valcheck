@@ -61,9 +61,27 @@ class TestJsonSerializer(unittest.TestCase):
         original_obj = json_serializer.from_json_string(json_string)
         self.assertTrue(isinstance(original_obj, dict) and bool(original_obj))
 
+    def test_make_json_serializable(self):
+        obj = {
+            "aaa": datetime(year=2020, month=6, day=22, hour=17, minute=30, second=45),
+            "bbb": date(year=2020, month=6, day=22),
+            "ccc": uuid.UUID("09c35a0b-ed0b-486a-ab06-6f8de0e381fd"),
+            "ddd": set([1, 2, 3, 3, 4, 4]),
+        }
+        expected_json_serializable = {
+            "aaa": "2020-06-22 17:30:45",
+            "bbb": "2020-06-22",
+            "ccc": "09c35a0b-ed0b-486a-ab06-6f8de0e381fd",
+            "ddd": [1, 2, 3, 4],
+        }
+        json_serializer = JsonSerializer(include_default_serializers=True)
+        json_serializer.register(type_=datetime, func=lambda value: value.strftime("%Y-%m-%d %H:%M:%S"))
+        obj_json_serializable = json_serializer.make_json_serializable(obj)
+        self.assertTrue(id(obj) != id(obj_json_serializable))
+        self.assertTrue(obj_json_serializable == expected_json_serializable)
+
     def test_json_serializer_singleton(self):
         json_serializer_singleton = JsonSerializerSingleton(include_default_serializers=True)
         self.assertTrue(isinstance(json_serializer_singleton, JsonSerializerSingleton))
         with self.assertRaises(SingletonError):
             JsonSerializerSingleton(include_default_serializers=True)
-
