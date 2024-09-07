@@ -1,4 +1,4 @@
-## Using `valcheck.json_utils.JsonSerializer` to convert Python objects into JSON serialized values
+## Using `valcheck.json_utils.JsonSerializer`
 
 import uuid
 
@@ -16,7 +16,7 @@ class Person:
 
 
 def main():
-    some_dictionary = {
+    obj = {
         "a": "Hello",
         "b": [1, 2, 3, 4.182192, None],
         "c": None,
@@ -60,8 +60,15 @@ def main():
     }
     json_serializer = JsonSerializer(include_default_serializers=True)
     json_serializer.register(type_=Person, func=lambda value: value.greet())
-    json_string = json_serializer.to_json_string(some_dictionary)
-    print("\n")
+    obj_json_serializable = json_serializer.make_json_serializable(obj)  # returns Python dictionary/list
+    json_string = json_serializer.to_json_string(obj)  # returns JSON string
+    print("\n\n")
+    print("Non JSON serializable object")
+    print(obj)
+    print("\n\n")
+    print("JSON serializable object")
+    print(obj_json_serializable)
+    print("\n\n")
     print("JSON string")
     print(json_string)
 
