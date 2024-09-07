@@ -56,14 +56,19 @@ class JsonSerializer:
 
     def to_json_string(self, obj: DictOrList, /, **kwargs: Any) -> str:
         """Converts Python dictionary/list into a JSON string"""
-        assert utils.is_instance_of_any(obj, types=[dict, list]), "Param `obj` must be of type 'dict' or 'list'"
-        obj_copy = utils.make_deep_copy(obj)
-        obj_copy = self._make_json_serializable(obj_copy)
         if "indent" not in kwargs:
             kwargs["indent"] = 4
         if "sort_keys" not in kwargs:
             kwargs["sort_keys"] = True
-        return json.dumps(obj_copy, **kwargs)
+        obj_json_serializable = self.make_json_serializable(obj)
+        return json.dumps(obj_json_serializable, **kwargs)
+
+    def make_json_serializable(self, obj: DictOrList, /) -> DictOrList:
+        """Returns a dictionary/list which is JSON serializable (a new copy is returned)"""
+        assert utils.is_instance_of_any(obj, types=[dict, list]), "Param `obj` must be of type 'dict' or 'list'"
+        obj_copy = utils.make_deep_copy(obj)
+        obj_copy = self._make_json_serializable(obj_copy)
+        return obj_copy
 
     def _make_json_serializable(self, obj: DictOrList, /) -> DictOrList:
         """Returns a dictionary/list which is JSON serializable. Modifies the given `obj` in-place."""
