@@ -3,7 +3,8 @@ import unittest
 import uuid
 
 from valcheck import utils
-from valcheck.json_utils import JsonSerializer
+from valcheck.json_utils import JsonSerializer, JsonSerializerSingleton
+from valcheck.meta_classes import SingletonError
 
 
 class Person:
@@ -51,9 +52,18 @@ class TestJsonSerializer(unittest.TestCase):
             "l": set([utils.get_current_datetime(timezone_aware=True), utils.get_current_date(timezone_aware=True), uuid.uuid4(), uuid.uuid1()]),
             "m": '{"key1": "value1", "key2": "value2"}',
         }
-        json_serializer = JsonSerializer()
+        json_serializer = JsonSerializer(include_default_serializers=True)
         json_serializer.register(type_=Person, func=lambda value: value.greet())
         json_serializer.register(type_=date, func=lambda value: value.strftime("%d %B, %Y"))
         json_serializer.register(type_=datetime, func=lambda value: value.strftime("%d %B, %Y || %I:%M:%S %p"))
         json_string = json_serializer.to_json_string(obj)
-        self.assertTrue(isinstance(json_string, str))
+        self.assertTrue(isinstance(json_string, str) and bool(json_string))
+        original_obj = json_serializer.from_json_string(json_string)
+        self.assertTrue(isinstance(original_obj, dict) and bool(original_obj))
+
+    def test_json_serializer_singleton(self):
+        json_serializer_singleton = JsonSerializerSingleton(include_default_serializers=True)
+        self.assertTrue(isinstance(json_serializer_singleton, JsonSerializerSingleton))
+        with self.assertRaises(SingletonError):
+            JsonSerializerSingleton(include_default_serializers=True)
+

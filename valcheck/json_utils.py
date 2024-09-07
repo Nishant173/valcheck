@@ -1,9 +1,10 @@
 from datetime import date, datetime
 import json
-from typing import Any, Callable, Dict, List, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 from uuid import UUID
 
 from valcheck import utils
+from valcheck.meta_classes import Singleton
 
 DictOrList = Union[Dict[str, Any], List[Any]]
 
@@ -11,8 +12,14 @@ DictOrList = Union[Dict[str, Any], List[Any]]
 class JsonSerializer:
     """Class that represents a JSON serializer."""
 
-    def __init__(self) -> None:
-        self._json_serializable_mapper: Dict[Type, Callable] = {
+    def __init__(self, *, include_default_serializers: Optional[bool] = False) -> None:
+        assert isinstance(include_default_serializers, bool), "Param `include_default_serializers` must be of type 'bool'"
+        self._json_serializable_mapper: Dict[Type, Callable] = {}
+        if include_default_serializers:
+            self._register_default_serializers()
+
+    def _register_default_serializers(self) -> None:
+        self._json_serializable_mapper.update({
             bytes: lambda value: str(value),
             set: lambda value: list(value),
             str: lambda value: self.from_json_string(value) if utils.is_valid_json_string(value) else value,
@@ -20,7 +27,7 @@ class JsonSerializer:
             date: lambda value: value.strftime("%Y-%m-%d"),
             datetime: lambda value: value.strftime("%Y-%m-%d %H:%M:%S.%f%z"),
             UUID: lambda value: str(value),
-        }
+        })
 
     def register(
             self,
@@ -30,7 +37,8 @@ class JsonSerializer:
         ) -> None:
         """
         To register a serializer for a given type.
-        Internally uses a type-to-callable mapping to convert a Python object to a JSON serializable value.
+        Internally uses a type-to-callable mapping to convert a Python object (of the given type) to a JSON serializable value.
+        Can be used to over-write the default serializers (if any).
 
         Params:
             - type_: The type to serialize.
@@ -84,3 +92,9 @@ class JsonSerializer:
                         if utils.is_instance_of_any(obj[idx], types=[dict, list]):
                             obj[idx] = self._make_json_serializable(obj[idx])
         return obj
+
+
+class JsonSerializerSingleton(JsonSerializer, metaclass=Singleton):
+    """Class that represents a JSON serializer which is a singleton."""
+    pass
+
