@@ -89,3 +89,4 @@ class TestJsonSerializer(unittest.TestCase):
         self.assertTrue(isinstance(json_serializer_singleton, JsonSerializerSingleton))
         with self.assertRaises(SingletonError):
             JsonSerializerSingleton(include_default_serializers=True)
+
