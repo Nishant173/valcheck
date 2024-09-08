@@ -41,8 +41,8 @@ class JsonStringFieldValidator(validators.Validator):
     json_string_field = fields.JsonStringField()
 
 
-class EmailIdFieldValidator(validators.Validator):
-    email_id_field = fields.EmailIdField()
+class EmailIdStringFieldValidator(validators.Validator):
+    email_id_string_field = fields.EmailIdStringField()
 
 
 class UuidStringFieldValidator(validators.Validator):
@@ -326,18 +326,26 @@ class TestField(unittest.TestCase):
 
     def test_email_id_field(self):
         self.assert_validations(
-            validator_model=EmailIdFieldValidator,
+            validator_model=EmailIdStringFieldValidator,
             io=[
                 {
-                    "data": {"email_id_field": "hello@example.com"},
+                    "data": {"email_id_string_field": "hello@example.com"},
                     "should_be_valid": True,
                 },
                 {
-                    "data": {"email_id_field": "hello@example.com."},
+                    "data": {"email_id_string_field": "hello@example.com."},
                     "should_be_valid": False,
                 },
                 {
-                    "data": {"email_id_field": ""},
+                    "data": {"email_id_string_field": ""},
+                    "should_be_valid": False,
+                },
+                {
+                    "data": {"email_id_string_field": 123},
+                    "should_be_valid": False,
+                },
+                {
+                    "data": {"email_id_string_field": None},
                     "should_be_valid": False,
                 },
             ],

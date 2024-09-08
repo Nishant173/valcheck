@@ -59,7 +59,9 @@ def main():
         "m": '{"key1": "value1", "key2": "value2"}',
     }
     json_serializer = JsonSerializer(include_default_serializers=True)
-    json_serializer.register(type_=Person, func=lambda value: value.greet())
+    json_serializer.register_serializers({
+        Person: lambda value: value.greet(),
+    })
     obj_json_serializable = json_serializer.make_json_serializable(obj)  # returns Python dictionary/list
     json_string = json_serializer.to_json_string(obj)  # returns JSON string
     print("\n\n")
@@ -75,3 +77,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
