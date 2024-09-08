@@ -29,7 +29,6 @@ class TestJsonSerializer(unittest.TestCase):
         """
         json_serializer = JsonSerializer(include_default_serializers=True)
         json_serializer.register_serializers({
-            str: lambda value: value,
             Person: lambda value: value.greet(),
             date: lambda value: value.strftime("%d %B, %Y"),
             datetime: lambda value: value.strftime("%d %B, %Y || %I:%M:%S %p"),
