@@ -1,9 +1,9 @@
-## Using `valcheck.json_utils.JsonSerializer`
+## Using `valcheck.serializers.json_serializers.JsonSerializer`
 
 import uuid
 
 from valcheck import utils
-from valcheck.json_utils import JsonSerializer
+from valcheck.serializers.json_serializers import JsonSerializer
 
 
 class Person:
@@ -77,4 +77,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 

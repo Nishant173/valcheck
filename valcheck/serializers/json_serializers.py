@@ -55,6 +55,11 @@ class JsonSerializer:
         obj_copy = self._make_json_serializable(obj_copy)
         return obj_copy
 
+    def _get_serializable_function(self, value: Any, /) -> Union[Callable, None]:
+        """Returns the serializable function for the given `value`. Returns `None` if the function is not registered."""
+        func: Union[Callable, None] = self._json_serializable_mapper.get(type(value), None)
+        return func
+
     def _make_json_serializable(self, obj: Any, /) -> Any:
         """Returns Python object which is JSON serializable. Modifies the given `obj` in-place."""
         if isinstance(obj, dict):
@@ -64,8 +69,8 @@ class JsonSerializer:
                 elif isinstance(value, list):
                     obj[key] = self._make_json_serializable(value)
                 else:
-                    func: Union[Callable, None] = self._json_serializable_mapper.get(type(value), None)
-                    if func is None:
+                    func = self._get_serializable_function(value)
+                    if not func:
                         continue
                     obj[key] = func(value)
                     if utils.is_instance_of_any(obj[key], types=[dict, list]):
@@ -77,16 +82,23 @@ class JsonSerializer:
                 elif isinstance(item, list):
                     obj[idx] = self._make_json_serializable(item)
                 else:
-                    func: Union[Callable, None] = self._json_serializable_mapper.get(type(item), None)
-                    if func is None:
+                    func = self._get_serializable_function(item)
+                    if not func:
                         continue
                     obj[idx] = func(item)
                     if utils.is_instance_of_any(obj[idx], types=[dict, list]):
                         obj[idx] = self._make_json_serializable(obj[idx])
+        else:
+            func = self._get_serializable_function(obj)
+            if func:
+                obj = func(obj)
+                if utils.is_instance_of_any(obj, types=[dict, list]):
+                    obj = self._make_json_serializable(obj)
         return obj
 
 
 class JsonSerializerSingleton(JsonSerializer, metaclass=Singleton):
     """Class that represents a JSON serializer which is a singleton."""
     pass
+
 

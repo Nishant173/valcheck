@@ -1,10 +1,11 @@
 from datetime import date, datetime
+from typing import Any, Optional
 import unittest
 import uuid
 
 from valcheck import utils
-from valcheck.json_utils import JsonSerializer, JsonSerializerSingleton
 from valcheck.meta_classes import SingletonError
+from valcheck.serializers.json_serializers import JsonSerializer, JsonSerializerSingleton
 
 
 class Person:
@@ -18,8 +19,42 @@ class Person:
 
 class TestJsonSerializer(unittest.TestCase):
 
+    def json_serializer_helper(self, obj: Any, /, *, print_details: Optional[bool] = False) -> None:
+        """
+        Expects a Python object that needs to be converted into a JSON string.
+
+        Checks the functionality of the following:
+            - `JsonSerializer.to_json_string()`
+            - `JsonSerializer.from_json_string()`
+        """
+        json_serializer = JsonSerializer(include_default_serializers=True)
+        json_serializer.register_serializers({
+            str: lambda value: value,
+            Person: lambda value: value.greet(),
+            date: lambda value: value.strftime("%d %B, %Y"),
+            datetime: lambda value: value.strftime("%d %B, %Y || %I:%M:%S %p"),
+        })
+        json_string = json_serializer.to_json_string(obj)
+        self.assertTrue(isinstance(json_string, str) and bool(json_string))
+        python_obj = json_serializer.from_json_string(json_string)
+        if utils.is_instance_of_any(obj, types=[dict, list]):
+            self.assertTrue(
+                utils.is_instance_of_any(python_obj, types=[dict, list])
+            )
+        if print_details:
+            print(
+                "\n\n\n\n\n",
+                "START",
+                f"Original object\n{obj}",
+                f"JSON string\n{json_string}",
+                f"Python object from JSON string\n{python_obj}",
+                "END",
+                sep="\n" + "=" * 100 + "\n",
+            )
+
     def test_json_serializer(self):
-        obj = {
+
+        obj_01 = {
             "a": "Hello",
             "b": [1, 2, 3, 4.182192, None],
             "c": None,
@@ -52,16 +87,64 @@ class TestJsonSerializer(unittest.TestCase):
             "l": set([utils.get_current_datetime(timezone_aware=True), utils.get_current_date(timezone_aware=True), uuid.uuid4(), uuid.uuid1()]),
             "m": '{"key1": "value1", "key2": "value2"}',
         }
-        json_serializer = JsonSerializer(include_default_serializers=True)
-        json_serializer.register_serializers({
-            Person: lambda value: value.greet(),
-            date: lambda value: value.strftime("%d %B, %Y"),
-            datetime: lambda value: value.strftime("%d %B, %Y || %I:%M:%S %p"),
-        })
-        json_string = json_serializer.to_json_string(obj)
-        self.assertTrue(isinstance(json_string, str) and bool(json_string))
-        original_obj = json_serializer.from_json_string(json_string)
-        self.assertTrue(isinstance(original_obj, dict) and bool(original_obj))
+        self.json_serializer_helper(obj_01)
+
+        obj_02 = set([
+            1,
+            2,
+            2,
+            3,
+            3,
+            4,
+            uuid.uuid4(),
+            Person(name="qwerty"),
+            (
+                "Hello",
+                Person(name="asdf"),
+                300,
+                None,
+                utils.get_current_date(timezone_aware=True),
+                utils.get_current_datetime(timezone_aware=True),
+            ),
+        ])
+        self.json_serializer_helper(obj_02)
+
+        obj_03 = [
+            1,
+            2,
+            2,
+            3,
+            3,
+            4,
+            uuid.uuid4(),
+            Person(name="qwerty"),
+            (
+                "Hello",
+                Person(name="asdf"),
+                300,
+                None,
+            ),
+            {
+                "key1": uuid.uuid4(),
+                "key2": utils.get_current_date(timezone_aware=True),
+                "key3": utils.get_current_datetime(timezone_aware=True),
+            },
+            utils.get_current_date(timezone_aware=True),
+            utils.get_current_datetime(timezone_aware=True),
+        ]
+        self.json_serializer_helper(obj_03)
+
+        obj_04 = "hello"
+        self.json_serializer_helper(obj_04)
+
+        obj_05 = b"hello"
+        self.json_serializer_helper(obj_05)
+
+        obj_06 = utils.get_current_date(timezone_aware=True)
+        self.json_serializer_helper(obj_06)
+
+        obj_07 = utils.get_current_datetime(timezone_aware=True)
+        self.json_serializer_helper(obj_07)
 
     def test_make_json_serializable(self):
         obj = {
