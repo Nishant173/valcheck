@@ -19,7 +19,7 @@ class Person:
 
 class TestJsonSerializer(unittest.TestCase):
 
-    def json_serializer_helper(self, obj: Any, /, *, print_details: Optional[bool] = True) -> None:
+    def json_serializer_helper(self, obj: Any, /, *, print_details: Optional[bool] = False) -> None:
         """
         Expects a Python object that needs to be converted into a JSON string.
 
