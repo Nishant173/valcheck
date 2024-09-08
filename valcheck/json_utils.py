@@ -1,12 +1,9 @@
 from datetime import date, datetime
-import json
-from typing import Any, Callable, Dict, List, Optional, Type, Union
+from typing import Any, Callable, Dict, Optional, Type, Union
 from uuid import UUID
 
 from valcheck import utils
 from valcheck.meta_classes import Singleton
-
-DictOrList = Union[Dict[str, Any], List[Any]]
 
 
 class JsonSerializer:
@@ -19,59 +16,47 @@ class JsonSerializer:
             self._register_default_serializers()
 
     def _register_default_serializers(self) -> None:
-        self._json_serializable_mapper.update({
+        self.register_serializers({
             bytes: lambda value: str(value),
+            date: lambda value: value.strftime("%Y-%m-%d"),
+            datetime: lambda value: value.strftime("%Y-%m-%d %H:%M:%S.%f%z"),
             set: lambda value: list(value),
             str: lambda value: self.from_json_string(value) if utils.is_valid_json_string(value) else value,
             tuple: lambda value: list(value),
-            date: lambda value: value.strftime("%Y-%m-%d"),
-            datetime: lambda value: value.strftime("%Y-%m-%d %H:%M:%S.%f%z"),
             UUID: lambda value: str(value),
         })
 
-    def register(
-            self,
-            *,
-            type_: Type,
-            func: Callable,
-        ) -> None:
+    def register_serializers(self, mapper: Dict[Type, Callable], /) -> None:
         """
         To register a serializer for a given type.
         Internally uses a type-to-callable mapping to convert a Python object (of the given type) to a JSON serializable value.
         Can be used to over-write the default serializers (if any).
 
         Params:
-            - type_: The type to serialize.
-            - func: Callable that takes in the unserializable value as a param, and returns the serializable value.
+            - mapper (dict): Dictionary where keys = the type to serialize, and
+            values = the callable that takes in the unserializable value as a param, and returns the serializable value.
         """
-        assert isinstance(type_, type), "Param `type_` must be of type 'type'"
-        assert callable(func), "Param `func` must be a callable"
-        self._json_serializable_mapper.update({type_: func})
+        for type_, callable_ in mapper.items():
+            assert isinstance(type_, type), "Keys of `mapper` must each be of type 'type'"
+            assert callable(callable_), "Values of `mapper` must each be a callable"
+        self._json_serializable_mapper.update(mapper)
 
-    def from_json_string(self, s: str, /, **kwargs: Any) -> DictOrList:
-        """Converts JSON string into a Python dictionary/list"""
-        assert isinstance(s, str), "Param `s` must be of type 'str'"
-        s_copy = utils.make_deep_copy(s)
-        return json.loads(s_copy, **kwargs)
+    def from_json_string(self, s: Union[str, bytes, bytearray], /, **kwargs: Any) -> Any:
+        """Converts JSON string into a Python object"""
+        return utils.from_json_string(s, **kwargs)
 
-    def to_json_string(self, obj: DictOrList, /, **kwargs: Any) -> str:
-        """Converts Python dictionary/list into a JSON string"""
-        if "indent" not in kwargs:
-            kwargs["indent"] = 4
-        if "sort_keys" not in kwargs:
-            kwargs["sort_keys"] = True
-        obj_json_serializable = self.make_json_serializable(obj)
-        return json.dumps(obj_json_serializable, **kwargs)
+    def to_json_string(self, obj: Any, /, **kwargs: Any) -> str:
+        """Converts Python object into a JSON string after making it JSON serializable"""
+        return utils.to_json_string(self.make_json_serializable(obj), **kwargs)
 
-    def make_json_serializable(self, obj: DictOrList, /) -> DictOrList:
-        """Returns a dictionary/list which is JSON serializable (a new copy is returned)"""
-        assert utils.is_instance_of_any(obj, types=[dict, list]), "Param `obj` must be of type 'dict' or 'list'"
+    def make_json_serializable(self, obj: Any, /) -> Any:
+        """Returns Python object which is JSON serializable (a new copy is returned)"""
         obj_copy = utils.make_deep_copy(obj)
         obj_copy = self._make_json_serializable(obj_copy)
         return obj_copy
 
-    def _make_json_serializable(self, obj: DictOrList, /) -> DictOrList:
-        """Returns a dictionary/list which is JSON serializable. Modifies the given `obj` in-place."""
+    def _make_json_serializable(self, obj: Any, /) -> Any:
+        """Returns Python object which is JSON serializable. Modifies the given `obj` in-place."""
         if isinstance(obj, dict):
             for key, value in obj.items():
                 if isinstance(value, dict):
@@ -80,10 +65,11 @@ class JsonSerializer:
                     obj[key] = self._make_json_serializable(value)
                 else:
                     func: Union[Callable, None] = self._json_serializable_mapper.get(type(value), None)
-                    if func:
-                        obj[key] = func(value)
-                        if utils.is_instance_of_any(obj[key], types=[dict, list]):
-                            obj[key] = self._make_json_serializable(obj[key])
+                    if func is None:
+                        continue
+                    obj[key] = func(value)
+                    if utils.is_instance_of_any(obj[key], types=[dict, list]):
+                        obj[key] = self._make_json_serializable(obj[key])
         elif isinstance(obj, list):
             for idx, item in enumerate(obj):
                 if isinstance(item, dict):
@@ -92,10 +78,11 @@ class JsonSerializer:
                     obj[idx] = self._make_json_serializable(item)
                 else:
                     func: Union[Callable, None] = self._json_serializable_mapper.get(type(item), None)
-                    if func:
-                        obj[idx] = func(item)
-                        if utils.is_instance_of_any(obj[idx], types=[dict, list]):
-                            obj[idx] = self._make_json_serializable(obj[idx])
+                    if func is None:
+                        continue
+                    obj[idx] = func(item)
+                    if utils.is_instance_of_any(obj[idx], types=[dict, list]):
+                        obj[idx] = self._make_json_serializable(obj[idx])
         return obj
 
 

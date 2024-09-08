@@ -308,7 +308,7 @@ class JsonStringField(Field):
         super(JsonStringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if isinstance(self.field_value, str) and utils.is_valid_json_string(self.field_value):
+        if utils.is_valid_json_string(self.field_value):
             return []
         suffix = "Must be a valid JSON string"
         return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
@@ -317,12 +317,12 @@ class JsonStringField(Field):
         return '{"key1": "value1", "key2": "value2"}'
 
 
-class EmailIdField(Field):
+class EmailIdStringField(Field):
     def __init__(self, **kwargs: Any) -> None:
-        super(EmailIdField, self).__init__(**kwargs)
+        super(EmailIdStringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if isinstance(self.field_value, str) and utils.is_valid_email_id(self.field_value):
+        if utils.is_valid_email_id_string(self.field_value):
             return []
         return [self.create_error_instance(validator_message=self.invalid_field_error_message())]
 
@@ -335,7 +335,7 @@ class UuidStringField(Field):
         super(UuidStringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if isinstance(self.field_value, str) and utils.is_valid_uuid_string(self.field_value):
+        if utils.is_valid_uuid_string(self.field_value):
             return []
         suffix = "Must be a valid UUID string"
         return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
@@ -364,7 +364,7 @@ class DateStringField(Field):
         super(DateStringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if isinstance(self.field_value, str) and utils.is_valid_date_string(self.field_value, self.format_):
+        if utils.is_valid_date_string(self.field_value, self.format_):
             return []
         suffix = f"Must be a valid date-string of format '{self.format_}'"
         return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
@@ -393,7 +393,7 @@ class DatetimeStringField(Field):
         super(DatetimeStringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if isinstance(self.field_value, str) and utils.is_valid_datetime_string(self.field_value, self.format_):
+        if utils.is_valid_datetime_string(self.field_value, self.format_):
             return []
         suffix = f"Must be a valid datetime-string of format '{self.format_}'"
         return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]

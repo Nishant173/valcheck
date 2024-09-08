@@ -53,9 +53,11 @@ class TestJsonSerializer(unittest.TestCase):
             "m": '{"key1": "value1", "key2": "value2"}',
         }
         json_serializer = JsonSerializer(include_default_serializers=True)
-        json_serializer.register(type_=Person, func=lambda value: value.greet())
-        json_serializer.register(type_=date, func=lambda value: value.strftime("%d %B, %Y"))
-        json_serializer.register(type_=datetime, func=lambda value: value.strftime("%d %B, %Y || %I:%M:%S %p"))
+        json_serializer.register_serializers({
+            Person: lambda value: value.greet(),
+            date: lambda value: value.strftime("%d %B, %Y"),
+            datetime: lambda value: value.strftime("%d %B, %Y || %I:%M:%S %p"),
+        })
         json_string = json_serializer.to_json_string(obj)
         self.assertTrue(isinstance(json_string, str) and bool(json_string))
         original_obj = json_serializer.from_json_string(json_string)
@@ -75,7 +77,9 @@ class TestJsonSerializer(unittest.TestCase):
             "ddd": [1, 2, 3, 4],
         }
         json_serializer = JsonSerializer(include_default_serializers=True)
-        json_serializer.register(type_=datetime, func=lambda value: value.strftime("%Y-%m-%d %H:%M:%S"))
+        json_serializer.register_serializers({
+            datetime: lambda value: value.strftime("%Y-%m-%d %H:%M:%S"),
+        })
         obj_json_serializable = json_serializer.make_json_serializable(obj)
         self.assertTrue(id(obj) != id(obj_json_serializable))
         self.assertTrue(obj_json_serializable == expected_json_serializable)

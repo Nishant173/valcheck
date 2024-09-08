@@ -51,10 +51,6 @@ def make_message(
     return f"{sep}".join(components)
 
 
-def is_iterable(obj: Any, /) -> bool:
-    return hasattr(obj, "__iter__")
-
-
 def is_list_of_instances_of_type(obj: Any, /, *, type_: Type, allow_empty: Optional[bool] = True) -> bool:
     """Returns True if `obj` is a list of instances of type `type_`"""
     if not isinstance(obj, list):
@@ -79,11 +75,13 @@ def is_valid_object_of_type(obj: Any, /, *, type_: Type, allow_empty: Optional[b
     return True if allow_empty else bool(obj)
 
 
-def is_valid_uuid_string(s: str, /) -> bool:
-    if len(s) != 36:
+def is_valid_uuid_string(value: Any, /) -> bool:
+    if not isinstance(value, str):
+        return False
+    if len(value) != 36:
         return False
     try:
-        _ = UUID(s)
+        _ = UUID(value)
         return True
     except (ValueError, TypeError):
         return False
@@ -91,20 +89,24 @@ def is_valid_uuid_string(s: str, /) -> bool:
         return False
 
 
-def is_valid_date_string(s: str, format_: str, /) -> bool:
+def is_valid_date_string(value: Any, format_: str, /) -> bool:
     """Returns True if given date string is valid; otherwise returns False"""
+    if not isinstance(value, str):
+        return False
     try:
-        return datetime.strptime(s, format_).date().strftime(format_) == s
+        return datetime.strptime(value, format_).date().strftime(format_) == value
     except (ValueError, TypeError):
         return False
     except Exception:
         return False
 
 
-def is_valid_datetime_string(s: str, format_: str, /) -> bool:
+def is_valid_datetime_string(value: Any, format_: str, /) -> bool:
     """Returns True if given datetime string is valid; otherwise returns False"""
+    if not isinstance(value, str):
+        return False
     try:
-        _ = datetime.strptime(s, format_)
+        _ = datetime.strptime(value, format_)
         return True
     except (ValueError, TypeError):
         return False
@@ -112,9 +114,11 @@ def is_valid_datetime_string(s: str, format_: str, /) -> bool:
         return False
 
 
-def is_valid_json_string(string: str, /) -> bool:
+def is_valid_json_string(value: Any, /) -> bool:
+    if not isinstance(value, str):
+        return False
     try:
-        _ = json.loads(string)
+        _ = json.loads(value)
         return True
     except (json.decoder.JSONDecodeError, TypeError):
         return False
@@ -122,10 +126,26 @@ def is_valid_json_string(string: str, /) -> bool:
         return False
 
 
-def is_valid_email_id(email_id: str, /) -> bool:
+def from_json_string(value: Union[str, bytes, bytearray], /, **kwargs: Any) -> Any:
+    """Converts JSON string into a Python object"""
+    return json.loads(value, **kwargs)
+
+
+def to_json_string(value: Any, /, **kwargs: Any) -> str:
+    """Converts Python object into a JSON string"""
+    if "indent" not in kwargs:
+        kwargs["indent"] = 4
+    if "sort_keys" not in kwargs:
+        kwargs["sort_keys"] = True
+    return json.dumps(value, **kwargs)
+
+
+def is_valid_email_id_string(value: Any, /) -> bool:
+    if not isinstance(value, str):
+        return False
     match_obj = re.fullmatch(
         pattern=re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+'),
-        string=email_id,
+        string=value,
     )
     return True if match_obj else False
 
@@ -138,11 +158,11 @@ def integerify_if_possible(value: Union[int, float], /) -> Union[int, float]:
     return int(value) if can_be_integer(value) else value
 
 
-def is_valid_number_string(s: str, /) -> bool:
-    if not isinstance(s, str):
+def is_valid_number_string(value: Any, /) -> bool:
+    if not isinstance(value, str):
         return False
     try:
-        _ = float(s)
+        _ = float(value)
         return True
     except (TypeError, ValueError):
         return False
@@ -150,12 +170,12 @@ def is_valid_number_string(s: str, /) -> bool:
         return False
 
 
-def is_valid_integer_string(s: str, /) -> bool:
-    return is_valid_number_string(s) and '.' not in s
+def is_valid_integer_string(value: Any, /) -> bool:
+    return is_valid_number_string(value) and '.' not in value
 
 
-def is_valid_float_string(s: str, /) -> bool:
-    return is_valid_number_string(s) and '.' in s
+def is_valid_float_string(value: Any, /) -> bool:
+    return is_valid_number_string(value) and '.' in value
 
 
 class Empty:
