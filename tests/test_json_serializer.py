@@ -249,3 +249,4 @@ class TestJsonSerializer(unittest.TestCase):
         self.assertTrue(
             utils.is_valid_json_string('  [1, 2, 3, null, "hello"]    ')
         )
+

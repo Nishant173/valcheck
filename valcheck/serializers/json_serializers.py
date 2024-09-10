@@ -101,3 +101,4 @@ class JsonSerializerSingleton(JsonSerializer, metaclass=Singleton):
     """Class that represents a JSON serializer which is a singleton."""
     pass
 
+
