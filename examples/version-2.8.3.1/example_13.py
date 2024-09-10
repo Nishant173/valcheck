@@ -59,7 +59,7 @@ def main():
         "m": '{"key1": "value1", "key2": "value2"}',
     }
     json_serializer = JsonSerializer(include_default_serializers=True)
-    json_serializer.register_serializers({
+    json_serializer.register_serializers_by_type({
         Person: lambda value: value.greet(),
     })
     obj_json_serializable = json_serializer.make_json_serializable(obj)  # returns Python dictionary/list

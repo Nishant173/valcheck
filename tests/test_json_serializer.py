@@ -28,7 +28,7 @@ class TestJsonSerializer(unittest.TestCase):
             - `JsonSerializer.from_json_string()`
         """
         json_serializer = JsonSerializer(include_default_serializers=True)
-        json_serializer.register_serializers({
+        json_serializer.register_serializers_by_type({
             Person: lambda value: value.greet(),
             date: lambda value: value.strftime("%d %B, %Y"),
             datetime: lambda value: value.strftime("%d %B, %Y || %I:%M:%S %p"),
@@ -145,6 +145,29 @@ class TestJsonSerializer(unittest.TestCase):
         obj_07 = utils.get_current_datetime(timezone_aware=True)
         self.json_serializer_helper(obj_07)
 
+    def test_from_json_string(self):
+        json_serializer = JsonSerializer()
+        self.assertEqual(
+            json_serializer.from_json_string(' [1, 2, 3, null, "hello"] '),
+            [1, 2, 3, None, "hello"],
+        )
+        self.assertEqual(
+            json_serializer.from_json_string(' {"x": [1, 2, 3, null, "hello"], "y": null, "z": 3.14} '),
+            {
+                "x": [1, 2, 3, None, "hello"],
+                "y": None,
+                "z": 3.14,
+            },
+        )
+        self.assertIs(
+            json_serializer.from_json_string(' null '),
+            None,
+        )
+        self.assertEqual(
+            json_serializer.from_json_string(' "null" '),
+            "null",
+        )
+
     def test_make_json_serializable(self):
         obj = {
             "aaa": datetime(year=2020, month=6, day=22, hour=17, minute=30, second=45),
@@ -159,7 +182,7 @@ class TestJsonSerializer(unittest.TestCase):
             "ddd": [1, 2, 3, 4],
         }
         json_serializer = JsonSerializer(include_default_serializers=True)
-        json_serializer.register_serializers({
+        json_serializer.register_serializers_by_type({
             datetime: lambda value: value.strftime("%Y-%m-%d %H:%M:%S"),
         })
         obj_json_serializable = json_serializer.make_json_serializable(obj)
@@ -172,3 +195,57 @@ class TestJsonSerializer(unittest.TestCase):
         with self.assertRaises(SingletonError):
             JsonSerializerSingleton(include_default_serializers=True)
 
+    def test_is_valid_json_object_or_array(self):
+        self.assertTrue(
+            not utils.is_valid_json_object_or_array("")
+        )
+        self.assertTrue(
+            not utils.is_valid_json_object_or_array("  ")
+        )
+        self.assertTrue(
+            utils.is_valid_json_object_or_array(' {"x": 1, "y": 3.14, "z": [1, 2, 3, null, "hello"]}  ')
+        )
+        self.assertTrue(
+            utils.is_valid_json_object_or_array('{"x": 1, "y": 3.14, "z": [1, 2, 3, null, "hello"]}')
+        )
+        self.assertTrue(
+            utils.is_valid_json_object_or_array('[1, 2, 3, null, "hello"]')
+        )
+        self.assertTrue(
+            utils.is_valid_json_object_or_array('  [1, 2, 3, null, "hello"]    ')
+        )
+        self.assertTrue(
+            utils.is_valid_json_object_or_array('  {}    ')
+        )
+        self.assertTrue(
+            utils.is_valid_json_object_or_array('  []   ')
+        )
+        self.assertTrue(
+            not utils.is_valid_json_object_or_array('  {.}    ')
+        )
+        self.assertTrue(
+            not utils.is_valid_json_object_or_array('  [.]   ')
+        )
+
+    def test_is_valid_json_string(self):
+        self.assertTrue(
+            not utils.is_valid_json_string('  ')
+        )
+        self.assertTrue(
+            utils.is_valid_json_string(' "hello" ')
+        )
+        self.assertTrue(
+            not utils.is_valid_json_string("hello")
+        )
+        self.assertTrue(
+            utils.is_valid_json_string('"hello"')
+        )
+        self.assertTrue(
+            utils.is_valid_json_string("null")
+        )
+        self.assertTrue(
+            utils.is_valid_json_string('"null"')
+        )
+        self.assertTrue(
+            utils.is_valid_json_string('  [1, 2, 3, null, "hello"]    ')
+        )
