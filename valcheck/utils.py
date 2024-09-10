@@ -126,6 +126,18 @@ def is_valid_json_string(value: Any, /) -> bool:
         return False
 
 
+def is_valid_json_object_or_array(value: Any, /) -> bool:
+    """Returns `True` if the given value is a string containing a valid JSON object or JSON array"""
+    if not isinstance(value, str):
+        return False
+    value_cleaned = value.strip()
+    return (
+        bool(value_cleaned)
+        and ((value_cleaned[0] == "[" and value_cleaned[-1] == "]") or (value_cleaned[0] == "{" and value_cleaned[-1] == "}"))
+        and is_valid_json_string(value_cleaned)
+    )
+
+
 def from_json_string(value: Union[str, bytes, bytearray], /, **kwargs: Any) -> Any:
     """Converts JSON string into a Python object"""
     return json.loads(value, **kwargs)

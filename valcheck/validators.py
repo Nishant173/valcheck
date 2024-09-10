@@ -44,6 +44,7 @@ class Validator:
         ) -> None:
         assert isinstance(data, dict), "Param `data` must be a dictionary"
         assert context is None or isinstance(context, dict), "Param `context` must be a dictionary"
+        assert isinstance(deep_copy, bool), "Param `deep_copy` must be a boolean"
         context = context if context else {}
         self._data: Dict[str, Any] = utils.make_deep_copy(data) if deep_copy else data
         self._context: Dict[str, Any] = utils.make_deep_copy(context) if deep_copy else context

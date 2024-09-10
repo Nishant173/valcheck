@@ -13,20 +13,20 @@ class JsonSerializer:
         assert isinstance(include_default_serializers, bool), "Param `include_default_serializers` must be of type 'bool'"
         self._json_serializable_mapper: Dict[Type, Callable] = {}
         if include_default_serializers:
-            self._register_default_serializers()
+            self._register_default_serializers_by_type()
 
-    def _register_default_serializers(self) -> None:
-        self.register_serializers({
+    def _register_default_serializers_by_type(self) -> None:
+        self.register_serializers_by_type({
             bytes: lambda value: str(value),
             date: lambda value: value.strftime("%Y-%m-%d"),
             datetime: lambda value: value.strftime("%Y-%m-%d %H:%M:%S.%f%z"),
             set: lambda value: list(value),
-            str: lambda value: self.from_json_string(value) if utils.is_valid_json_string(value) else value,
+            str: lambda value: self.from_json_string(value) if utils.is_valid_json_object_or_array(value) else value,
             tuple: lambda value: list(value),
             UUID: lambda value: str(value),
         })
 
-    def register_serializers(self, mapper: Dict[Type, Callable], /) -> None:
+    def register_serializers_by_type(self, mapper: Dict[Type, Callable], /) -> None:
         """
         To register a serializer for a given type.
         Internally uses a type-to-callable mapping to convert a Python object (of the given type) to a JSON serializable value.
@@ -100,4 +100,5 @@ class JsonSerializer:
 class JsonSerializerSingleton(JsonSerializer, metaclass=Singleton):
     """Class that represents a JSON serializer which is a singleton."""
     pass
+
 
