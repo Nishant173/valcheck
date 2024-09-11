@@ -314,12 +314,16 @@ class TestField(unittest.TestCase):
                     "should_be_valid": True,
                 },
                 {
-                    "data": {"json_string_field": '[1, 2, 3, null]'},
+                    "data": {"json_string_field": '[1, 2, 3, null, "hello"]'},
                     "should_be_valid": True,
                 },
                 {
                     "data": {"json_string_field": None},
                     "should_be_valid": False,
+                },
+                {
+                    "data": {"json_string_field": 'null'},
+                    "should_be_valid": True,
                 },
             ],
         )
@@ -809,3 +813,4 @@ class TestField(unittest.TestCase):
                 },
             ],
         )
+

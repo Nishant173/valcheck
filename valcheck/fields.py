@@ -304,16 +304,29 @@ class StringField(Field):
 
 
 class JsonStringField(Field):
-    def __init__(self, **kwargs: Any) -> None:
+    def __init__(self, *, which: Optional[str] = "ANY", **kwargs: Any) -> None:
+        which_options = ["ANY", "JSON_ARRAY", "JSON_OBJECT", "JSON_OBJECT_OR_ARRAY"]
+        assert isinstance(which, str) and which in which_options, f"Param `which` must be one of {which_options}"
+        self.which = which
         super(JsonStringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if utils.is_valid_json_string(self.field_value):
-            return []
-        suffix = "Must be a valid JSON string"
-        return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=suffix))]
+        error_message = ""
+        if self.which == "ANY" and not utils.is_valid_json_string(self.field_value):
+            error_message = "Must be a valid JSON string"
+        if self.which == "JSON_ARRAY" and not utils.is_valid_json_array(self.field_value):
+            error_message = "Must be a valid JSON array"
+        if self.which == "JSON_OBJECT" and not utils.is_valid_json_object(self.field_value):
+            error_message = "Must be a valid JSON object"
+        if self.which == "JSON_OBJECT_OR_ARRAY" and not utils.is_valid_json_object_or_array(self.field_value):
+            error_message = "Must be a valid JSON object or JSON array"
+        if error_message:
+            return [self.create_error_instance(validator_message=self.invalid_field_error_message(suffix=error_message))]
+        return []
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.which == "JSON_ARRAY":
+            return '[1, 2, 3, null, "hello"]'
         return '{"key1": "value1", "key2": "value2"}'
 
 
