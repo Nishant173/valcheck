@@ -2,7 +2,7 @@ import copy
 from datetime import date, datetime, timezone
 import json
 import re
-from typing import Any, Dict, List, Optional, Type, Union
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 from uuid import UUID
 
 
@@ -114,30 +114,6 @@ def is_valid_datetime_string(value: Any, format_: str, /) -> bool:
         return False
 
 
-def is_valid_json_string(value: Any, /) -> bool:
-    if not isinstance(value, str):
-        return False
-    try:
-        _ = json.loads(value)
-        return True
-    except (json.decoder.JSONDecodeError, TypeError):
-        return False
-    except Exception:
-        return False
-
-
-def is_valid_json_object_or_array(value: Any, /) -> bool:
-    """Returns `True` if the given value is a string containing a valid JSON object or JSON array"""
-    if not isinstance(value, str):
-        return False
-    value_cleaned = value.strip()
-    return (
-        bool(value_cleaned)
-        and ((value_cleaned[0] == "[" and value_cleaned[-1] == "]") or (value_cleaned[0] == "{" and value_cleaned[-1] == "}"))
-        and is_valid_json_string(value_cleaned)
-    )
-
-
 def from_json_string(value: Union[str, bytes, bytearray], /, **kwargs: Any) -> Any:
     """Converts JSON string into a Python object"""
     return json.loads(value, **kwargs)
@@ -150,6 +126,53 @@ def to_json_string(value: Any, /, **kwargs: Any) -> str:
     if "sort_keys" not in kwargs:
         kwargs["sort_keys"] = True
     return json.dumps(value, **kwargs)
+
+
+def validate_json_string(value: Any, /) -> Tuple[Any, bool]:
+    """
+    Attempts to parse the given JSON string.
+    Returns tuple of `(parsed_obj, is_valid)`.
+    If the JSON string is not valid, always returns `(None, False)`.
+    """
+    if not isinstance(value, str):
+        return (None, False)
+    try:
+        parsed_obj = from_json_string(value)
+    except Exception:
+        return (None, False)
+    return (parsed_obj, True)
+
+
+def is_valid_json_string(value: Any, /) -> bool:
+    _, is_valid = validate_json_string(value)
+    return is_valid
+
+
+def is_valid_json_object(value: Any, /) -> bool:
+    """Returns `True` if the given value is a string containing a valid JSON object"""
+    parsed_obj, is_valid = validate_json_string(value)
+    return (
+        is_valid
+        and isinstance(parsed_obj, dict)
+    )
+
+
+def is_valid_json_array(value: Any, /) -> bool:
+    """Returns `True` if the given value is a string containing a valid JSON array"""
+    parsed_obj, is_valid = validate_json_string(value)
+    return (
+        is_valid
+        and isinstance(parsed_obj, list)
+    )
+
+
+def is_valid_json_object_or_array(value: Any, /) -> bool:
+    """Returns `True` if the given value is a string containing a valid JSON object or JSON array"""
+    parsed_obj, is_valid = validate_json_string(value)
+    return (
+        is_valid
+        and is_instance_of_any(parsed_obj, types=[dict, list])
+    )
 
 
 def is_valid_email_id_string(value: Any, /) -> bool:
