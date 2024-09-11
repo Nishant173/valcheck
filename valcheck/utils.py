@@ -240,3 +240,4 @@ def wrap_in_quotes_if_string(obj: Any, /) -> Any:
     if isinstance(obj, str):
         return f"'{obj}'"
     return obj
+
