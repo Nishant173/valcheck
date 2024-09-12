@@ -6,18 +6,18 @@ from typing import Any, Dict, List, Optional, Tuple, Type, Union
 from uuid import UUID
 
 
-def get_current_datetime(*, timezone_aware: Optional[bool] = False) -> datetime:
-    """
-    Returns the current datetime (timezone-naive).
-    If `timezone_aware=True`, returns a timezone-aware UTC datetime.
-    """
-    assert isinstance(timezone_aware, bool), "Param `timezone_aware` must be of type 'bool'"
-    tz = timezone.utc if timezone_aware else None
-    return datetime.now(tz=tz)
+class Empty:
+    """Class used to denote an empty/missing value"""
+    def __str__(self) -> str:
+        return f"<{self.__class__.__name__}>"
 
 
-def get_current_date(*, timezone_aware: Optional[bool] = False) -> date:
-    return get_current_datetime(timezone_aware=timezone_aware).date()
+def set_as_empty() -> Empty:
+    return Empty()
+
+
+def is_empty(obj: Any, /) -> bool:
+    return isinstance(obj, Empty)
 
 
 def make_deep_copy(obj: Any, /) -> Any:
@@ -51,6 +51,21 @@ def make_message(
     return f"{sep}".join(components)
 
 
+def wrap_in_quotes_if_string(obj: Any, /) -> Any:
+    if isinstance(obj, str):
+        return f"'{obj}'"
+    return obj
+
+
+def is_instance_of_any(obj: Any, *, types: List[Type]) -> bool:
+    return any((isinstance(obj, type_) for type_ in types))
+
+
+def is_collection_of_items(obj: Any, /) -> bool:
+    """If the given `obj` is one of `[list, tuple, set]`, returns `True`"""
+    return is_instance_of_any(obj, types=[list, tuple, set])
+
+
 def is_list_of_instances_of_type(obj: Any, /, *, type_: Type, allow_empty: Optional[bool] = True) -> bool:
     """Returns True if `obj` is a list of instances of type `type_`"""
     if not isinstance(obj, list):
@@ -75,43 +90,145 @@ def is_valid_object_of_type(obj: Any, /, *, type_: Type, allow_empty: Optional[b
     return True if allow_empty else bool(obj)
 
 
-def is_valid_uuid_string(value: Any, /) -> bool:
+def integerify_if_possible(value: Union[int, float], /) -> Union[int, float]:
+    value_as_int = int(value)
+    return value_as_int if value == value_as_int else value
+
+
+def validate_number_string(value: Any, /) -> Tuple[Union[int, float, None], bool]:
+    """
+    Attempts to validate the given number string.
+    Returns tuple of `(number_as_int_or_float, is_valid)`.
+    If the number string is not valid, always returns `(None, False)`.
+    """
     if not isinstance(value, str):
-        return False
-    if len(value) != 36:
-        return False
+        return (None, False)
     try:
-        _ = UUID(value)
-        return True
-    except (ValueError, TypeError):
-        return False
+        number = float(value)
+        if "." not in value:
+            number = int(number)
     except Exception:
-        return False
+        return (None, False)
+    return (number, True)
+
+
+def is_valid_number_string(value: Any, /) -> bool:
+    _, is_valid = validate_number_string(value)
+    return is_valid
+
+
+def validate_integer_string(value: Any, /) -> Tuple[Union[int, None], bool]:
+    """
+    Attempts to validate the given integer string.
+    Returns tuple of `(number_as_int, is_valid)`.
+    If the integer string is not valid, always returns `(None, False)`.
+    """
+    number, is_valid = validate_number_string(value)
+    if is_valid and isinstance(number, int):
+        return (number, True)
+    return (None, False)
+
+
+def is_valid_integer_string(value: Any, /) -> bool:
+    _, is_valid = validate_integer_string(value)
+    return is_valid
+
+
+def validate_float_string(value: Any, /) -> Tuple[Union[float, None], bool]:
+    """
+    Attempts to validate the given float string.
+    Returns tuple of `(number_as_float, is_valid)`.
+    If the float string is not valid, always returns `(None, False)`.
+    """
+    number, is_valid = validate_number_string(value)
+    if is_valid and isinstance(number, float):
+        return (number, True)
+    return (None, False)
+
+
+def is_valid_float_string(value: Any, /) -> bool:
+    _, is_valid = validate_float_string(value)
+    return is_valid
+
+
+def validate_uuid_string(value: Any, /) -> Tuple[Union[UUID, None], bool]:
+    """
+    Attempts to validate the given UUID string.
+    Returns tuple of `(uuid_obj, is_valid)`.
+    If the UUID string is not valid, always returns `(None, False)`.
+    """
+    if not isinstance(value, str):
+        return (None, False)
+    if len(value) != 36:
+        return (None, False)
+    try:
+        uuid_obj = UUID(value)
+    except Exception:
+        return (None, False)
+    return (uuid_obj, True)
+
+
+def is_valid_uuid_string(value: Any, /) -> bool:
+    _, is_valid = validate_uuid_string(value)
+    return is_valid
+
+
+def get_current_datetime(*, timezone_aware: Optional[bool] = False) -> datetime:
+    """
+    Returns the current datetime (timezone-naive).
+    If `timezone_aware=True`, returns a timezone-aware UTC datetime.
+    """
+    assert isinstance(timezone_aware, bool), "Param `timezone_aware` must be of type 'bool'"
+    tz = timezone.utc if timezone_aware else None
+    return datetime.now(tz=tz)
+
+
+def get_current_date(*, timezone_aware: Optional[bool] = False) -> date:
+    return get_current_datetime(timezone_aware=timezone_aware).date()
+
+
+def validate_date_string(value: Any, format_: str, /) -> Tuple[Union[date, None], bool]:
+    """
+    Attempts to validate the given date string.
+    Returns tuple of `(date_obj, is_valid)`.
+    If the date string is not valid, always returns `(None, False)`.
+    """
+    if not isinstance(value, str):
+        return (None, False)
+    try:
+        date_obj = datetime.strptime(value, format_).date()
+        is_valid = date_obj.strftime(format_) == value
+    except Exception:
+        return (None, False)
+    else:
+        return (date_obj, True) if is_valid else (None, False)
 
 
 def is_valid_date_string(value: Any, format_: str, /) -> bool:
     """Returns True if given date string is valid; otherwise returns False"""
+    _, is_valid = validate_date_string(value, format_)
+    return is_valid
+
+
+def validate_datetime_string(value: Any, format_: str, /) -> Tuple[Union[datetime, None], bool]:
+    """
+    Attempts to validate the given datetime string.
+    Returns tuple of `(datetime_obj, is_valid)`.
+    If the datetime string is not valid, always returns `(None, False)`.
+    """
     if not isinstance(value, str):
-        return False
+        return (None, False)
     try:
-        return datetime.strptime(value, format_).date().strftime(format_) == value
-    except (ValueError, TypeError):
-        return False
+        datetime_obj = datetime.strptime(value, format_)
     except Exception:
-        return False
+        return (None, False)
+    return (datetime_obj, True)
 
 
 def is_valid_datetime_string(value: Any, format_: str, /) -> bool:
     """Returns True if given datetime string is valid; otherwise returns False"""
-    if not isinstance(value, str):
-        return False
-    try:
-        _ = datetime.strptime(value, format_)
-        return True
-    except (ValueError, TypeError):
-        return False
-    except Exception:
-        return False
+    _, is_valid = validate_datetime_string(value, format_)
+    return is_valid
 
 
 def from_json_string(value: Union[str, bytes, bytearray], /, **kwargs: Any) -> Any:
@@ -128,7 +245,7 @@ def to_json_string(value: Any, /, **kwargs: Any) -> str:
     return json.dumps(value, **kwargs)
 
 
-def validate_json_string(value: Any, /) -> Tuple[Any, bool]:
+def validate_json_string(value: Any, /) -> Tuple[Union[Any, None], bool]:
     """
     Attempts to parse the given JSON string.
     Returns tuple of `(parsed_obj, is_valid)`.
@@ -148,31 +265,43 @@ def is_valid_json_string(value: Any, /) -> bool:
     return is_valid
 
 
+def validate_json_object(value: Any, /) -> Tuple[Union[dict, None], bool]:
+    parsed_obj, is_valid = validate_json_string(value)
+    if is_valid and isinstance(parsed_obj, dict):
+        return (parsed_obj, True)
+    return (None, False)
+
+
 def is_valid_json_object(value: Any, /) -> bool:
     """Returns `True` if the given value is a string containing a valid JSON object"""
+    _, is_valid = validate_json_object(value)
+    return is_valid
+
+
+def validate_json_array(value: Any, /) -> Tuple[Union[list, None], bool]:
     parsed_obj, is_valid = validate_json_string(value)
-    return (
-        is_valid
-        and isinstance(parsed_obj, dict)
-    )
+    if is_valid and isinstance(parsed_obj, list):
+        return (parsed_obj, True)
+    return (None, False)
 
 
 def is_valid_json_array(value: Any, /) -> bool:
     """Returns `True` if the given value is a string containing a valid JSON array"""
+    _, is_valid = validate_json_array(value)
+    return is_valid
+
+
+def validate_json_object_or_array(value: Any, /) -> Tuple[Union[dict, list, None], bool]:
     parsed_obj, is_valid = validate_json_string(value)
-    return (
-        is_valid
-        and isinstance(parsed_obj, list)
-    )
+    if is_valid and (isinstance(parsed_obj, dict) or isinstance(parsed_obj, list)):
+        return (parsed_obj, True)
+    return (None, False)
 
 
 def is_valid_json_object_or_array(value: Any, /) -> bool:
     """Returns `True` if the given value is a string containing a valid JSON object or JSON array"""
-    parsed_obj, is_valid = validate_json_string(value)
-    return (
-        is_valid
-        and is_instance_of_any(parsed_obj, types=[dict, list])
-    )
+    _, is_valid = validate_json_object_or_array(value)
+    return is_valid
 
 
 def is_valid_email_id_string(value: Any, /) -> bool:
@@ -183,61 +312,4 @@ def is_valid_email_id_string(value: Any, /) -> bool:
         string=value,
     )
     return True if match_obj else False
-
-
-def can_be_integer(value: Union[int, float], /) -> bool:
-    return int(value) == value
-
-
-def integerify_if_possible(value: Union[int, float], /) -> Union[int, float]:
-    return int(value) if can_be_integer(value) else value
-
-
-def is_valid_number_string(value: Any, /) -> bool:
-    if not isinstance(value, str):
-        return False
-    try:
-        _ = float(value)
-        return True
-    except (TypeError, ValueError):
-        return False
-    except Exception:
-        return False
-
-
-def is_valid_integer_string(value: Any, /) -> bool:
-    return is_valid_number_string(value) and '.' not in value
-
-
-def is_valid_float_string(value: Any, /) -> bool:
-    return is_valid_number_string(value) and '.' in value
-
-
-class Empty:
-    """Class used to denote an empty/missing value"""
-    def __str__(self) -> str:
-        return f"<{self.__class__.__name__}>"
-
-
-def set_as_empty() -> Empty:
-    return Empty()
-
-
-def is_empty(obj: Any, /) -> bool:
-    return isinstance(obj, Empty)
-
-
-def is_instance_of_any(obj: Any, types: List[Type]) -> bool:
-    return any((isinstance(obj, type_) for type_ in types))
-
-
-def is_collection_of_items(obj: Any, /) -> bool:
-    """If the given `obj` is one of `[list, tuple, set]`, returns `True`"""
-    return is_instance_of_any(obj, types=[list, tuple, set])
-
-
-def wrap_in_quotes_if_string(obj: Any, /) -> Any:
-    if isinstance(obj, str):
-        return f"'{obj}'"
-    return obj
 
