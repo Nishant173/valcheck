@@ -409,7 +409,7 @@ class DateStringField(Field):
     def validate(self) -> List[Error]:
         date_obj, is_valid = utils.validate_date_string(self.field_value, self.format_)
         if not is_valid:
-            suffix = f"Must be a valid date-string of format '{self.format_}'"
+            suffix = f"Must be a valid date-string of format '{self.format_}'. Eg: '{self.sample_value()}'"
             return [self.create_invalid_field_error(suffix=suffix)]
         if self.to_date_obj and date_obj is not None:
             self.field_value = date_obj
@@ -443,7 +443,7 @@ class DatetimeStringField(Field):
     def validate(self) -> List[Error]:
         datetime_obj, is_valid = utils.validate_datetime_string(self.field_value, self.format_)
         if not is_valid:
-            suffix = f"Must be a valid datetime-string of format '{self.format_}'"
+            suffix = f"Must be a valid datetime-string of format '{self.format_}'. Eg: '{self.sample_value()}'"
             return [self.create_invalid_field_error(suffix=suffix)]
         if self.to_datetime_obj and datetime_obj is not None:
             self.field_value = datetime_obj
