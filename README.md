@@ -22,4 +22,3 @@ class PersonValidator(validators.Validator):
     gender = fields.ChoiceField(choices=GENDER_CHOICES)
     num_friends = fields.IntegerField()
 ```
-
