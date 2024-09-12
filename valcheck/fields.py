@@ -572,7 +572,7 @@ class NumberStringField(Field):
     def validate(self) -> List[Error]:
         number, is_valid = utils.validate_number_string(self.field_value)
         if not is_valid:
-            suffix = "Must be a valid number cast as a string (either integer or float)"
+            suffix = "Must be a valid number (either integer or float) cast as a string"
             return [self.create_invalid_field_error(suffix=suffix)]
         if self.to_number and number is not None:
             self.field_value = number
@@ -591,7 +591,8 @@ class IntegerStringField(Field):
     def validate(self) -> List[Error]:
         number_as_int, is_valid = utils.validate_integer_string(self.field_value)
         if not is_valid:
-            return [self.create_invalid_field_error()]
+            suffix = "Must be a valid integer cast as a string"
+            return [self.create_invalid_field_error(suffix=suffix)]
         if self.to_integer and number_as_int is not None:
             self.field_value = number_as_int
         return []
@@ -609,7 +610,8 @@ class FloatStringField(Field):
     def validate(self) -> List[Error]:
         number_as_float, is_valid = utils.validate_float_string(self.field_value)
         if not is_valid:
-            return [self.create_invalid_field_error()]
+            suffix = "Must be a valid float cast as a string"
+            return [self.create_invalid_field_error(suffix=suffix)]
         if self.to_float and number_as_float is not None:
             self.field_value = number_as_float
         return []
