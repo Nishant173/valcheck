@@ -1,3 +1,4 @@
+from datetime import datetime, date, timezone
 from typing import Any, Dict, List, Type
 import unittest
 import uuid
@@ -19,6 +20,23 @@ CHOICES = (
 
 def has_errors(errors: List[models.Error], /) -> bool:
     return bool(errors)
+
+
+class FieldConversionValidator(validators.Validator):
+    json_string_field_1 = fields.JsonStringField(which="JSON_OBJECT", to_python_obj=False)
+    json_string_field_2 = fields.JsonStringField(which="JSON_OBJECT", to_python_obj=True)
+    uuid_string_field_1 = fields.UuidStringField(to_uuid_obj=False)
+    uuid_string_field_2 = fields.UuidStringField(to_uuid_obj=True)
+    date_string_field_1 = fields.DateStringField(to_date_obj=False)
+    date_string_field_2 = fields.DateStringField(to_date_obj=True)
+    datetime_string_field_1 = fields.DatetimeStringField(to_datetime_obj=False)
+    datetime_string_field_2 = fields.DatetimeStringField(to_datetime_obj=True)
+    number_string_field_1 = fields.NumberStringField(to_number=False)
+    number_string_field_2 = fields.NumberStringField(to_number=True)
+    integer_string_field_1 = fields.IntegerStringField(to_integer=False)
+    integer_string_field_2 = fields.IntegerStringField(to_integer=True)
+    float_string_field_1 = fields.FloatStringField(to_float=False)
+    float_string_field_2 = fields.FloatStringField(to_float=True)
 
 
 class AnyFieldValidator1(validators.Validator):
@@ -135,6 +153,61 @@ class FieldParamsValidator(validators.Validator):
 
 
 class TestField(unittest.TestCase):
+
+    def test_field_conversions(self):
+        data = {
+            "json_string_field_1": '{"key1": "value1", "key2": "value2"}',
+            "json_string_field_2": '{"key1": "value1", "key2": "value2"}',
+            "uuid_string_field_1": "ca2f7082-1b87-4324-b2c5-a3f624ca2eae",
+            "uuid_string_field_2": "ca2f7082-1b87-4324-b2c5-a3f624ca2eae",
+            "date_string_field_1": "2020-05-25",
+            "date_string_field_2": "2020-05-25",
+            "datetime_string_field_1": "2020-05-25 17:45:30.0+0000",
+            "datetime_string_field_2": "2020-05-25 17:45:30.0+0000",
+            "number_string_field_1": "3.1428",
+            "number_string_field_2": "3.1428",
+            "integer_string_field_1": "9015",
+            "integer_string_field_2": "9015",
+            "float_string_field_1": "3.1428",
+            "float_string_field_2": "3.1428",
+        }
+        expected_validated_data = {
+            "json_string_field_1": '{"key1": "value1", "key2": "value2"}',
+            "json_string_field_2": {"key1": "value1", "key2": "value2"},
+            "uuid_string_field_1": "ca2f7082-1b87-4324-b2c5-a3f624ca2eae",
+            "uuid_string_field_2": uuid.UUID("ca2f7082-1b87-4324-b2c5-a3f624ca2eae"),
+            "date_string_field_1": "2020-05-25",
+            "date_string_field_2": date(year=2020, month=5, day=25),
+            "datetime_string_field_1": "2020-05-25 17:45:30.0+0000",
+            "datetime_string_field_2": datetime(
+                year=2020, month=5, day=25, hour=17, minute=45, second=30, microsecond=0, tzinfo=timezone.utc,
+            ),
+            "number_string_field_1": "3.1428",
+            "number_string_field_2": 3.1428,
+            "integer_string_field_1": "9015",
+            "integer_string_field_2": 9015,
+            "float_string_field_1": "3.1428",
+            "float_string_field_2": 3.1428,
+        }
+        val = FieldConversionValidator(data=data)
+        val.run_validations()
+        self.assertTrue(not has_errors(val.errors))
+        validated_data = val.validated_data
+        for key in validated_data:
+            self.assertTrue(
+                key in expected_validated_data,
+                msg="Make sure that `expected_validated_data` has the expected keys",
+            )
+            validated_value = validated_data[key]
+            expected_value = expected_validated_data[key]
+            self.assertTrue(
+                type(validated_value) is type(expected_value),
+                msg=f"Validated value type: `{type(validated_value).__name__}` || Expected value type: `{type(expected_value).__name__}`",
+            )
+            self.assertTrue(
+                validated_value == expected_value,
+                msg=f"Validated value: `{validated_value}` || Expected value: `{expected_value}`",
+            )
 
     def field_params_validator_helper(self, *, data: Dict[str, Any], should_be_valid: bool) -> None:
         val = FieldParamsValidator(data=data)
@@ -699,6 +772,14 @@ class TestField(unittest.TestCase):
                     "data": {"number_string_field": "-1"},
                     "should_be_valid": True,
                 },
+                {
+                    "data": {"number_string_field": "-1.0"},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"number_string_field": "-1.01"},
+                    "should_be_valid": True,
+                },
             ],
         )
 
@@ -730,6 +811,10 @@ class TestField(unittest.TestCase):
                     "data": {"integer_string_field": "-1"},
                     "should_be_valid": True,
                 },
+                {
+                    "data": {"integer_string_field": "-1.0"},
+                    "should_be_valid": False,
+                },
             ],
         )
 
@@ -737,6 +822,14 @@ class TestField(unittest.TestCase):
         self.assert_validations(
             validator_model=FloatStringFieldValidator,
             io=[
+                {
+                    "data": {"float_string_field": "1.1"},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"float_string_field": "1.0"},
+                    "should_be_valid": True,
+                },
                 {
                     "data": {"float_string_field": 0},
                     "should_be_valid": False,
