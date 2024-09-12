@@ -312,4 +312,3 @@ def is_valid_email_id_string(value: Any, /) -> bool:
         string=value,
     )
     return True if match_obj else False
-

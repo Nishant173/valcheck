@@ -51,6 +51,7 @@ class Validator:
         self._field_info: Dict[str, Field] = self._initialise_fields()
         self._errors: List[Error] = []
         self._validated_data: Dict[str, Any] = {}
+        self._is_run_validations_called: bool = False
 
     @property
     def data(self) -> Dict[str, Any]:
@@ -286,6 +287,10 @@ class Validator:
         Runs validations and registers errors/validated-data.
         If `raise_exception=True` and validations fail, raises `valcheck.exceptions.ValidationException`.
         """
+        assert not self._is_run_validations_called, (
+            f"The `run_validations()` method can be called only once per instance of the '{self.__class__.__name__}' class"
+        )
+        self._is_run_validations_called = True
         self._clear_errors()
         self._clear_validated_data()
         for _, field in self._field_info.items():
