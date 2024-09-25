@@ -30,13 +30,13 @@ class PersonValidator(validators.Validator):
         if name.replace(" ", "") == "":
             error = models.Error(
                 description="Invalid - The given name only has whitespaces. Please pass in an actual name",
-                initial_field_path="name",
+                field_path_part="name",
             )
             errors.append(error)
         if gender == "Male" and date_of_birth.month == 12:
             error = models.Error(
                 description="Invalid - We don't allow males born in the month of December",
-                initial_field_path="date_of_birth/gender", # the error is in either `date_of_birth` or `gender`
+                field_path_part="date_of_birth/gender", # the error is in either `date_of_birth` or `gender`
             )
             errors.append(error)
         return errors
