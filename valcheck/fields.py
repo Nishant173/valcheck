@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date, datetime
 import random
-from typing import Any, Callable, Iterable, List, Optional, Type, Union
+from typing import Any, Callable, Iterable, List, Literal, Optional, Type, Union
 import uuid
 
 from valcheck.models import Error
@@ -314,11 +314,17 @@ class StringField(Field):
 
 
 class JsonStringField(Field):
-    def __init__(self, *, which: Optional[str] = "ANY", to_python_obj: Optional[bool] = False, **kwargs: Any) -> None:
+    def __init__(
+            self,
+            *,
+            which: Literal["ANY", "JSON_ARRAY", "JSON_OBJECT", "JSON_OBJECT_OR_ARRAY"] = "ANY",
+            to_python_obj: Optional[bool] = False,
+            **kwargs: Any,
+        ) -> None:
         which_options = ["ANY", "JSON_ARRAY", "JSON_OBJECT", "JSON_OBJECT_OR_ARRAY"]
         assert isinstance(which, str) and which in which_options, f"Param `which` must be one of {which_options}"
         assert isinstance(to_python_obj, bool), f"Param `to_python_obj` must be of type 'bool'"
-        self.which = which
+        self.which: Literal["ANY", "JSON_ARRAY", "JSON_OBJECT", "JSON_OBJECT_OR_ARRAY"] = which
         self.to_python_obj = to_python_obj
         super(JsonStringField, self).__init__(**kwargs)
 

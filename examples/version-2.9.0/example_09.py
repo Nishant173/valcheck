@@ -25,7 +25,7 @@ class TimestampValidator(validators.Validator):
         if self.get_validated_value("start_timestamp") >= self.get_validated_value("end_timestamp"):
             error = models.Error(
                 description="`start_timestamp` must be < `end_timestamp`",
-                initial_field_path="start_timestamp/end_timestamp",
+                field_path_part="start_timestamp/end_timestamp",
             )
             errors.append(error)
         return errors

@@ -24,7 +24,7 @@ class PersonValidator(validators.Validator):
             if user_id_is_odd and gender not in ("Female", "Male"):
                 error = models.Error(
                     description="Invalid gender - Please use one of ('Female', 'Male') for an odd user ID",
-                    initial_field_path="gender",
+                    field_path_part="gender",
                 )
                 errors.append(error)
         return errors

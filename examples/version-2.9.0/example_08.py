@@ -12,7 +12,7 @@ class ValidatorA(validators.Validator):
 
     def model_validator(self) -> List[models.Error]:
         if self.get_validated_value("a1") >= self.get_validated_value("a2"):
-            return [models.Error(description="a1 must be < a2", initial_field_path="a1/a2")]
+            return [models.Error(description="a1 must be < a2", field_path_part="a1/a2")]
         return []
 
 
@@ -22,7 +22,7 @@ class ValidatorB(validators.Validator):
 
     def model_validator(self) -> List[models.Error]:
         if self.get_validated_value("b1") >= self.get_validated_value("b2"):
-            return [models.Error(description="b1 must be < b2", initial_field_path="b1/b2")]
+            return [models.Error(description="b1 must be < b2", field_path_part="b1/b2")]
         return []
 
 
@@ -32,7 +32,7 @@ class ValidatorC(validators.Validator):
 
     def model_validator(self) -> List[models.Error]:
         if self.get_validated_value("c1") >= self.get_validated_value("c2"):
-            return [models.Error(description="c1 must be < c2", initial_field_path="c1/c2")]
+            return [models.Error(description="c1 must be < c2", field_path_part="c1/c2")]
         return []
 
 
@@ -42,7 +42,7 @@ class ValidatorX(ValidatorA, ValidatorB, ValidatorC):
 
     def model_validator(self) -> List[models.Error]:
         if self.get_validated_value("x1") >= self.get_validated_value("x2"):
-            return [models.Error(description="x1 must be < x2", initial_field_path="x1/x2")]
+            return [models.Error(description="x1 must be < x2", field_path_part="x1/x2")]
         return []
 
     def model_validators_to_consider(self) -> List[Type[validators.Validator]]:
