@@ -1,7 +1,7 @@
 from typing import Optional
 
 from valcheck.apis import status_codes
-from valcheck.apis.exceptions import ApiException
+from valcheck.apis.exceptions import ApiRequestValidationException
 from valcheck.validators import Validator
 
 
@@ -13,11 +13,11 @@ class ApiRequestValidator(Validator):
     def run_validations(self, *, raise_exception: Optional[bool] = False) -> None:
         """
         Runs validations and registers errors/validated-data.
-        If `raise_exception=True` and validations fail, raises `valcheck.apis.exceptions.ApiException`.
+        If `raise_exception=True` and validations fail, raises `valcheck.apis.exceptions.ApiRequestValidationException`.
         """
         super().run_validations()
         if raise_exception and self.errors:
-            raise ApiException(
+            raise ApiRequestValidationException(
                 http_status_code=self.HTTP_STATUS_CODE,
                 errors=self.errors,
             )

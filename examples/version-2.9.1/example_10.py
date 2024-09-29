@@ -4,7 +4,7 @@ from pprint import pprint
 
 from valcheck import fields
 from valcheck.apis.validators import ApiRequestValidator
-from valcheck.apis.exceptions import ApiException
+from valcheck.apis.exceptions import ApiRequestValidationException
 from valcheck.apis import status_codes
 
 
@@ -33,7 +33,7 @@ def main():
     person_validator = PersonValidator(data=data)
     try:
         person_validator.run_validations(raise_exception=True)
-    except ApiException as exc:
+    except ApiRequestValidationException as exc:
         pprint([error.as_dict() for error in exc.errors]) # Error list
         print(f"HTTP status code: {exc.http_status_code}")
     else:
