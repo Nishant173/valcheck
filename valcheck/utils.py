@@ -33,6 +33,11 @@ def dict_has_all_keys(d: Dict, /, *, keys: List) -> bool:
     return all((key in keys for key in d))
 
 
+def dicts_have_common_keys(d1: dict, d2: dict, /) -> bool:
+    common_keys = set(d1.keys()).intersection(set(d2.keys()))
+    return bool(common_keys)
+
+
 def make_message(
         message: str,
         /,

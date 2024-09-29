@@ -30,8 +30,8 @@ class MissingFieldException(Exception):
     pass
 
 
-class ValidationException(Exception):
-    """Exception to be raised when data validation fails"""
+class BaseValidationException(Exception):
+    """Base class for all validation failure exceptions"""
 
     def __init__(self, *, errors: List[Error]) -> None:
         _validate_list_of_errors(errors)
@@ -49,10 +49,23 @@ class ValidationException(Exception):
     def as_dict(self) -> Dict[str, Any]:
         return {
             "errors": [error.as_dict() for error in self.errors],
-            "count": len(self.errors),
+            "error_count": len(self.errors),
         }
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.as_dict()})"
 
+
+class ValidationException(BaseValidationException):
+    """Exception to be raised when data validation fails"""
+
+    def __init__(self, **kwargs: Any) -> None:
+        super(ValidationException, self).__init__(**kwargs)
+
+
+class FunctionInputValidationException(BaseValidationException):
+    """Exception to be raised when data validation fails for a function's input parameters"""
+
+    def __init__(self, **kwargs: Any) -> None:
+        super(FunctionInputValidationException, self).__init__(**kwargs)
 
