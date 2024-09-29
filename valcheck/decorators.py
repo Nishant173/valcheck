@@ -14,11 +14,11 @@ def function_input_validator(
     ) -> Callable:
     """
     Decorator that validates the input parameters of the decorated function.
-    If validation of function input fails, raises `valcheck.exceptions.FunctionInputValidationException`.
+    If validation fails, raises `valcheck.exceptions.FunctionInputValidationException`.
 
     Parameters:
         - validator_model (Type[Validator]): The validator model used to perform the validation.
-        - validator_model_kwargs (dict): Parameters to `validator_model` (if any). The `data` parameter will already be plugged in.
+        - validator_model_kwargs (dict): Parameters to `validator_model` (if any). The `data` parameter will be plugged in by default.
         - args_to_kwargs (Callable): Callable that takes in the args (positional arguments if any) of the decorated function, and returns
         the corresponding kwargs (keyword arguments) as a dictionary. This is necessary since `validator_model` only accepts kwargs.
     """
