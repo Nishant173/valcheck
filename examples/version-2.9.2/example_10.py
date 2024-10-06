@@ -13,10 +13,6 @@ GENDER_CHOICES = ("Female", "Male", "Other")
 
 
 class PersonValidator(ApiRequestValidator):
-
-    # To specify the HTTP status code of the error raised
-    HTTP_STATUS_CODE: int = status_codes.HTTP_400_BAD_REQUEST
-
     name = fields.StringField(allow_empty=False)
     age = fields.IntegerField()
     gender = fields.ChoiceField(choices=GENDER_CHOICES)
@@ -32,7 +28,10 @@ def main():
     }
     person_validator = PersonValidator(data=data)
     try:
-        person_validator.run_validations(raise_exception=True)
+        person_validator.run_validations(
+            raise_exception=True,
+            http_status_code=status_codes.HTTP_400_BAD_REQUEST,
+        )
     except ApiRequestValidationException as exc:
         pprint([error.as_dict() for error in exc.errors]) # Error list
         print(f"HTTP status code: {exc.http_status_code}")
