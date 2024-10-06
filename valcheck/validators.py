@@ -282,7 +282,7 @@ class Validator:
         """
         return []
 
-    def run_validations(self, *, raise_exception: Optional[bool] = False) -> None:
+    def run_validations(self, *, raise_exception: Optional[bool] = False, **kwargs: Any) -> None:
         """
         Runs validations and registers errors/validated-data.
         If `raise_exception=True` and validations fail, raises `valcheck.exceptions.ValidationException`.

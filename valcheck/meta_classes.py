@@ -16,3 +16,4 @@ class Singleton(type):
             raise SingletonError(f"Instance of the singleton already exists for the class '{cls.__name__}'")
         cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
+
