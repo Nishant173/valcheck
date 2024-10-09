@@ -38,6 +38,53 @@ def dicts_have_common_keys(d1: dict, d2: dict, /) -> bool:
     return bool(common_keys)
 
 
+def access_nested_dictionary(dict_: dict, /, *, path: List, default: Union[Any, Empty] = set_as_empty()) -> Any:
+    """
+    Returns the value accessed via `path` from the `dict_`.
+
+    If `default` is not passed, raises:
+        - `KeyError` if the `path` is not found.
+        - `ValueError` if you try to access a nested list or tuple without an index (int) in the `path`.
+        - `IndexError` if you try to access a nested list or tuple via an index, but the index is out of range.
+    """
+    assert isinstance(dict_, dict), "Param `dict_` must be a dictionary"
+    assert isinstance(path, list) and bool(path), "Param `path` must be a non-empty list"
+    result = dict_
+    empty = set_as_empty()
+    default_exists = not is_empty(default)
+    path_traversed = []
+    for item in path:
+        path_traversed.append(item)
+
+        if isinstance(result, dict):
+            result = result.get(item, empty)
+        elif isinstance(result, (list, tuple)):
+            if not isinstance(item, int):
+                if default_exists:
+                    return default
+                raise ValueError(
+                    f"An index (int) is needed to access an item inside type '{result.__class__.__name__}' at path: {path_traversed[:-1]}"
+                )
+            try:
+                result = result[item]
+            except IndexError:
+                if default_exists:
+                    return default
+                raise IndexError(f"Index `{item}` not found at path: {path_traversed}")
+        else:
+            if default_exists:
+                return default
+            raise ValueError(
+                f"Cannot access path part `{item}` from item of type '{result.__class__.__name__}' at path: {path_traversed[:-1]}"
+            )
+
+        if is_empty(result):
+            if default_exists:
+                return default
+            raise KeyError(f"Key not found at path: {path_traversed}")
+    return result
+
+
 def make_message(
         message: str,
         /,
