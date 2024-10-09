@@ -3,7 +3,7 @@ import unittest
 from valcheck import utils
 
 
-class TestJsonSerializer(unittest.TestCase):
+class TestUtils(unittest.TestCase):
 
     def test_access_nested_dictionary(self):
         dictionary = {
