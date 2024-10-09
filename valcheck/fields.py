@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 import random
 from typing import Any, Callable, Iterable, List, Literal, Optional, Type, Union
 import uuid
@@ -422,7 +422,7 @@ class DateStringField(Field):
         return []
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
-        return utils.get_current_date().strftime(self.format_)
+        return date(year=2020, month=4, day=20).strftime(self.format_)
 
 
 class DateField(Field):
@@ -456,7 +456,16 @@ class DatetimeStringField(Field):
         return []
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
-        return utils.get_current_datetime(timezone_aware=True).strftime(self.format_)
+        return datetime(
+            year=2020,
+            month=4,
+            day=20,
+            hour=17,
+            minute=30,
+            second=45,
+            microsecond=585675,
+            tzinfo=timezone.utc,
+        ).strftime(self.format_)
 
 
 class DatetimeField(Field):

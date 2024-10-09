@@ -42,9 +42,29 @@ def main():
     person_validator.run_validations()
     errors = person_validator.errors
     if errors:
+        print("Errors")
         pprint([error.as_dict() for error in errors]) # Error list
     else:
+        print("Validated data")
         pprint(person_validator.validated_data) # Dictionary having validated data (by field)
+
+        print("\n\n")
+
+        target = "address"
+        print(
+            f"Target: {target}",
+            f"Validated value: {person_validator.get_validated_value(target)}",
+            sep="\n",
+        )
+
+        print("\n\n")
+
+        path = ["address", "postal_code"]
+        print(
+            f"Path: {path}",
+            f"Validated value (nested): {person_validator.get_validated_value_nested(path)}",
+            sep="\n",
+        )
 
 
 if __name__ == "__main__":

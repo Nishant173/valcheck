@@ -29,6 +29,7 @@ class Validator:
     Instance methods:
         - get_representation()
         - get_validated_value()
+        - get_validated_value_nested()
         - list_field_validators()
         - model_validator()
         - model_validators_to_consider()
@@ -213,14 +214,29 @@ class Validator:
             /,
         ) -> Any:
         """
-        Returns the validated field value. Raises `valcheck.exceptions.MissingFieldException` if the field
-        is missing, and no default is provided.
+        Returns the validated field value based on the given `field_target`.
+        Raises `valcheck.exceptions.MissingFieldException` if the field is missing, and no default is provided.
         """
         if field_target in self.validated_data:
             return self.validated_data[field_target]
         if not utils.is_empty(default):
             return default
         raise MissingFieldException(f"The field target '{field_target}' is missing from the validated data")
+
+    def get_validated_value_nested(
+            self,
+            path: List,
+            default: Union[Any, utils.Empty] = utils.set_as_empty(),
+            /,
+        ) -> Any:
+        """
+        Returns the validated field value (nested) based on the given `path`.
+        Raises `valcheck.exceptions.MissingFieldException` if the field is missing, and no default is provided.
+        """
+        try:
+            return utils.access_nested_dictionary(self.validated_data, path=path, default=default)
+        except (IndexError, KeyError, ValueError) as exc:
+            raise MissingFieldException(f"The field target path {path} is missing from the validated data. Error info: {exc}")
 
     def _perform_field_validation_checks(self, *, field: Field) -> None:
         """Performs validation checks for the given field, and registers errors (if any) and validated-data"""
