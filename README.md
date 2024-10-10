@@ -23,4 +23,3 @@ class PersonValidator(validators.Validator):
     num_friends = fields.IntegerField()
 ```
 
-

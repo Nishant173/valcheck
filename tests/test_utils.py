@@ -103,4 +103,3 @@ class TestUtils(unittest.TestCase):
         self.assertIsNone(
             utils.access_nested_dictionary(dictionary, path=["other_hobbies_v1", 300, "name"], default=None),
         )
-
