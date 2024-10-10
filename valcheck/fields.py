@@ -72,6 +72,7 @@ class Field:
             nullable: Optional[bool] = False,
             default_factory: Optional[Callable] = None,
             converter_factory: Optional[Callable] = None,
+            sample_value_factory: Optional[Callable] = None,
             validators: Optional[List[Callable]] = None,
             error: Optional[Error] = None,
             type_alias: Optional[str] = None,
@@ -86,6 +87,7 @@ class Field:
             if `required=False` and the field is missing.
             - converter_factory (callable): Callable that takes in the validated value (of the field), and returns
             the converted value (for the field).
+            - sample_value_factory (callable): Callable that returns the sample value for the field.
             - validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
             The callable returns True if validation is successful, else False.
             - error (Error instance): Instance of type `valcheck.models.Error`.
@@ -106,6 +108,9 @@ class Field:
             "Param `converter_factory` must be a callable that takes in the validated value (of the field), and returns"
             " the converted value (for the field)."
         )
+        assert sample_value_factory is None or callable(sample_value_factory), (
+            "Param `sample_value_factory` must be a callable that returns the sample value"
+        )
         assert validators is None or isinstance(validators, list), "Param `validators` must be of type 'list'"
         if isinstance(validators, list):
             for validator in validators:
@@ -123,6 +128,7 @@ class Field:
         self.nullable = nullable
         self.default_factory = default_factory
         self.converter_factory = converter_factory
+        self.sample_value_factory = sample_value_factory
         self.validators = validators or []
         self.error = error or Error()
         self.type_alias = type_alias or self.__class__.__name__
@@ -276,12 +282,14 @@ class AnyField(Field):
         return []
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         options = (
             {},
             [],
-            "",
+            "some string",
             '{"key1": "value1", "key2": "value2"}',
-        )  # could be any value
+        )
         return random.choice(options)
 
 
@@ -295,7 +303,10 @@ class BooleanField(Field):
         return [self.create_invalid_field_error()]
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
-        return True
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        options = (True, False)
+        return random.choice(options)
 
 
 class StringField(Field):
@@ -310,7 +321,9 @@ class StringField(Field):
         return [self.create_invalid_field_error()]
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
-        return ""
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return "some string"
 
 
 class JsonStringField(Field):
@@ -354,6 +367,8 @@ class JsonStringField(Field):
         return []
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         if self.which == "JSON_ARRAY":
             return '[1, 2, 3, null, "hello"]'
         return '{"key1": "value1", "key2": "value2"}'
@@ -369,6 +384,8 @@ class EmailIdStringField(Field):
         return [self.create_invalid_field_error()]
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return "hello@example.com"
 
 
@@ -388,6 +405,8 @@ class UuidStringField(Field):
         return []
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return str(uuid.uuid4())
 
 
@@ -401,6 +420,8 @@ class UuidField(Field):
         return [self.create_invalid_field_error()]
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return uuid.uuid4()
 
 
@@ -422,6 +443,8 @@ class DateStringField(Field):
         return []
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return date(year=2020, month=4, day=20).strftime(self.format_)
 
 
@@ -435,6 +458,8 @@ class DateField(Field):
         return [self.create_invalid_field_error()]
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return utils.get_current_date()
 
 
@@ -456,6 +481,8 @@ class DatetimeStringField(Field):
         return []
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return datetime(
             year=2020,
             month=4,
@@ -484,6 +511,8 @@ class DatetimeField(Field):
         return [self.create_invalid_field_error()]
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return utils.get_current_datetime(timezone_aware=self.timezone_aware)
 
 
@@ -500,6 +529,8 @@ class ChoiceField(Field):
         return [self.create_invalid_field_error(suffix=suffix)]
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return random.choice(self.choices)
 
 
@@ -520,6 +551,8 @@ class MultiChoiceField(Field):
         return [self.create_invalid_field_error(suffix=suffix)]
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return (
             random.sample(self.choices, k=2) if len(self.choices) > 1 else random.sample(self.choices, k=1)
         )
@@ -535,6 +568,8 @@ class BytesField(Field):
         return [self.create_invalid_field_error()]
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return b''
 
 
@@ -549,6 +584,8 @@ class NumberField(Field):
         return [self.create_invalid_field_error(suffix=suffix)]
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return 3.14
 
 
@@ -562,6 +599,8 @@ class IntegerField(Field):
         return [self.create_invalid_field_error()]
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return 314
 
 
@@ -575,6 +614,8 @@ class FloatField(Field):
         return [self.create_invalid_field_error()]
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return 3.14
 
 
@@ -594,6 +635,8 @@ class NumberStringField(Field):
         return []
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return "3.14"
 
 
@@ -613,6 +656,8 @@ class IntegerStringField(Field):
         return []
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return "314"
 
 
@@ -632,6 +677,8 @@ class FloatStringField(Field):
         return []
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return "3.14"
 
 
@@ -647,7 +694,13 @@ class DictionaryField(Field):
         return [self.create_invalid_field_error()]
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
-        return {}
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return {
+            "a": 1,
+            "b": 2,
+            "c": 3,
+        }
 
 
 class ListField(Field):
@@ -662,7 +715,9 @@ class ListField(Field):
         return [self.create_invalid_field_error()]
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
-        return []
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return [1, 2, 3]
 
 
 class ModelDictionaryField(Field):
@@ -698,9 +753,10 @@ class ModelDictionaryField(Field):
         return error_objs
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
-        key = kwargs.get("key", None)
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return {
-            **self.validator_model(data={}).get_representation(key=key),
+            **self.validator_model(data={}).get_representation(**kwargs),
         }
 
 
@@ -755,8 +811,9 @@ class ModelListField(Field):
         return errors
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
-        key = kwargs.get("key", None)
+        if self.sample_value_factory:
+            return self.sample_value_factory()
         return [
-            self.validator_model(data={}).get_representation(key=key),
+            self.validator_model(data={}).get_representation(**kwargs),
         ]
 

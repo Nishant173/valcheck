@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import string
-from typing import Any, Callable, Dict, List, Optional, Type, Union
+from typing import Any, Callable, Dict, List, Literal, Optional, Type, Union
 
 from valcheck.exceptions import (
     DuplicateSourcesException,
@@ -93,21 +93,25 @@ class Validator:
         assert key in key_mapper, f"Param `key` must be one of {list(key_mapper.keys())}"
         return key_mapper[key]
 
-    def get_representation(self, *, key: str) -> Dict[str, Any]:
+    def get_representation(
+            self,
+            *,
+            key: Literal["field_identifier", "source", "target"],
+            nullify_values: Optional[bool] = False,
+        ) -> Dict[str, Any]:
         """
         Returns dictionary having the representation of the expected data format.
-        Options for `key` are: `['field_identifier', 'source', 'target']`.
+        Options for `key` are: `["field_identifier", "source", "target"]`.
         """
+        assert isinstance(nullify_values, bool), "Param `nullify_values` must be of type 'bool'"
         field_key_picker = self._get_field_key_picker(key=key)
         representation = {}
         for _, field in self._field_info.items():
             field_key = field_key_picker(field)
-            if isinstance(field, ModelDictionaryField):
-                representation[field_key] = field.sample_value(key=key)
-            elif isinstance(field, ModelListField):
-                representation[field_key] = field.sample_value(key=key)
+            if isinstance(field, (ModelDictionaryField, ModelListField)):
+                representation[field_key] = field.sample_value(key=key, nullify_values=nullify_values)
             else:
-                representation[field_key] = field.sample_value()
+                representation[field_key] = None if nullify_values else field.sample_value()
         return representation
 
     def _validate_field_identifier(self, field_identifier: str, /) -> None:
