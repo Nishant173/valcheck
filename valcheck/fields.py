@@ -464,17 +464,35 @@ class DateField(Field):
 
 
 class DatetimeStringField(Field):
-    def __init__(self, *, format_: Optional[str] = "%Y-%m-%d %H:%M:%S.%f%z", to_datetime_obj: Optional[bool] = False, **kwargs: Any) -> None:
+    def __init__(
+            self,
+            *,
+            format_: Optional[str] = "%Y-%m-%d %H:%M:%S.%f%z",
+            to_datetime_obj: Optional[bool] = False,
+            allowed_tz_names: Optional[List[str]] = None,
+            **kwargs: Any,
+        ) -> None:
         assert isinstance(format_, str), "Param `format_` must be of type 'str'"
         assert isinstance(to_datetime_obj, bool), "Param `to_datetime_obj` must be of type 'bool'"
+        assert allowed_tz_names is None or isinstance(allowed_tz_names, list), "Param `allowed_tz_names` must be of type 'list'"
         self.format_ = format_
         self.to_datetime_obj = to_datetime_obj
+        self.allowed_tz_names = allowed_tz_names
         super(DatetimeStringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        datetime_obj, is_valid = utils.validate_datetime_string(self.field_value, self.format_)
+        datetime_obj, is_valid = utils.validate_datetime_string(
+            self.field_value,
+            self.format_,
+            allowed_tz_names=self.allowed_tz_names,
+            raise_if_tz_uncomparable=True,
+        )
         if not is_valid:
-            suffix = f"Must be a valid datetime-string of format '{self.format_}'. Eg: '{self.sample_value()}'"
+            suffix = "".join([
+                f"Must be a valid datetime-string of format '{self.format_}'.",
+                f" Must be of one of the following timezones [{' | '.join(self.allowed_tz_names)}]." if self.allowed_tz_names else "",
+                f" Eg: '{self.sample_value()}'.",
+            ])
             return [self.create_invalid_field_error(suffix=suffix)]
         if self.to_datetime_obj and datetime_obj is not None:
             self.field_value = datetime_obj
@@ -483,7 +501,7 @@ class DatetimeStringField(Field):
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         if self.sample_value_factory:
             return self.sample_value_factory()
-        return datetime(
+        dt_obj = datetime(
             year=2020,
             month=4,
             day=20,
@@ -492,23 +510,49 @@ class DatetimeStringField(Field):
             second=45,
             microsecond=585675,
             tzinfo=timezone.utc,
-        ).strftime(self.format_)
+        )
+        if self.allowed_tz_names:
+            tz_name = random.choice(self.allowed_tz_names)
+            dt_obj = utils.convert_datetime_timezone(dt_obj, tz_name=tz_name)
+        return dt_obj.strftime(self.format_)
 
 
 class DatetimeField(Field):
-    def __init__(self, *, timezone_aware: Optional[bool] = True, **kwargs: Any) -> None:
+    def __init__(
+            self,
+            *,
+            timezone_aware: Optional[bool] = True,
+            allowed_tz_names: Optional[List[str]] = None,
+            **kwargs: Any,
+        ) -> None:
         assert isinstance(timezone_aware, bool), "Param `timezone_aware` must be of type 'bool'"
+        assert allowed_tz_names is None or isinstance(allowed_tz_names, list), "Param `allowed_tz_names` must be of type 'list'"
+        if not timezone_aware:
+            assert allowed_tz_names is None, "Param `allowed_tz_names` must not be passed when `timezone_aware=False`"
         self.timezone_aware = timezone_aware
+        self.allowed_tz_names = allowed_tz_names
         super(DatetimeField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if (
+        if not (
             isinstance(self.field_value, datetime)
             and self.field_value.__class__ is datetime
-            and (self.field_value.tzinfo is not None if self.timezone_aware else self.field_value.tzinfo is None)
         ):
-            return []
-        return [self.create_invalid_field_error()]
+            suffix = "Invalid data-type"
+            return [self.create_invalid_field_error(suffix=suffix)]
+        if not (self.field_value.tzinfo is not None if self.timezone_aware else self.field_value.tzinfo is None):
+            suffix = (
+                "Invalid timezone awareness/naivety."
+                f" Expected a {'timezone-aware' if self.timezone_aware else 'timezone-naive'} datetime object."
+            )
+            return [self.create_invalid_field_error(suffix=suffix)]
+        if self.allowed_tz_names and not utils.is_datetime_of_timezone(self.field_value, allowed_tz_names=self.allowed_tz_names):
+            suffix = (
+                "Invalid timezone."
+                f" Must be of one of the following timezones [{' | '.join(self.allowed_tz_names)}]."
+            )
+            return [self.create_invalid_field_error(suffix=suffix)]
+        return []
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         if self.sample_value_factory:
