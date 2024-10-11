@@ -143,6 +143,22 @@ class TestUtils(unittest.TestCase):
             not utils.is_datetime_of_timezone(dt_obj_tz_aware, allowed_tz_names=["UTC"]),
         )
 
+    def test_get_tzname(self):
+        datetime_string = "2020-04-20 17:30:45.585675+0530"
+        format_ = "%Y-%m-%d %H:%M:%S.%f%z"
+
+        dt_obj_tz_aware = datetime.strptime(datetime_string, format_)
+        assert dt_obj_tz_aware.tzinfo is not None, "Ensure that `dt_obj_tz_aware` is timezone-aware in the test-case"
+        dt_obj_tz_naive = dt_obj_tz_aware.replace(tzinfo=None)
+
+        self.assertEqual(
+            utils.get_tzname(dt_obj_tz_aware),
+            "UTC+05:30",
+        )
+        self.assertIsNone(
+            utils.get_tzname(dt_obj_tz_naive),
+        )
+
     def test_convert_datetime_timezone(self):
         datetime_string = "2020-04-20 17:30:45.585675+0000"
         format_ = "%Y-%m-%d %H:%M:%S.%f%z"

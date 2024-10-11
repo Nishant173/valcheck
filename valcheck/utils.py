@@ -329,7 +329,7 @@ def get_tzname(dt_obj: datetime, /) -> Union[str, None]:
     Returns the timezone name of the given datetime object.
     If the given datetime object is timezone-naive, returns `None`.
     """
-    return dt_obj.tzinfo.tzname(dt_obj)
+    return dt_obj.tzinfo.tzname(dt_obj) if is_timezone_aware(dt_obj) else None
 
 
 def is_datetime_of_timezone(dt_obj: datetime, /, *, allowed_tz_names: List[str]) -> bool:
