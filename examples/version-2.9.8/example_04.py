@@ -29,6 +29,7 @@ class ItemValidator(validators.Validator):
 class CartValidator(validators.Validator):
     timestamp_of_purchase = fields.DatetimeStringField(
         format_=DATETIME_STRING_FORMAT,
+        allowed_tz_names=["UTC-02:30", "UTC", "UTC+05:30"],
         converter_factory=lambda ts_string: datetime.strptime(ts_string, DATETIME_STRING_FORMAT).astimezone(timezone.utc),
     )
     items = fields.ModelListField(validator_model=ItemValidator, allow_empty=False)
