@@ -142,6 +142,10 @@ def is_valid_object_of_type(obj: Any, /, *, type_: Type, allow_empty: Optional[b
     return True if allow_empty else bool(obj)
 
 
+def is_empty_value_allowed(obj: Any, /, *, allow_empty: Optional[bool] = True) -> bool:
+    return True if allow_empty else bool(obj)
+
+
 def integerify_if_possible(value: Union[int, float], /) -> Union[int, float]:
     value_as_int = int(value)
     return value_as_int if value == value_as_int else value

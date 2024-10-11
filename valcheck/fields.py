@@ -29,12 +29,7 @@ class ValidatedField:
         kwargs_list = [
             f"is_valid={not bool(self.errors)}",
             f"field_identifier={utils.wrap_in_quotes_if_string(self.field.field_identifier)}",
-            f"field_value={utils.wrap_in_quotes_if_string(self.field.field_value)}",
-            f"source={utils.wrap_in_quotes_if_string(self.field.source)}",
-            f"target={utils.wrap_in_quotes_if_string(self.field.target)}",
-            f"required={self.field.required}",
-            f"nullable={self.field.nullable}",
-            f"type_alias={utils.wrap_in_quotes_if_string(self.field.type_alias)}",
+            f"field={self.field}",
         ]
         kwargs_string = "(" + ", ".join(kwargs_list) + ")"
         return f"{self.__class__.__name__}{kwargs_string}"
@@ -316,9 +311,11 @@ class StringField(Field):
         super(StringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if utils.is_valid_object_of_type(self.field_value, type_=str, allow_empty=self.allow_empty):
-            return []
-        return [self.create_invalid_field_error()]
+        if not utils.is_valid_object_of_type(self.field_value, type_=str):
+            return [self.create_invalid_field_error()]
+        if not utils.is_empty_value_allowed(self.field_value, allow_empty=self.allow_empty):
+            return [self.create_invalid_field_error(suffix="Must be a non-empty string")]
+        return []
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         if self.sample_value_factory:
@@ -752,9 +749,11 @@ class DictionaryField(Field):
         super(DictionaryField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if utils.is_valid_object_of_type(self.field_value, type_=dict, allow_empty=self.allow_empty):
-            return []
-        return [self.create_invalid_field_error()]
+        if not utils.is_valid_object_of_type(self.field_value, type_=dict):
+            return [self.create_invalid_field_error()]
+        if not utils.is_empty_value_allowed(self.field_value, allow_empty=self.allow_empty):
+            return [self.create_invalid_field_error(suffix="Must be a non-empty dictionary")]
+        return []
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         if self.sample_value_factory:
@@ -773,9 +772,11 @@ class ListField(Field):
         super(ListField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if utils.is_valid_object_of_type(self.field_value, type_=list, allow_empty=self.allow_empty):
-            return []
-        return [self.create_invalid_field_error()]
+        if not utils.is_valid_object_of_type(self.field_value, type_=list):
+            return [self.create_invalid_field_error()]
+        if not utils.is_empty_value_allowed(self.field_value, allow_empty=self.allow_empty):
+            return [self.create_invalid_field_error(suffix="Must be a non-empty list")]
+        return []
 
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         if self.sample_value_factory:
@@ -801,7 +802,7 @@ class ModelDictionaryField(Field):
 
     def validate(self) -> List[Error]:
         if not isinstance(self.field_value, dict):
-            suffix = "Field is not a dictionary"
+            suffix = "Field must be a dictionary"
             error = self.create_invalid_field_error(suffix=suffix)
             return [error]
         validator = self.validator_model(data=self.field_value)
@@ -843,11 +844,11 @@ class ModelListField(Field):
 
     def validate(self) -> List[Error]:
         if not isinstance(self.field_value, list):
-            suffix = "Field is not a list"
+            suffix = "Field must be a list"
             error = self.create_invalid_field_error(suffix=suffix)
             return [error]
         if not self.allow_empty and not self.field_value:
-            suffix = "Field is an empty list"
+            suffix = "Field must be a non-empty list"
             error = self.create_invalid_field_error(suffix=suffix)
             return [error]
         errors: List[Error] = []
@@ -856,7 +857,7 @@ class ModelListField(Field):
             row_number = idx + 1
             row_number_string = f"<Row number: {row_number}>"
             if not isinstance(item, dict):
-                suffix = f"Row is not a dictionary {row_number_string}"
+                suffix = f"Row must be a dictionary {row_number_string}"
                 error = self.create_invalid_field_error(suffix=suffix)
                 errors.append(error)
                 continue
@@ -879,4 +880,5 @@ class ModelListField(Field):
         return [
             self.validator_model(data={}).get_representation(**kwargs),
         ]
+
 
