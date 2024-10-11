@@ -481,12 +481,18 @@ class DatetimeStringField(Field):
         super(DatetimeStringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        datetime_obj, is_valid = utils.validate_datetime_string(
-            self.field_value,
-            self.format_,
-            allowed_tz_names=self.allowed_tz_names,
-            raise_if_tz_uncomparable=True,
-        )
+        try:
+            datetime_obj, is_valid = utils.validate_datetime_string(
+                self.field_value,
+                self.format_,
+                allowed_tz_names=self.allowed_tz_names,
+                raise_if_tz_uncomparable=True,
+            )
+        except ValueError as exc:
+            raise AssertionError(
+                f"'{self.__class__.__name__}' has a `format_` '{self.format_}' which is timezone-naive, so the param `allowed_tz_names` must not be passed."
+                f" Details: {exc}"
+            )
         if not is_valid:
             suffix = "".join([
                 f"Must be a valid datetime-string of format '{self.format_}'.",
@@ -557,7 +563,20 @@ class DatetimeField(Field):
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         if self.sample_value_factory:
             return self.sample_value_factory()
-        return utils.get_current_datetime(timezone_aware=self.timezone_aware)
+        dt_obj = datetime(
+            year=2020,
+            month=4,
+            day=20,
+            hour=17,
+            minute=30,
+            second=45,
+            microsecond=585675,
+            tzinfo=timezone.utc if self.timezone_aware else None,
+        )
+        if self.allowed_tz_names:
+            tz_name = random.choice(self.allowed_tz_names)
+            dt_obj = utils.convert_datetime_timezone(dt_obj, tz_name=tz_name)
+        return dt_obj
 
 
 class ChoiceField(Field):

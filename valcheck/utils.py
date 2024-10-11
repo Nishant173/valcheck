@@ -363,7 +363,7 @@ def validate_datetime_string(
     If the datetime string is not valid, always returns `(None, False)`.
 
     Parameters:
-        - raise_if_tz_uncomparable (bool): If set to `True`, raises an `AssertionError` when the given datetime string is timezone-naive and
+        - raise_if_tz_uncomparable (bool): If set to `True`, raises an `ValueError` if the given datetime string is timezone-naive and
         the param `allowed_tz_names` is passed in, since we cannot check if a timezone-naive datetime string belongs to a particular timezone.
     """
     if not isinstance(value, str):
@@ -375,7 +375,7 @@ def validate_datetime_string(
     if allowed_tz_names:
         if not is_timezone_aware(datetime_obj):
             if raise_if_tz_uncomparable:
-                raise AssertionError(
+                raise ValueError(
                     "The given datetime string does not include a timezone."
                     f" Cannot check if a timezone-naive datetime string belongs to a particular timezone [{' | '.join(allowed_tz_names)}]."
                     " Suggest using a timezone-aware datetime string."
