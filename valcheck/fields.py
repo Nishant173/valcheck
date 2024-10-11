@@ -844,11 +844,11 @@ class ModelListField(Field):
 
     def validate(self) -> List[Error]:
         if not isinstance(self.field_value, list):
-            suffix = "Must be a list"
+            suffix = "Field must be a list"
             error = self.create_invalid_field_error(suffix=suffix)
             return [error]
         if not self.allow_empty and not self.field_value:
-            suffix = "Must be a non-empty list"
+            suffix = "Field must be a non-empty list"
             error = self.create_invalid_field_error(suffix=suffix)
             return [error]
         errors: List[Error] = []
