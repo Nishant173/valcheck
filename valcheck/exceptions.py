@@ -69,4 +69,3 @@ class FunctionInputValidationException(BaseValidationException):
     def __init__(self, **kwargs: Any) -> None:
         super(FunctionInputValidationException, self).__init__(**kwargs)
 
-
