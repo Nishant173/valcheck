@@ -29,12 +29,7 @@ class ValidatedField:
         kwargs_list = [
             f"is_valid={not bool(self.errors)}",
             f"field_identifier={utils.wrap_in_quotes_if_string(self.field.field_identifier)}",
-            f"field_value={utils.wrap_in_quotes_if_string(self.field.field_value)}",
-            f"source={utils.wrap_in_quotes_if_string(self.field.source)}",
-            f"target={utils.wrap_in_quotes_if_string(self.field.target)}",
-            f"required={self.field.required}",
-            f"nullable={self.field.nullable}",
-            f"type_alias={utils.wrap_in_quotes_if_string(self.field.type_alias)}",
+            f"field={self.field}",
         ]
         kwargs_string = "(" + ", ".join(kwargs_list) + ")"
         return f"{self.__class__.__name__}{kwargs_string}"
