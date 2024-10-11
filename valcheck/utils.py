@@ -324,6 +324,14 @@ def is_timezone_aware(dt_obj: datetime, /) -> bool:
     return dt_obj.tzinfo is not None
 
 
+def get_tzname(dt_obj: datetime, /) -> Union[str, None]:
+    """
+    Returns the timezone name of the given datetime object.
+    If the given datetime object is timezone-naive, returns `None`.
+    """
+    return dt_obj.tzinfo.tzname(dt_obj)
+
+
 def is_datetime_of_timezone(dt_obj: datetime, /, *, allowed_tz_names: List[str]) -> bool:
     """
     Checks if the given datetime object belongs to one of the allowed timezones.
@@ -334,7 +342,7 @@ def is_datetime_of_timezone(dt_obj: datetime, /, *, allowed_tz_names: List[str])
     """
     assert is_timezone_aware(dt_obj), "Param `dt_obj` must be timezone-aware"
     assert isinstance(allowed_tz_names, list) and bool(allowed_tz_names), "Param `allowed_tz_names` must be a non-empty list"
-    tz_name: str = dt_obj.tzinfo.tzname(dt_obj)
+    tz_name: str = get_tzname(dt_obj)
     return tz_name in allowed_tz_names
 
 
