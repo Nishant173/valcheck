@@ -8,6 +8,7 @@ from valcheck import fields, models, utils, validators
 
 DATE_FORMAT = "%d %B, %Y"
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S %z"
+DATETIME_FORMAT_TZ_NAIVE = "%Y-%m-%d %H:%M:%S"
 CHOICES = (
     "A",
     "B",
@@ -83,9 +84,33 @@ class DatetimeStringValidator(validators.Validator):
     datetime_string_field = fields.DatetimeStringField(format_=DATETIME_FORMAT)
 
 
+class DatetimeStringValidatorV2(validators.Validator):
+    datetime_string_field_tz_aware_v2 = fields.DatetimeStringField(
+        format_=DATETIME_FORMAT,
+        allowed_tz_names=["UTC", "UTC+05:30"],
+        required=False,
+    )
+    datetime_string_field_tz_naive_v2 = fields.DatetimeStringField(
+        format_=DATETIME_FORMAT_TZ_NAIVE,
+        required=False,
+    )
+
+
 class DatetimeValidator(validators.Validator):
     datetime_field_tz_aware = fields.DatetimeField(timezone_aware=True, required=False)
     datetime_field_tz_naive = fields.DatetimeField(timezone_aware=False, required=False)
+
+
+class DatetimeValidatorV2(validators.Validator):
+    datetime_field_tz_aware_v2 = fields.DatetimeField(
+        timezone_aware=True,
+        allowed_tz_names=["UTC", "UTC+05:30"],
+        required=False,
+    )
+    datetime_field_tz_naive_v2 = fields.DatetimeField(
+        timezone_aware=False,
+        required=False,
+    )
 
 
 class ChoiceFieldValidator(validators.Validator):
@@ -523,6 +548,49 @@ class TestField(unittest.TestCase):
             ],
         )
 
+    def test_datetime_string_field_v2(self):
+        dt_obj_1 = utils.get_current_datetime(timezone_aware=True)
+        dt_obj_2 = utils.convert_datetime_timezone(dt_obj_1, tz_name="UTC+05:30")
+        dt_obj_3 = utils.convert_datetime_timezone(dt_obj_1, tz_name="UTC+02:30")
+        dt_obj_4 = utils.convert_datetime_timezone(dt_obj_1, tz_name="UTC-03:30")
+        self.assert_validations(
+            validator_model=DatetimeStringValidatorV2,
+            io=[
+                {
+                    "data": {"datetime_string_field_tz_aware_v2": dt_obj_1.strftime(DATETIME_FORMAT)},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"datetime_string_field_tz_aware_v2": dt_obj_2.strftime(DATETIME_FORMAT)},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"datetime_string_field_tz_aware_v2": dt_obj_3.strftime(DATETIME_FORMAT)},
+                    "should_be_valid": False,  # timezone 'UTC+02:30' not allowed in validator
+                },
+                {
+                    "data": {"datetime_string_field_tz_aware_v2": dt_obj_4.strftime(DATETIME_FORMAT)},
+                    "should_be_valid": False,  # timezone 'UTC-03:30' not allowed in validator
+                },
+                {
+                    "data": {"datetime_string_field_tz_naive_v2": dt_obj_1.replace(tzinfo=None).strftime(DATETIME_FORMAT_TZ_NAIVE)},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"datetime_string_field_tz_naive_v2": dt_obj_2.replace(tzinfo=None).strftime(DATETIME_FORMAT_TZ_NAIVE)},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"datetime_string_field_tz_naive_v2": dt_obj_3.replace(tzinfo=None).strftime(DATETIME_FORMAT_TZ_NAIVE)},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"datetime_string_field_tz_naive_v2": dt_obj_4.replace(tzinfo=None).strftime(DATETIME_FORMAT_TZ_NAIVE)},
+                    "should_be_valid": True,
+                },
+            ],
+        )
+
     def test_datetime_field(self):
         self.assert_validations(
             validator_model=DatetimeValidator,
@@ -550,6 +618,49 @@ class TestField(unittest.TestCase):
                 {
                     "data": {"datetime_field_tz_naive": utils.get_current_datetime(timezone_aware=False).strftime(DATETIME_FORMAT)},
                     "should_be_valid": False,
+                },
+            ],
+        )
+
+    def test_datetime_field_v2(self):
+        dt_obj_1 = utils.get_current_datetime(timezone_aware=True)
+        dt_obj_2 = utils.convert_datetime_timezone(dt_obj_1, tz_name="UTC+05:30")
+        dt_obj_3 = utils.convert_datetime_timezone(dt_obj_1, tz_name="UTC+02:30")
+        dt_obj_4 = utils.convert_datetime_timezone(dt_obj_1, tz_name="UTC-03:30")
+        self.assert_validations(
+            validator_model=DatetimeValidatorV2,
+            io=[
+                {
+                    "data": {"datetime_field_tz_aware_v2": dt_obj_1},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"datetime_field_tz_aware_v2": dt_obj_2},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"datetime_field_tz_aware_v2": dt_obj_3},
+                    "should_be_valid": False,  # timezone 'UTC+02:30' not allowed in validator
+                },
+                {
+                    "data": {"datetime_field_tz_aware_v2": dt_obj_4},
+                    "should_be_valid": False,  # timezone 'UTC-03:30' not allowed in validator
+                },
+                {
+                    "data": {"datetime_field_tz_naive_v2": dt_obj_1.replace(tzinfo=None)},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"datetime_field_tz_naive_v2": dt_obj_2.replace(tzinfo=None)},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"datetime_field_tz_naive_v2": dt_obj_3.replace(tzinfo=None)},
+                    "should_be_valid": True,
+                },
+                {
+                    "data": {"datetime_field_tz_naive_v2": dt_obj_4.replace(tzinfo=None)},
+                    "should_be_valid": True,
                 },
             ],
         )

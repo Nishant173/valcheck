@@ -64,3 +64,4 @@ class TestModelValidator(unittest.TestCase):
         val.run_validations()
         # count of errors must be 4, since all the `model_validator()` calls in the hierarchy (of 4 classes) fail once for each class
         self.assertTrue(len(val.errors) == 4)
+

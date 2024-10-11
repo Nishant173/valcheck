@@ -1,5 +1,5 @@
 import copy
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 import json
 import re
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
@@ -262,11 +262,117 @@ def is_valid_date_string(value: Any, format_: str, /) -> bool:
     return is_valid
 
 
-def validate_datetime_string(value: Any, format_: str, /) -> Tuple[Union[datetime, None], bool]:
+class TimezoneString:
+    """Class that represents a timezone-string"""
+
+    def __init__(self, tz_name: str, /) -> None:
+        """
+        Parameters:
+            - tz_name (str): String that represents a timezone. Eg: `["UTC-02:30", "UTC", "UTC+05:30"]`.
+        """
+        assert isinstance(tz_name, str) and bool(tz_name), (
+            "Param `tz_name` must be a non-empty string"
+        )
+        offset_string = self._compute_offset_string(tz_name)
+        if offset_string is None:
+            raise ValueError(f"Invalid '{self.__class__.__name__}' with value '{tz_name}'")
+
+        self.tz_name: str = tz_name
+        self.offset_string: str = offset_string
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}(tz_name='{self.tz_name}')"
+
+    def _compute_offset_string(self, tz_name: str, /) -> Union[str, None]:
+        """
+        If the given `tz_name` is valid, computes and returns the offset; otherwise returns `None`.
+        Example offsets: `["-02:30", "+00:00", "+05:30"]`.
+        """
+        if not tz_name.startswith("UTC"):
+            return None
+        if tz_name == "UTC":
+            return "+00:00"
+        parts = tz_name.split("UTC")
+        if not (
+            len(parts) == 2
+            and parts[0] == ""
+            and len(parts[1]) == 6
+        ):
+            return None
+        offset_string = parts[1]
+        is_valid = (
+            offset_string[0] in ("+", "-")
+            and offset_string[1].isdigit()
+            and offset_string[2].isdigit()
+            and offset_string[3] == ":"
+            and offset_string[4].isdigit()
+            and offset_string[5].isdigit()
+        )
+        return offset_string if is_valid else None
+
+    def as_timedelta(self) -> timedelta:
+        """Returns the corresponding timedelta representation"""
+        is_negative = self.offset_string[0] == "-"
+        hours = int(f"{self.offset_string[1]}{self.offset_string[2]}")
+        minutes = int(f"{self.offset_string[4]}{self.offset_string[5]}")
+        timedelta_obj = timedelta(hours=hours, minutes=minutes)
+        return -timedelta_obj if is_negative else timedelta_obj
+
+
+def is_timezone_aware(dt_obj: datetime, /) -> bool:
+    """Checks if the given datetime object is timezone-aware"""
+    return dt_obj.tzinfo is not None
+
+
+def get_tzname(dt_obj: datetime, /) -> Union[str, None]:
+    """
+    Returns the timezone name of the given datetime object.
+    If the given datetime object is timezone-naive, returns `None`.
+    """
+    return dt_obj.tzinfo.tzname(dt_obj) if is_timezone_aware(dt_obj) else None
+
+
+def is_datetime_of_timezone(dt_obj: datetime, /, *, allowed_tz_names: List[str]) -> bool:
+    """
+    Checks if the given datetime object belongs to one of the allowed timezones.
+
+    Parameters:
+        - dt_obj (datetime): Timezone-aware datetime object.
+        - allowed_tz_names (List[str]): List of allowed timezone names.
+    """
+    assert is_timezone_aware(dt_obj), "Param `dt_obj` must be timezone-aware"
+    assert isinstance(allowed_tz_names, list) and bool(allowed_tz_names), "Param `allowed_tz_names` must be a non-empty list"
+    tz_name: str = get_tzname(dt_obj)
+    return tz_name in allowed_tz_names
+
+
+def convert_datetime_timezone(dt_obj: datetime, /, *, tz_name: str) -> datetime:
+    """
+    Converts the given datetime object to the specified timezome (`tz_name`).
+    Expects timezone-aware datetime object.
+    """
+    assert is_timezone_aware(dt_obj), "Param `dt_obj` must be timezone-aware"
+    offset = TimezoneString(tz_name).as_timedelta()
+    tz = timezone(offset=offset)
+    return dt_obj.astimezone(tz=tz)
+
+
+def validate_datetime_string(
+        value: Any,
+        format_: str,
+        /,
+        *,
+        allowed_tz_names: Optional[List[str]] = None,
+        raise_if_tz_uncomparable: Optional[bool] = False,
+    ) -> Tuple[Union[datetime, None], bool]:
     """
     Attempts to validate the given datetime string.
     Returns tuple of `(datetime_obj, is_valid)`.
     If the datetime string is not valid, always returns `(None, False)`.
+
+    Parameters:
+        - raise_if_tz_uncomparable (bool): If set to `True`, raises `ValueError` if the given datetime string is timezone-naive and
+        the param `allowed_tz_names` is passed in, since we cannot check if a timezone-naive datetime string belongs to a particular timezone.
     """
     if not isinstance(value, str):
         return (None, False)
@@ -274,12 +380,36 @@ def validate_datetime_string(value: Any, format_: str, /) -> Tuple[Union[datetim
         datetime_obj = datetime.strptime(value, format_)
     except Exception:
         return (None, False)
+    if allowed_tz_names:
+        if not is_timezone_aware(datetime_obj):
+            if raise_if_tz_uncomparable:
+                raise ValueError(
+                    "The given datetime string does not include a timezone."
+                    f" Cannot check if a timezone-naive datetime string belongs to a particular timezone [{' | '.join(allowed_tz_names)}]."
+                    " Suggest using a timezone-aware datetime string."
+                )
+            return (None, False)
+        if not is_datetime_of_timezone(datetime_obj, allowed_tz_names=allowed_tz_names):
+            return (None, False)
+        return (datetime_obj, True)
     return (datetime_obj, True)
 
 
-def is_valid_datetime_string(value: Any, format_: str, /) -> bool:
+def is_valid_datetime_string(
+        value: Any,
+        format_: str,
+        /,
+        *,
+        allowed_tz_names: Optional[List[str]] = None,
+        raise_if_tz_uncomparable: Optional[bool] = False,
+    ) -> bool:
     """Returns True if given datetime string is valid; otherwise returns False"""
-    _, is_valid = validate_datetime_string(value, format_)
+    _, is_valid = validate_datetime_string(
+        value,
+        format_,
+        allowed_tz_names=allowed_tz_names,
+        raise_if_tz_uncomparable=raise_if_tz_uncomparable,
+    )
     return is_valid
 
 
