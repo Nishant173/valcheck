@@ -96,6 +96,19 @@ class DatetimeStringValidatorV2(validators.Validator):
     )
 
 
+class DatetimeStringValidatorV3(validators.Validator):
+    valid_field = fields.DatetimeStringField(
+        format_=DATETIME_FORMAT_TZ_NAIVE,
+        allowed_tz_names=None,
+        required=False,
+    )
+    invalid_field = fields.DatetimeStringField(
+        format_=DATETIME_FORMAT_TZ_NAIVE,
+        allowed_tz_names=["UTC", "UTC+05:30"],
+        required=False,
+    )
+
+
 class DatetimeValidator(validators.Validator):
     datetime_field_tz_aware = fields.DatetimeField(timezone_aware=True, required=False)
     datetime_field_tz_naive = fields.DatetimeField(timezone_aware=False, required=False)
@@ -590,6 +603,28 @@ class TestField(unittest.TestCase):
                 },
             ],
         )
+
+    def test_datetime_string_field_v3(self):
+        tz_naive_timestamp_string = utils.get_current_datetime(timezone_aware=True).strftime(DATETIME_FORMAT_TZ_NAIVE)
+
+        # case 1
+        data_1 = {
+            "valid_field": tz_naive_timestamp_string,
+        }
+        val_1 = DatetimeStringValidatorV3(data=data_1)
+        val_1.run_validations()
+        self.assertEqual(
+            val_1.get_validated_value("valid_field"),
+            tz_naive_timestamp_string,
+        )
+
+        # case 2
+        with self.assertRaises(AssertionError):
+            data_2 = {
+                "invalid_field": tz_naive_timestamp_string,
+            }
+            val_2 = DatetimeStringValidatorV3(data=data_2)
+            val_2.run_validations()
 
     def test_datetime_field(self):
         self.assert_validations(
