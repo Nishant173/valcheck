@@ -457,7 +457,7 @@ class DateField(Field):
     def sample_value(self, **kwargs: Any) -> Union[Any, None]:
         if self.sample_value_factory:
             return self.sample_value_factory()
-        return utils.get_current_date()
+        return date(year=2020, month=4, day=20)
 
 
 class DatetimeStringField(Field):
@@ -478,25 +478,25 @@ class DatetimeStringField(Field):
         super(DatetimeStringField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        try:
-            datetime_obj, is_valid = utils.validate_datetime_string(
-                self.field_value,
-                self.format_,
-                allowed_tz_names=self.allowed_tz_names,
-                raise_if_tz_uncomparable=True,
+        datetime_obj, is_valid = utils.validate_datetime_string(self.field_value, self.format_)
+        if not is_valid or datetime_obj is None:
+            suffix = (
+                f"Must be a valid datetime-string of format '{self.format_}'."
+                f" Eg: '{self.sample_value()}'."
             )
-        except ValueError as exc:
-            raise AssertionError(
-                f"'{self.__class__.__name__}' has a `format_` '{self.format_}' which is timezone-naive, so the param `allowed_tz_names` must not be passed."
-                f" Details: {exc}"
-            )
-        if not is_valid:
-            suffix = "".join([
-                f"Must be a valid datetime-string of format '{self.format_}'.",
-                f" Must be of one of the following timezones [{' | '.join(self.allowed_tz_names)}]." if self.allowed_tz_names else "",
-                f" Eg: '{self.sample_value()}'.",
-            ])
             return [self.create_invalid_field_error(suffix=suffix)]
+        if self.allowed_tz_names:
+            assert utils.is_timezone_aware(datetime_obj), (
+                f"'{self.__class__.__name__}' has param `format_` set to '{self.format_}' which is not timezone-aware."
+                " Therefore the param `allowed_tz_names` must not be passed."
+            )
+            if not utils.is_datetime_of_timezone(datetime_obj, allowed_tz_names=self.allowed_tz_names):
+                suffix = (
+                    f"Must be a valid datetime-string of format '{self.format_}'."
+                    f" Must be of one of the following timezones [{' | '.join(self.allowed_tz_names)}]."
+                    f" Eg: '{self.sample_value()}'."
+                )
+                return [self.create_invalid_field_error(suffix=suffix)]
         if self.to_datetime_obj and datetime_obj is not None:
             self.field_value = datetime_obj
         return []
@@ -514,7 +514,8 @@ class DatetimeStringField(Field):
             microsecond=585675,
             tzinfo=timezone.utc,
         )
-        if self.allowed_tz_names:
+        dt_obj = datetime.strptime(dt_obj.strftime(self.format_), self.format_)
+        if self.allowed_tz_names and utils.is_timezone_aware(dt_obj):
             tz_name = random.choice(self.allowed_tz_names)
             dt_obj = utils.convert_datetime_timezone(dt_obj, tz_name=tz_name)
         return dt_obj.strftime(self.format_)
