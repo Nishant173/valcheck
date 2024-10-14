@@ -106,7 +106,7 @@ class DatetimeStringValidatorV3(validators.Validator):
         format_=DATETIME_FORMAT_TZ_NAIVE,
         allowed_tz_names=["UTC", "UTC+05:30"],
         required=False,
-    )
+    )  # Must not pass `allowed_tz_names` when `format_` is timezone-naive
 
 
 class DatetimeValidator(validators.Validator):
