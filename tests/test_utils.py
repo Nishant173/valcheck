@@ -231,4 +231,3 @@ class TestUtils(unittest.TestCase):
         self.assertFalse(is_valid_3)
         self.assertIsNone(dt_obj_3)
 
-
