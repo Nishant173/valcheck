@@ -72,6 +72,8 @@ class Error:
             include_validator_message: Optional[bool] = True,
             include_field_path: Optional[bool] = True,
         ) -> Dict[str, Any]:
+        assert isinstance(include_validator_message, bool), "Param `include_validator_message` must be of type 'bool'"
+        assert isinstance(include_field_path, bool), "Param `include_field_path` must be of type 'bool'"
         dict_ = {
             "description": self.description,
             "code": self.code,

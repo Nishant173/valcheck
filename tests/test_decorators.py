@@ -66,3 +66,4 @@ class TestFunctionInputDecorator(unittest.TestCase):
                 False,
                 msg="Expected the `valcheck.exceptions.FunctionInputValidationException` to be raised",
             )
+

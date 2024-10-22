@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 # Constants
 PACKAGE_NAME = "valcheck"
-PACKAGE_VERSION = "3.0.0"
+PACKAGE_VERSION = "4.0"
 AUTHOR_NAME = "Nishant Rao"
 AUTHOR_EMAIL_ID = "nishant.rao173@gmail.com"
 FILEPATH_TO_README = os.path.join(os.path.abspath(os.path.dirname(__file__)), "README.md")
@@ -42,5 +42,4 @@ setup(
         "Operating System :: Microsoft :: Windows",
     ],
 )
-
 

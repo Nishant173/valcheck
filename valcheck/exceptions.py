@@ -46,9 +46,14 @@ class BaseValidationException(Exception):
         _validate_list_of_errors(value)
         self._errors = value
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self, **kwargs: Any) -> Dict[str, Any]:
+        """
+        Accepted kwargs:
+            - include_validator_message (bool)
+            - include_field_path (bool)
+        """
         return {
-            "errors": [error.as_dict() for error in self.errors],
+            "errors": [error.as_dict(**kwargs) for error in self.errors],
             "error_count": len(self.errors),
         }
 
