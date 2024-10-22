@@ -20,8 +20,8 @@ class ApiRequestValidationException(BaseValidationException):
         assert isinstance(value, int), "Param `http_status_code` must be an integer"
         self._http_status_code = value
 
-    def as_dict(self) -> Dict[str, Any]:
-        dict_obj = super().as_dict()
+    def as_dict(self, **kwargs: Any) -> Dict[str, Any]:
+        dict_obj = super().as_dict(**kwargs)
         dict_obj["http_status_code"] = self.http_status_code
         return dict_obj
 
