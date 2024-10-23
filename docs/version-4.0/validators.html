@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>valcheck.validators API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>valcheck.validators</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="valcheck.validators.Validator"><code class="flex name class">
+<span>class <span class="ident">Validator</span></span>
+<span>(</span><span>*, data: Dict[str, Any], context: Optional[Dict[str, Any]] = None, deep_copy: Optional[bool] = False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a Validator.</p>
+<h2 id="properties">Properties</h2>
+<ul>
+<li>context</li>
+<li>data</li>
+<li>errors</li>
+<li>extra_data</li>
+<li>validated_data</li>
+</ul>
+<p>Instance methods:
+- get_representation()
+- get_validated_value()
+- get_validated_value_nested()
+- list_field_validators()
+- model_validator()
+- model_validators_to_consider()
+- run_validations()</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Validator:
+    &#34;&#34;&#34;
+    Class that represents a Validator.
+
+    Properties:
+        - context
+        - data
+        - errors
+        - extra_data
+        - validated_data
+
+    Instance methods:
+        - get_representation()
+        - get_validated_value()
+        - get_validated_value_nested()
+        - list_field_validators()
+        - model_validator()
+        - model_validators_to_consider()
+        - run_validations()
+    &#34;&#34;&#34;
+
+    def __init__(
+            self,
+            *,
+            data: Dict[str, Any],
+            context: Optional[Dict[str, Any]] = None,
+            deep_copy: Optional[bool] = False,
+        ) -&gt; None:
+        assert isinstance(data, dict), &#34;Param `data` must be a dictionary&#34;
+        assert context is None or isinstance(context, dict), &#34;Param `context` must be a dictionary&#34;
+        assert isinstance(deep_copy, bool), &#34;Param `deep_copy` must be a boolean&#34;
+        context = context if context else {}
+        self._data: Dict[str, Any] = utils.make_deep_copy(data) if deep_copy else data
+        self._context: Dict[str, Any] = utils.make_deep_copy(context) if deep_copy else context
+        self._field_info: Dict[str, Field] = self._initialise_fields()
+        self._errors: List[Error] = []
+        self._validated_data: Dict[str, Any] = {}
+        self._is_run_validations_called: bool = False
+
+    @property
+    def data(self) -&gt; Dict[str, Any]:
+        return self._data
+
+    @property
+    def context(self) -&gt; Dict[str, Any]:
+        return self._context
+
+    def list_field_validators(self) -&gt; List[Dict[str, Any]]:
+        &#34;&#34;&#34;Returns list of all the registered field validators&#34;&#34;&#34;
+        return [
+            {
+                &#34;field_type&#34;: field.__class__.__name__,
+                &#34;field_identifier&#34;: field_identifier,
+                &#34;source&#34;: field.source,
+                &#34;target&#34;: field.target,
+                &#34;required&#34;: field.required,
+                &#34;nullable&#34;: field.nullable,
+                &#34;field_validators_of_model&#34;: (
+                    field.validator_model(data={}).list_field_validators()
+                    if utils.is_instance_of_any(obj=field, types=[ModelDictionaryField, ModelListField])
+                    else []
+                ),
+            } for field_identifier, field in self._field_info.items()
+        ]
+
+    def _get_field_key_picker(self, *, key: str) -&gt; Callable[[Field], str]:
+        &#34;&#34;&#34;
+        Validates the `key` and returns a callable.
+        The callable takes in a field and returns the field&#39;s attribute based on `key`.
+        &#34;&#34;&#34;
+        key_mapper = {
+            &#34;field_identifier&#34;: lambda field_obj: field_obj.field_identifier,
+            &#34;source&#34;: lambda field_obj: field_obj.source,
+            &#34;target&#34;: lambda field_obj: field_obj.target,
+        }
+        assert key in key_mapper, f&#34;Param `key` must be one of {list(key_mapper.keys())}&#34;
+        return key_mapper[key]
+
+    def get_representation(
+            self,
+            *,
+            key: Literal[&#34;field_identifier&#34;, &#34;source&#34;, &#34;target&#34;],
+            nullify_values: Optional[bool] = False,
+        ) -&gt; Dict[str, Any]:
+        &#34;&#34;&#34;
+        Returns dictionary having the representation of the expected data format.
+        Options for `key` are: `[&#34;field_identifier&#34;, &#34;source&#34;, &#34;target&#34;]`.
+        &#34;&#34;&#34;
+        assert isinstance(nullify_values, bool), &#34;Param `nullify_values` must be of type &#39;bool&#39;&#34;
+        field_key_picker = self._get_field_key_picker(key=key)
+        representation = {}
+        for _, field in self._field_info.items():
+            field_key = field_key_picker(field)
+            if isinstance(field, (ModelDictionaryField, ModelListField)):
+                representation[field_key] = field.sample_value(key=key, nullify_values=nullify_values)
+            else:
+                representation[field_key] = None if nullify_values else field.sample_value()
+        return representation
+
+    def _validate_field_identifier(self, field_identifier: str, /) -&gt; None:
+        &#34;&#34;&#34;If an invalid field-identifier is found, raises `valcheck.exceptions.InvalidFieldIdentifierException`&#34;&#34;&#34;
+        error_message = (
+            f&#34;Invalid field identifier &#39;{field_identifier}&#39;.&#34;
+            &#34; The first character must be a lowercase alphabet.&#34;
+            &#34; Can only contain lowercase alphabets, numbers, and underscores.&#34;
+        )
+        if not (
+            isinstance(field_identifier, str)
+            and bool(field_identifier)
+        ):
+            raise InvalidFieldIdentifierException(error_message)
+        allowed_chars = string.ascii_lowercase + string.digits + &#39;_&#39;
+        for idx, char in enumerate(field_identifier):
+            if idx == 0 and char not in string.ascii_lowercase:
+                raise InvalidFieldIdentifierException(error_message)
+            if char not in allowed_chars:
+                raise InvalidFieldIdentifierException(error_message)
+
+    def _validate_uniqueness_of_sources_and_targets(self, field_info: Dict[str, Field], /) -&gt; None:
+        &#34;&#34;&#34;
+        If duplicate sources/targets are found, raises `valcheck.exceptions.DuplicateSourcesException`
+        or `valcheck.exceptions.DuplicateTargetsException`
+        &#34;&#34;&#34;
+        sources, targets = [], []
+        for _, field in field_info.items():
+            if field.source:
+                sources.append(field.source)
+            if field.target:
+                targets.append(field.target)
+        if len(sources) != len(set(sources)):
+            raise DuplicateSourcesException(f&#34;Received duplicate values for `source`: {sorted(sources)}&#34;)
+        if len(targets) != len(set(targets)):
+            raise DuplicateTargetsException(f&#34;Received duplicate values for `target`: {sorted(targets)}&#34;)
+
+    def _initialise_fields(self) -&gt; Dict[str, Field]:
+        &#34;&#34;&#34;Returns dictionary having keys = field identifiers, and values = initialised field instances&#34;&#34;&#34;
+        vars_dict: Dict[str, Any] = {}
+        for class_ in reversed(self.__class__.__mro__):
+            vars_dict.update(**vars(class_))
+        field_info = {}
+        for field_identifier in vars_dict:
+            temp_field: Field = vars_dict[field_identifier]
+            if (
+                isinstance(field_identifier, str)
+                and temp_field.__class__ is not Field
+                and issubclass(temp_field.__class__, Field)
+            ):
+                self._validate_field_identifier(field_identifier)
+                field = temp_field.copy()
+                field.field_identifier = field_identifier
+                field.source = field.source if field.source else field_identifier
+                field.target = field.target if field.target else field_identifier
+                field.field_value = self.data.get(field.source, utils.set_as_empty())
+                field_info[field_identifier] = field
+        self._validate_uniqueness_of_sources_and_targets(field_info)
+        return field_info
+
+    @property
+    def errors(self) -&gt; List[Error]:
+        return self._errors
+
+    def _clear_errors(self) -&gt; None:
+        &#34;&#34;&#34;Clears out the list of errors&#34;&#34;&#34;
+        self._errors.clear()
+
+    def _register_errors(self, *, errors: List[Error]) -&gt; None:
+        self._errors.extend(errors)
+
+    def _register_validated_data(self, *, key: str, value: Any) -&gt; None:
+        self._validated_data[key] = value
+
+    @property
+    def validated_data(self) -&gt; Dict[str, Any]:
+        return self._validated_data
+
+    def _clear_validated_data(self) -&gt; None:
+        &#34;&#34;&#34;Clears out the dictionary having validated data&#34;&#34;&#34;
+        self._validated_data.clear()
+
+    @property
+    def extra_data(self) -&gt; Dict[str, Any]:
+        &#34;&#34;&#34;
+        Returns dictionary containing the extra data (key-value pairs) which is present in the `data` dictionary, but not a part of
+        the fields being validated by the validator.
+        &#34;&#34;&#34;
+        sources = set(
+            filter(
+                None,
+                (
+                    field_instance.source if field_instance.source else None for _, field_instance in self._field_info.items()
+                ),
+            )
+        )
+        extra_keys_in_data = set(self.data.keys()).difference(sources)
+        return { key : value for key, value in self.data.items() if key in extra_keys_in_data }
+
+    def get_validated_value(
+            self,
+            field_target: str,
+            default: Union[Any, utils.Empty] = utils.set_as_empty(),
+            /,
+        ) -&gt; Any:
+        &#34;&#34;&#34;
+        Returns the validated field value based on the given `field_target`.
+        Raises `valcheck.exceptions.MissingFieldException` if the field is missing, and no default is provided.
+        &#34;&#34;&#34;
+        if field_target in self.validated_data:
+            return self.validated_data[field_target]
+        if not utils.is_empty(default):
+            return default
+        raise MissingFieldException(f&#34;The field target &#39;{field_target}&#39; is missing from the validated data&#34;)
+
+    def get_validated_value_nested(
+            self,
+            path: List,
+            default: Union[Any, utils.Empty] = utils.set_as_empty(),
+            /,
+        ) -&gt; Any:
+        &#34;&#34;&#34;
+        Returns the validated field value (nested) based on the given `path`.
+        Raises `valcheck.exceptions.MissingFieldException` if the field is missing, and no default is provided.
+        &#34;&#34;&#34;
+        try:
+            return utils.access_nested_dictionary(self.validated_data, path=path, default=default)
+        except (IndexError, KeyError, ValueError) as exc:
+            raise MissingFieldException(f&#34;The field target path {path} is missing from the validated data. Error info: {exc}&#34;)
+
+    def _perform_field_validation_checks(self, *, field: Field) -&gt; None:
+        &#34;&#34;&#34;Performs validation checks for the given field, and registers errors (if any) and validated-data&#34;&#34;&#34;
+        validated_field = field.validate_entire_field()
+        if validated_field.errors:
+            self._register_errors(errors=validated_field.errors)
+            return
+        if not utils.is_empty(validated_field.field.field_value):
+            self._register_validated_data(
+                key=validated_field.field.target,
+                value=validated_field.field.field_value,
+            )
+
+    def _perform_model_validation_checks(self) -&gt; None:
+        &#34;&#34;&#34;Performs model validation checks, and registers errors (if any)&#34;&#34;&#34;
+        errors: List[Error] = []
+        model_validator_classes_to_consider = self.model_validators_to_consider()
+        assert utils.is_list_of_subclasses_of_type(
+            model_validator_classes_to_consider,
+            type_=Validator,
+            allow_empty=True,
+        ), (
+            &#34;The output of the `model_validators_to_consider()` method must be a list of types, each&#34;
+            &#34; being a sub-class of `valcheck.validators.Validator`.&#34;
+            &#34; Must be an empty list if there are no parent classes to consider.&#34;
+        )
+        if self.__class__ not in model_validator_classes_to_consider:
+            model_validator_classes_to_consider += [self.__class__]
+        for class_ in self.__class__.__mro__:
+            if (
+                class_ is not Validator
+                and issubclass(class_, Validator)
+                and class_ in model_validator_classes_to_consider
+                and &#34;model_validator&#34; in class_.__dict__  # the `model_validator()` method must be implemented in said class
+            ):
+                errors += class_.model_validator(self)
+        assert utils.is_list_of_instances_of_type(errors, type_=Error, allow_empty=True), (
+            &#34;The output of the `model_validator()` method must be a list of errors (each of type `valcheck.models.Error`).&#34;
+            &#34; Must be an empty list if there are no errors.&#34;
+        )
+        INVALID_MODEL_ERROR_MESSAGE = &#34;Invalid model - Validation failed&#34;
+        for error in errors:
+            error.validator_message = INVALID_MODEL_ERROR_MESSAGE
+        self._register_errors(errors=errors)
+
+    def model_validators_to_consider(self) -&gt; List[Type[Validator]]:
+        &#34;&#34;&#34;
+        Used to determine which classes in the hierarchy need to be considered while calling the `model_validator()` method.
+        The output of this method must be a list of class references of type `valcheck.validators.Validator`.
+        Must be an empty list if there are no parent classes to consider.
+        &#34;&#34;&#34;
+        return []
+
+    def model_validator(self) -&gt; List[Error]:
+        &#34;&#34;&#34;
+        Used to validate the entire model, after all individual fields are validated.
+        The output of this method must be a list of errors (each of type `valcheck.models.Error`).
+        Must be an empty list if there are no errors.
+        &#34;&#34;&#34;
+        return []
+
+    def run_validations(self, *, raise_exception: Optional[bool] = False, **kwargs: Any) -&gt; None:
+        &#34;&#34;&#34;
+        Runs validations and registers errors/validated-data.
+        If `raise_exception=True` and validations fail, raises `valcheck.exceptions.ValidationException`.
+        &#34;&#34;&#34;
+        assert not self._is_run_validations_called, (
+            f&#34;The `run_validations()` method can be called only once per instance of the &#39;{self.__class__.__name__}&#39; class&#34;
+        )
+        self._is_run_validations_called = True
+        self._clear_errors()
+        self._clear_validated_data()
+        for _, field in self._field_info.items():
+            self._perform_field_validation_checks(field=field)
+        # Perform model validation checks only if there are no errors in field validation checks
+        if not self.errors:
+            self._perform_model_validation_checks()
+        if self.errors:
+            self._clear_validated_data()
+        if raise_exception and self.errors:
+            raise ValidationException(errors=self.errors)</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="valcheck.apis.validators.ApiRequestValidator" href="apis/validators.html#valcheck.apis.validators.ApiRequestValidator">ApiRequestValidator</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="valcheck.validators.Validator.context"><code class="name">prop <span class="ident">context</span> : Dict[str, Any]</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def context(self) -&gt; Dict[str, Any]:
+    return self._context</code></pre>
+</details>
+</dd>
+<dt id="valcheck.validators.Validator.data"><code class="name">prop <span class="ident">data</span> : Dict[str, Any]</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def data(self) -&gt; Dict[str, Any]:
+    return self._data</code></pre>
+</details>
+</dd>
+<dt id="valcheck.validators.Validator.errors"><code class="name">prop <span class="ident">errors</span> : List[Error]</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def errors(self) -&gt; List[Error]:
+    return self._errors</code></pre>
+</details>
+</dd>
+<dt id="valcheck.validators.Validator.extra_data"><code class="name">prop <span class="ident">extra_data</span> : Dict[str, Any]</code></dt>
+<dd>
+<div class="desc"><p>Returns dictionary containing the extra data (key-value pairs) which is present in the <code>data</code> dictionary, but not a part of
+the fields being validated by the validator.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def extra_data(self) -&gt; Dict[str, Any]:
+    &#34;&#34;&#34;
+    Returns dictionary containing the extra data (key-value pairs) which is present in the `data` dictionary, but not a part of
+    the fields being validated by the validator.
+    &#34;&#34;&#34;
+    sources = set(
+        filter(
+            None,
+            (
+                field_instance.source if field_instance.source else None for _, field_instance in self._field_info.items()
+            ),
+        )
+    )
+    extra_keys_in_data = set(self.data.keys()).difference(sources)
+    return { key : value for key, value in self.data.items() if key in extra_keys_in_data }</code></pre>
+</details>
+</dd>
+<dt id="valcheck.validators.Validator.validated_data"><code class="name">prop <span class="ident">validated_data</span> : Dict[str, Any]</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def validated_data(self) -&gt; Dict[str, Any]:
+    return self._validated_data</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="valcheck.validators.Validator.get_representation"><code class="name flex">
+<span>def <span class="ident">get_representation</span></span>(<span>self, *, key: "Literal['field_identifier', 'source', 'target']", nullify_values: Optional[bool] = False) ‑> Dict[str, Any]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns dictionary having the representation of the expected data format.
+Options for <code>key</code> are: <code>["field_identifier", "source", "target"]</code>.</p></div>
+</dd>
+<dt id="valcheck.validators.Validator.get_validated_value"><code class="name flex">
+<span>def <span class="ident">get_validated_value</span></span>(<span>self, field_target: str, default: Union[Any, utils.Empty] = &lt;valcheck.utils.Empty object&gt;, /) ‑> Any</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the validated field value based on the given <code>field_target</code>.
+Raises <code><a title="valcheck.exceptions.MissingFieldException" href="exceptions.html#valcheck.exceptions.MissingFieldException">MissingFieldException</a></code> if the field is missing, and no default is provided.</p></div>
+</dd>
+<dt id="valcheck.validators.Validator.get_validated_value_nested"><code class="name flex">
+<span>def <span class="ident">get_validated_value_nested</span></span>(<span>self, path: List, default: Union[Any, utils.Empty] = &lt;valcheck.utils.Empty object&gt;, /) ‑> Any</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the validated field value (nested) based on the given <code>path</code>.
+Raises <code><a title="valcheck.exceptions.MissingFieldException" href="exceptions.html#valcheck.exceptions.MissingFieldException">MissingFieldException</a></code> if the field is missing, and no default is provided.</p></div>
+</dd>
+<dt id="valcheck.validators.Validator.list_field_validators"><code class="name flex">
+<span>def <span class="ident">list_field_validators</span></span>(<span>self) ‑> List[Dict[str, Any]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns list of all the registered field validators</p></div>
+</dd>
+<dt id="valcheck.validators.Validator.model_validator"><code class="name flex">
+<span>def <span class="ident">model_validator</span></span>(<span>self) ‑> List[<a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Used to validate the entire model, after all individual fields are validated.
+The output of this method must be a list of errors (each of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>).
+Must be an empty list if there are no errors.</p></div>
+</dd>
+<dt id="valcheck.validators.Validator.model_validators_to_consider"><code class="name flex">
+<span>def <span class="ident">model_validators_to_consider</span></span>(<span>self) ‑> List[Type[<a title="valcheck.validators.Validator" href="#valcheck.validators.Validator">Validator</a>]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Used to determine which classes in the hierarchy need to be considered while calling the <code>model_validator()</code> method.
+The output of this method must be a list of class references of type <code><a title="valcheck.validators.Validator" href="#valcheck.validators.Validator">Validator</a></code>.
+Must be an empty list if there are no parent classes to consider.</p></div>
+</dd>
+<dt id="valcheck.validators.Validator.run_validations"><code class="name flex">
+<span>def <span class="ident">run_validations</span></span>(<span>self, *, raise_exception: Optional[bool] = False, **kwargs: Any) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Runs validations and registers errors/validated-data.
+If <code>raise_exception=True</code> and validations fail, raises <code><a title="valcheck.exceptions.ValidationException" href="exceptions.html#valcheck.exceptions.ValidationException">ValidationException</a></code>.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="valcheck" href="index.html">valcheck</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="valcheck.validators.Validator" href="#valcheck.validators.Validator">Validator</a></code></h4>
+<ul class="">
+<li><code><a title="valcheck.validators.Validator.context" href="#valcheck.validators.Validator.context">context</a></code></li>
+<li><code><a title="valcheck.validators.Validator.data" href="#valcheck.validators.Validator.data">data</a></code></li>
+<li><code><a title="valcheck.validators.Validator.errors" href="#valcheck.validators.Validator.errors">errors</a></code></li>
+<li><code><a title="valcheck.validators.Validator.extra_data" href="#valcheck.validators.Validator.extra_data">extra_data</a></code></li>
+<li><code><a title="valcheck.validators.Validator.get_representation" href="#valcheck.validators.Validator.get_representation">get_representation</a></code></li>
+<li><code><a title="valcheck.validators.Validator.get_validated_value" href="#valcheck.validators.Validator.get_validated_value">get_validated_value</a></code></li>
+<li><code><a title="valcheck.validators.Validator.get_validated_value_nested" href="#valcheck.validators.Validator.get_validated_value_nested">get_validated_value_nested</a></code></li>
+<li><code><a title="valcheck.validators.Validator.list_field_validators" href="#valcheck.validators.Validator.list_field_validators">list_field_validators</a></code></li>
+<li><code><a title="valcheck.validators.Validator.model_validator" href="#valcheck.validators.Validator.model_validator">model_validator</a></code></li>
+<li><code><a title="valcheck.validators.Validator.model_validators_to_consider" href="#valcheck.validators.Validator.model_validators_to_consider">model_validators_to_consider</a></code></li>
+<li><code><a title="valcheck.validators.Validator.run_validations" href="#valcheck.validators.Validator.run_validations">run_validations</a></code></li>
+<li><code><a title="valcheck.validators.Validator.validated_data" href="#valcheck.validators.Validator.validated_data">validated_data</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>
