@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>valcheck.utils API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>valcheck.utils</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="valcheck.utils.access_nested_dictionary"><code class="name flex">
+<span>def <span class="ident">access_nested_dictionary</span></span>(<span>dict_: dict, /, *, path: List, default: Union[Any, <a title="valcheck.utils.Empty" href="#valcheck.utils.Empty">Empty</a>] = &lt;valcheck.utils.Empty object&gt;) ‑> Any</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the value accessed via <code>path</code> from the <code>dict_</code>.</p>
+<p>If <code>default</code> is not passed, raises:
+- <code>KeyError</code> if the <code>path</code> is not found.
+- <code>ValueError</code> if you try to access a nested list or tuple without an index (int) in the <code>path</code>.
+- <code>IndexError</code> if you try to access a nested list or tuple via an index, but the index is out of range.</p></div>
+</dd>
+<dt id="valcheck.utils.convert_datetime_timezone"><code class="name flex">
+<span>def <span class="ident">convert_datetime_timezone</span></span>(<span>dt_obj: datetime.datetime, /, *, tz_name: str) ‑> datetime.datetime</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Converts the given datetime object to the specified timezome (<code>tz_name</code>).
+Expects timezone-aware datetime object.</p></div>
+</dd>
+<dt id="valcheck.utils.dict_has_all_keys"><code class="name flex">
+<span>def <span class="ident">dict_has_all_keys</span></span>(<span>d: Dict, /, *, keys: List) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.dict_has_any_keys"><code class="name flex">
+<span>def <span class="ident">dict_has_any_keys</span></span>(<span>d: Dict, /, *, keys: List) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.dicts_have_common_keys"><code class="name flex">
+<span>def <span class="ident">dicts_have_common_keys</span></span>(<span>d1: dict, d2: dict, /) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.from_json_string"><code class="name flex">
+<span>def <span class="ident">from_json_string</span></span>(<span>value: Union[str, bytes, bytearray], /, **kwargs: Any) ‑> Any</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Converts JSON string into a Python object</p></div>
+</dd>
+<dt id="valcheck.utils.get_current_date"><code class="name flex">
+<span>def <span class="ident">get_current_date</span></span>(<span>*, timezone_aware: Optional[bool] = False) ‑> datetime.date</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.get_current_datetime"><code class="name flex">
+<span>def <span class="ident">get_current_datetime</span></span>(<span>*, timezone_aware: Optional[bool] = False) ‑> datetime.datetime</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the current datetime (timezone-naive).
+If <code>timezone_aware=True</code>, returns a timezone-aware UTC datetime.</p></div>
+</dd>
+<dt id="valcheck.utils.get_tzname"><code class="name flex">
+<span>def <span class="ident">get_tzname</span></span>(<span>dt_obj: datetime.datetime, /) ‑> Optional[str]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the timezone name of the given datetime object.
+If the given datetime object is timezone-naive, returns <code>None</code>.</p></div>
+</dd>
+<dt id="valcheck.utils.integerify_if_possible"><code class="name flex">
+<span>def <span class="ident">integerify_if_possible</span></span>(<span>value: Union[int, float], /) ‑> Union[int, float]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.is_collection_of_items"><code class="name flex">
+<span>def <span class="ident">is_collection_of_items</span></span>(<span>obj: Any, /) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>If the given <code>obj</code> is one of <code>[list, tuple, set]</code>, returns <code>True</code></p></div>
+</dd>
+<dt id="valcheck.utils.is_datetime_of_timezone"><code class="name flex">
+<span>def <span class="ident">is_datetime_of_timezone</span></span>(<span>dt_obj: datetime.datetime, /, *, allowed_tz_names: List[str]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks if the given datetime object belongs to one of the allowed timezones.</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>dt_obj (datetime): Timezone-aware datetime object.</li>
+<li>allowed_tz_names (List[str]): List of allowed timezone names.</li>
+</ul></div>
+</dd>
+<dt id="valcheck.utils.is_empty"><code class="name flex">
+<span>def <span class="ident">is_empty</span></span>(<span>obj: Any, /) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.is_empty_value_allowed"><code class="name flex">
+<span>def <span class="ident">is_empty_value_allowed</span></span>(<span>obj: Any, /, *, allow_empty: Optional[bool] = True) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.is_instance_of_any"><code class="name flex">
+<span>def <span class="ident">is_instance_of_any</span></span>(<span>obj: Any, *, types: List[Type]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.is_list_of_instances_of_type"><code class="name flex">
+<span>def <span class="ident">is_list_of_instances_of_type</span></span>(<span>obj: Any, /, *, type_: Type, allow_empty: Optional[bool] = True) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns True if <code>obj</code> is a list of instances of type <code>type_</code></p></div>
+</dd>
+<dt id="valcheck.utils.is_list_of_subclasses_of_type"><code class="name flex">
+<span>def <span class="ident">is_list_of_subclasses_of_type</span></span>(<span>obj: Any, /, *, type_: Type, allow_empty: Optional[bool] = True) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns True if <code>obj</code> is a list of sub-classes of type <code>type_</code></p></div>
+</dd>
+<dt id="valcheck.utils.is_timezone_aware"><code class="name flex">
+<span>def <span class="ident">is_timezone_aware</span></span>(<span>dt_obj: datetime.datetime, /) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks if the given datetime object is timezone-aware</p></div>
+</dd>
+<dt id="valcheck.utils.is_valid_date_string"><code class="name flex">
+<span>def <span class="ident">is_valid_date_string</span></span>(<span>value: Any, format_: str, /) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns True if given date string is valid; otherwise returns False</p></div>
+</dd>
+<dt id="valcheck.utils.is_valid_datetime_string"><code class="name flex">
+<span>def <span class="ident">is_valid_datetime_string</span></span>(<span>value: Any, format_: str, /, *, allowed_tz_names: Optional[List[str]] = None, raise_if_tz_uncomparable: Optional[bool] = False) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns True if given datetime string is valid; otherwise returns False</p></div>
+</dd>
+<dt id="valcheck.utils.is_valid_email_id_string"><code class="name flex">
+<span>def <span class="ident">is_valid_email_id_string</span></span>(<span>value: Any, /) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.is_valid_float_string"><code class="name flex">
+<span>def <span class="ident">is_valid_float_string</span></span>(<span>value: Any, /) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.is_valid_integer_string"><code class="name flex">
+<span>def <span class="ident">is_valid_integer_string</span></span>(<span>value: Any, /) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.is_valid_json_array"><code class="name flex">
+<span>def <span class="ident">is_valid_json_array</span></span>(<span>value: Any, /) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns <code>True</code> if the given value is a string containing a valid JSON array</p></div>
+</dd>
+<dt id="valcheck.utils.is_valid_json_object"><code class="name flex">
+<span>def <span class="ident">is_valid_json_object</span></span>(<span>value: Any, /) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns <code>True</code> if the given value is a string containing a valid JSON object</p></div>
+</dd>
+<dt id="valcheck.utils.is_valid_json_object_or_array"><code class="name flex">
+<span>def <span class="ident">is_valid_json_object_or_array</span></span>(<span>value: Any, /) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns <code>True</code> if the given value is a string containing a valid JSON object or JSON array</p></div>
+</dd>
+<dt id="valcheck.utils.is_valid_json_string"><code class="name flex">
+<span>def <span class="ident">is_valid_json_string</span></span>(<span>value: Any, /) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.is_valid_number_string"><code class="name flex">
+<span>def <span class="ident">is_valid_number_string</span></span>(<span>value: Any, /) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.is_valid_object_of_type"><code class="name flex">
+<span>def <span class="ident">is_valid_object_of_type</span></span>(<span>obj: Any, /, *, type_: Type, allow_empty: Optional[bool] = True) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.is_valid_uuid_string"><code class="name flex">
+<span>def <span class="ident">is_valid_uuid_string</span></span>(<span>value: Any, /) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.make_deep_copy"><code class="name flex">
+<span>def <span class="ident">make_deep_copy</span></span>(<span>obj: Any, /) ‑> Any</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns a deep-copy of the given object</p></div>
+</dd>
+<dt id="valcheck.utils.make_message"><code class="name flex">
+<span>def <span class="ident">make_message</span></span>(<span>message: str, /, *, prefix: Optional[str] = None, suffix: Optional[str] = None, sep: Optional[str] = None) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.set_as_empty"><code class="name flex">
+<span>def <span class="ident">set_as_empty</span></span>(<span>) ‑> <a title="valcheck.utils.Empty" href="#valcheck.utils.Empty">Empty</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.to_json_string"><code class="name flex">
+<span>def <span class="ident">to_json_string</span></span>(<span>value: Any, /, **kwargs: Any) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Converts Python object into a JSON string</p></div>
+</dd>
+<dt id="valcheck.utils.validate_date_string"><code class="name flex">
+<span>def <span class="ident">validate_date_string</span></span>(<span>value: Any, format_: str, /) ‑> Tuple[Optional[datetime.date], bool]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Attempts to validate the given date string.
+Returns tuple of <code>(date_obj, is_valid)</code>.
+If the date string is not valid, always returns <code>(None, False)</code>.</p></div>
+</dd>
+<dt id="valcheck.utils.validate_datetime_string"><code class="name flex">
+<span>def <span class="ident">validate_datetime_string</span></span>(<span>value: Any, format_: str, /, *, allowed_tz_names: Optional[List[str]] = None, raise_if_tz_uncomparable: Optional[bool] = False) ‑> Tuple[Optional[datetime.datetime], bool]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Attempts to validate the given datetime string.
+Returns tuple of <code>(datetime_obj, is_valid)</code>.
+If the datetime string is not valid, always returns <code>(None, False)</code>.</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>raise_if_tz_uncomparable (bool): If set to <code>True</code>, raises <code>ValueError</code> if the given datetime string is timezone-naive and
+the param <code>allowed_tz_names</code> is passed in, since we cannot check if a timezone-naive datetime string belongs to a particular timezone.</li>
+</ul></div>
+</dd>
+<dt id="valcheck.utils.validate_float_string"><code class="name flex">
+<span>def <span class="ident">validate_float_string</span></span>(<span>value: Any, /) ‑> Tuple[Optional[float], bool]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Attempts to validate the given float string.
+Returns tuple of <code>(number_as_float, is_valid)</code>.
+If the float string is not valid, always returns <code>(None, False)</code>.</p></div>
+</dd>
+<dt id="valcheck.utils.validate_integer_string"><code class="name flex">
+<span>def <span class="ident">validate_integer_string</span></span>(<span>value: Any, /) ‑> Tuple[Optional[int], bool]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Attempts to validate the given integer string.
+Returns tuple of <code>(number_as_int, is_valid)</code>.
+If the integer string is not valid, always returns <code>(None, False)</code>.</p></div>
+</dd>
+<dt id="valcheck.utils.validate_json_array"><code class="name flex">
+<span>def <span class="ident">validate_json_array</span></span>(<span>value: Any, /) ‑> Tuple[Optional[list], bool]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.validate_json_object"><code class="name flex">
+<span>def <span class="ident">validate_json_object</span></span>(<span>value: Any, /) ‑> Tuple[Optional[dict], bool]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.validate_json_object_or_array"><code class="name flex">
+<span>def <span class="ident">validate_json_object_or_array</span></span>(<span>value: Any, /) ‑> Tuple[Union[dict, list, ForwardRef(None)], bool]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.utils.validate_json_string"><code class="name flex">
+<span>def <span class="ident">validate_json_string</span></span>(<span>value: Any, /) ‑> Tuple[Optional[Any], bool]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Attempts to parse the given JSON string.
+Returns tuple of <code>(parsed_obj, is_valid)</code>.
+If the JSON string is not valid, always returns <code>(None, False)</code>.</p></div>
+</dd>
+<dt id="valcheck.utils.validate_number_string"><code class="name flex">
+<span>def <span class="ident">validate_number_string</span></span>(<span>value: Any, /) ‑> Tuple[Union[int, float, ForwardRef(None)], bool]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Attempts to validate the given number string.
+Returns tuple of <code>(number_as_int_or_float, is_valid)</code>.
+If the number string is not valid, always returns <code>(None, False)</code>.</p></div>
+</dd>
+<dt id="valcheck.utils.validate_uuid_string"><code class="name flex">
+<span>def <span class="ident">validate_uuid_string</span></span>(<span>value: Any, /) ‑> Tuple[Optional[uuid.UUID], bool]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Attempts to validate the given UUID string.
+Returns tuple of <code>(uuid_obj, is_valid)</code>.
+If the UUID string is not valid, always returns <code>(None, False)</code>.</p></div>
+</dd>
+<dt id="valcheck.utils.wrap_in_quotes_if_string"><code class="name flex">
+<span>def <span class="ident">wrap_in_quotes_if_string</span></span>(<span>obj: Any, /) ‑> Any</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="valcheck.utils.Empty"><code class="flex name class">
+<span>class <span class="ident">Empty</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class used to denote an empty/missing value</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Empty:
+    &#34;&#34;&#34;Class used to denote an empty/missing value&#34;&#34;&#34;
+    def __str__(self) -&gt; str:
+        return f&#34;&lt;{self.__class__.__name__}&gt;&#34;</code></pre>
+</details>
+</dd>
+<dt id="valcheck.utils.TimezoneString"><code class="flex name class">
+<span>class <span class="ident">TimezoneString</span></span>
+<span>(</span><span>tz_name: str, /)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a timezone-string</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>tz_name (str): String that represents a timezone. Eg: <code>["UTC-02:30", "UTC", "UTC+05:30"]</code>.</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TimezoneString:
+    &#34;&#34;&#34;Class that represents a timezone-string&#34;&#34;&#34;
+
+    def __init__(self, tz_name: str, /) -&gt; None:
+        &#34;&#34;&#34;
+        Parameters:
+            - tz_name (str): String that represents a timezone. Eg: `[&#34;UTC-02:30&#34;, &#34;UTC&#34;, &#34;UTC+05:30&#34;]`.
+        &#34;&#34;&#34;
+        assert isinstance(tz_name, str) and bool(tz_name), (
+            &#34;Param `tz_name` must be a non-empty string&#34;
+        )
+        offset_string = self._compute_offset_string(tz_name)
+        if offset_string is None:
+            raise ValueError(f&#34;Invalid &#39;{self.__class__.__name__}&#39; with value &#39;{tz_name}&#39;&#34;)
+
+        self.tz_name: str = tz_name
+        self.offset_string: str = offset_string
+
+    def __str__(self) -&gt; str:
+        return f&#34;{self.__class__.__name__}(tz_name=&#39;{self.tz_name}&#39;)&#34;
+
+    def _compute_offset_string(self, tz_name: str, /) -&gt; Union[str, None]:
+        &#34;&#34;&#34;
+        If the given `tz_name` is valid, computes and returns the offset; otherwise returns `None`.
+        Example offsets: `[&#34;-02:30&#34;, &#34;+00:00&#34;, &#34;+05:30&#34;]`.
+        &#34;&#34;&#34;
+        if not tz_name.startswith(&#34;UTC&#34;):
+            return None
+        if tz_name == &#34;UTC&#34;:
+            return &#34;+00:00&#34;
+        parts = tz_name.split(&#34;UTC&#34;)
+        if not (
+            len(parts) == 2
+            and parts[0] == &#34;&#34;
+            and len(parts[1]) == 6
+        ):
+            return None
+        offset_string = parts[1]
+        is_valid = (
+            offset_string[0] in (&#34;+&#34;, &#34;-&#34;)
+            and offset_string[1].isdigit()
+            and offset_string[2].isdigit()
+            and offset_string[3] == &#34;:&#34;
+            and offset_string[4].isdigit()
+            and offset_string[5].isdigit()
+        )
+        return offset_string if is_valid else None
+
+    def as_timedelta(self) -&gt; timedelta:
+        &#34;&#34;&#34;Returns the corresponding timedelta representation&#34;&#34;&#34;
+        is_negative = self.offset_string[0] == &#34;-&#34;
+        hours = int(f&#34;{self.offset_string[1]}{self.offset_string[2]}&#34;)
+        minutes = int(f&#34;{self.offset_string[4]}{self.offset_string[5]}&#34;)
+        timedelta_obj = timedelta(hours=hours, minutes=minutes)
+        return -timedelta_obj if is_negative else timedelta_obj</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="valcheck.utils.TimezoneString.as_timedelta"><code class="name flex">
+<span>def <span class="ident">as_timedelta</span></span>(<span>self) ‑> datetime.timedelta</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the corresponding timedelta representation</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="valcheck" href="index.html">valcheck</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="valcheck.utils.access_nested_dictionary" href="#valcheck.utils.access_nested_dictionary">access_nested_dictionary</a></code></li>
+<li><code><a title="valcheck.utils.convert_datetime_timezone" href="#valcheck.utils.convert_datetime_timezone">convert_datetime_timezone</a></code></li>
+<li><code><a title="valcheck.utils.dict_has_all_keys" href="#valcheck.utils.dict_has_all_keys">dict_has_all_keys</a></code></li>
+<li><code><a title="valcheck.utils.dict_has_any_keys" href="#valcheck.utils.dict_has_any_keys">dict_has_any_keys</a></code></li>
+<li><code><a title="valcheck.utils.dicts_have_common_keys" href="#valcheck.utils.dicts_have_common_keys">dicts_have_common_keys</a></code></li>
+<li><code><a title="valcheck.utils.from_json_string" href="#valcheck.utils.from_json_string">from_json_string</a></code></li>
+<li><code><a title="valcheck.utils.get_current_date" href="#valcheck.utils.get_current_date">get_current_date</a></code></li>
+<li><code><a title="valcheck.utils.get_current_datetime" href="#valcheck.utils.get_current_datetime">get_current_datetime</a></code></li>
+<li><code><a title="valcheck.utils.get_tzname" href="#valcheck.utils.get_tzname">get_tzname</a></code></li>
+<li><code><a title="valcheck.utils.integerify_if_possible" href="#valcheck.utils.integerify_if_possible">integerify_if_possible</a></code></li>
+<li><code><a title="valcheck.utils.is_collection_of_items" href="#valcheck.utils.is_collection_of_items">is_collection_of_items</a></code></li>
+<li><code><a title="valcheck.utils.is_datetime_of_timezone" href="#valcheck.utils.is_datetime_of_timezone">is_datetime_of_timezone</a></code></li>
+<li><code><a title="valcheck.utils.is_empty" href="#valcheck.utils.is_empty">is_empty</a></code></li>
+<li><code><a title="valcheck.utils.is_empty_value_allowed" href="#valcheck.utils.is_empty_value_allowed">is_empty_value_allowed</a></code></li>
+<li><code><a title="valcheck.utils.is_instance_of_any" href="#valcheck.utils.is_instance_of_any">is_instance_of_any</a></code></li>
+<li><code><a title="valcheck.utils.is_list_of_instances_of_type" href="#valcheck.utils.is_list_of_instances_of_type">is_list_of_instances_of_type</a></code></li>
+<li><code><a title="valcheck.utils.is_list_of_subclasses_of_type" href="#valcheck.utils.is_list_of_subclasses_of_type">is_list_of_subclasses_of_type</a></code></li>
+<li><code><a title="valcheck.utils.is_timezone_aware" href="#valcheck.utils.is_timezone_aware">is_timezone_aware</a></code></li>
+<li><code><a title="valcheck.utils.is_valid_date_string" href="#valcheck.utils.is_valid_date_string">is_valid_date_string</a></code></li>
+<li><code><a title="valcheck.utils.is_valid_datetime_string" href="#valcheck.utils.is_valid_datetime_string">is_valid_datetime_string</a></code></li>
+<li><code><a title="valcheck.utils.is_valid_email_id_string" href="#valcheck.utils.is_valid_email_id_string">is_valid_email_id_string</a></code></li>
+<li><code><a title="valcheck.utils.is_valid_float_string" href="#valcheck.utils.is_valid_float_string">is_valid_float_string</a></code></li>
+<li><code><a title="valcheck.utils.is_valid_integer_string" href="#valcheck.utils.is_valid_integer_string">is_valid_integer_string</a></code></li>
+<li><code><a title="valcheck.utils.is_valid_json_array" href="#valcheck.utils.is_valid_json_array">is_valid_json_array</a></code></li>
+<li><code><a title="valcheck.utils.is_valid_json_object" href="#valcheck.utils.is_valid_json_object">is_valid_json_object</a></code></li>
+<li><code><a title="valcheck.utils.is_valid_json_object_or_array" href="#valcheck.utils.is_valid_json_object_or_array">is_valid_json_object_or_array</a></code></li>
+<li><code><a title="valcheck.utils.is_valid_json_string" href="#valcheck.utils.is_valid_json_string">is_valid_json_string</a></code></li>
+<li><code><a title="valcheck.utils.is_valid_number_string" href="#valcheck.utils.is_valid_number_string">is_valid_number_string</a></code></li>
+<li><code><a title="valcheck.utils.is_valid_object_of_type" href="#valcheck.utils.is_valid_object_of_type">is_valid_object_of_type</a></code></li>
+<li><code><a title="valcheck.utils.is_valid_uuid_string" href="#valcheck.utils.is_valid_uuid_string">is_valid_uuid_string</a></code></li>
+<li><code><a title="valcheck.utils.make_deep_copy" href="#valcheck.utils.make_deep_copy">make_deep_copy</a></code></li>
+<li><code><a title="valcheck.utils.make_message" href="#valcheck.utils.make_message">make_message</a></code></li>
+<li><code><a title="valcheck.utils.set_as_empty" href="#valcheck.utils.set_as_empty">set_as_empty</a></code></li>
+<li><code><a title="valcheck.utils.to_json_string" href="#valcheck.utils.to_json_string">to_json_string</a></code></li>
+<li><code><a title="valcheck.utils.validate_date_string" href="#valcheck.utils.validate_date_string">validate_date_string</a></code></li>
+<li><code><a title="valcheck.utils.validate_datetime_string" href="#valcheck.utils.validate_datetime_string">validate_datetime_string</a></code></li>
+<li><code><a title="valcheck.utils.validate_float_string" href="#valcheck.utils.validate_float_string">validate_float_string</a></code></li>
+<li><code><a title="valcheck.utils.validate_integer_string" href="#valcheck.utils.validate_integer_string">validate_integer_string</a></code></li>
+<li><code><a title="valcheck.utils.validate_json_array" href="#valcheck.utils.validate_json_array">validate_json_array</a></code></li>
+<li><code><a title="valcheck.utils.validate_json_object" href="#valcheck.utils.validate_json_object">validate_json_object</a></code></li>
+<li><code><a title="valcheck.utils.validate_json_object_or_array" href="#valcheck.utils.validate_json_object_or_array">validate_json_object_or_array</a></code></li>
+<li><code><a title="valcheck.utils.validate_json_string" href="#valcheck.utils.validate_json_string">validate_json_string</a></code></li>
+<li><code><a title="valcheck.utils.validate_number_string" href="#valcheck.utils.validate_number_string">validate_number_string</a></code></li>
+<li><code><a title="valcheck.utils.validate_uuid_string" href="#valcheck.utils.validate_uuid_string">validate_uuid_string</a></code></li>
+<li><code><a title="valcheck.utils.wrap_in_quotes_if_string" href="#valcheck.utils.wrap_in_quotes_if_string">wrap_in_quotes_if_string</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="valcheck.utils.Empty" href="#valcheck.utils.Empty">Empty</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.utils.TimezoneString" href="#valcheck.utils.TimezoneString">TimezoneString</a></code></h4>
+<ul class="">
+<li><code><a title="valcheck.utils.TimezoneString.as_timedelta" href="#valcheck.utils.TimezoneString.as_timedelta">as_timedelta</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,2189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>valcheck.fields API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>valcheck.fields</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="valcheck.fields.AnyField"><code class="flex name class">
+<span>class <span class="ident">AnyField</span></span>
+<span>(</span><span>**kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnyField(Field):
+    def __init__(self, **kwargs: Any) -&gt; None:
+        super(AnyField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        return []
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        options = (
+            {},
+            [],
+            &#34;some string&#34;,
+            &#39;{&#34;key1&#34;: &#34;value1&#34;, &#34;key2&#34;: &#34;value2&#34;}&#39;,
+        )
+        return random.choice(options)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.BooleanField"><code class="flex name class">
+<span>class <span class="ident">BooleanField</span></span>
+<span>(</span><span>**kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BooleanField(Field):
+    def __init__(self, **kwargs: Any) -&gt; None:
+        super(BooleanField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        if isinstance(self.field_value, bool):
+            return []
+        return [self.create_invalid_field_error()]
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        options = (True, False)
+        return random.choice(options)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.BytesField"><code class="flex name class">
+<span>class <span class="ident">BytesField</span></span>
+<span>(</span><span>**kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BytesField(Field):
+    def __init__(self, **kwargs: Any) -&gt; None:
+        super(BytesField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        if isinstance(self.field_value, bytes):
+            return []
+        return [self.create_invalid_field_error()]
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return b&#39;&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.ChoiceField"><code class="flex name class">
+<span>class <span class="ident">ChoiceField</span></span>
+<span>(</span><span>*, choices: Iterable[Any], **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ChoiceField(Field):
+    def __init__(self, *, choices: Iterable[Any], **kwargs: Any) -&gt; None:
+        assert utils.is_collection_of_items(choices) and bool(choices), &#34;Param `choices` must be a non-empty iterable&#34;
+        self.choices = choices
+        super(ChoiceField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        if self.field_value in self.choices:
+            return []
+        suffix = f&#34;Must be a valid choice i.e; one of {list(self.choices)}&#34;
+        return [self.create_invalid_field_error(suffix=suffix)]
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return random.choice(self.choices)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.DateField"><code class="flex name class">
+<span>class <span class="ident">DateField</span></span>
+<span>(</span><span>**kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DateField(Field):
+    def __init__(self, **kwargs: Any) -&gt; None:
+        super(DateField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        if isinstance(self.field_value, date) and self.field_value.__class__ is date:
+            return []
+        return [self.create_invalid_field_error()]
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return date(year=2020, month=4, day=20)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.DateStringField"><code class="flex name class">
+<span>class <span class="ident">DateStringField</span></span>
+<span>(</span><span>*, format_: Optional[str] = '%Y-%m-%d', to_date_obj: Optional[bool] = False, **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DateStringField(Field):
+    def __init__(self, *, format_: Optional[str] = &#34;%Y-%m-%d&#34;, to_date_obj: Optional[bool] = False, **kwargs: Any) -&gt; None:
+        assert isinstance(format_, str), &#34;Param `format_` must be of type &#39;str&#39;&#34;
+        assert isinstance(to_date_obj, bool), &#34;Param `to_date_obj` must be of type &#39;bool&#39;&#34;
+        self.format_ = format_
+        self.to_date_obj = to_date_obj
+        super(DateStringField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        date_obj, is_valid = utils.validate_date_string(self.field_value, self.format_)
+        if not is_valid:
+            suffix = f&#34;Must be a valid date-string of format &#39;{self.format_}&#39;. Eg: &#39;{self.sample_value()}&#39;&#34;
+            return [self.create_invalid_field_error(suffix=suffix)]
+        if self.to_date_obj and date_obj is not None:
+            self.field_value = date_obj
+        return []
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return date(year=2020, month=4, day=20).strftime(self.format_)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.DatetimeField"><code class="flex name class">
+<span>class <span class="ident">DatetimeField</span></span>
+<span>(</span><span>*, timezone_aware: Optional[bool] = True, allowed_tz_names: Optional[List[str]] = None, **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DatetimeField(Field):
+    def __init__(
+            self,
+            *,
+            timezone_aware: Optional[bool] = True,
+            allowed_tz_names: Optional[List[str]] = None,
+            **kwargs: Any,
+        ) -&gt; None:
+        assert isinstance(timezone_aware, bool), &#34;Param `timezone_aware` must be of type &#39;bool&#39;&#34;
+        assert allowed_tz_names is None or isinstance(allowed_tz_names, list), &#34;Param `allowed_tz_names` must be of type &#39;list&#39;&#34;
+        if not timezone_aware:
+            assert allowed_tz_names is None, &#34;Param `allowed_tz_names` must not be passed when `timezone_aware=False`&#34;
+        self.timezone_aware = timezone_aware
+        self.allowed_tz_names = allowed_tz_names
+        super(DatetimeField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        if not (
+            isinstance(self.field_value, datetime)
+            and self.field_value.__class__ is datetime
+        ):
+            suffix = &#34;Invalid data-type&#34;
+            return [self.create_invalid_field_error(suffix=suffix)]
+        if not (self.field_value.tzinfo is not None if self.timezone_aware else self.field_value.tzinfo is None):
+            suffix = (
+                &#34;Invalid timezone awareness/naivety.&#34;
+                f&#34; Expected a {&#39;timezone-aware&#39; if self.timezone_aware else &#39;timezone-naive&#39;} datetime object.&#34;
+            )
+            return [self.create_invalid_field_error(suffix=suffix)]
+        if self.allowed_tz_names and not utils.is_datetime_of_timezone(self.field_value, allowed_tz_names=self.allowed_tz_names):
+            suffix = (
+                &#34;Invalid timezone.&#34;
+                f&#34; Must be of one of the following timezones [{&#39; | &#39;.join(self.allowed_tz_names)}].&#34;
+            )
+            return [self.create_invalid_field_error(suffix=suffix)]
+        return []
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        dt_obj = datetime(
+            year=2020,
+            month=4,
+            day=20,
+            hour=17,
+            minute=30,
+            second=45,
+            microsecond=585675,
+            tzinfo=timezone.utc if self.timezone_aware else None,
+        )
+        if self.allowed_tz_names:
+            tz_name = random.choice(self.allowed_tz_names)
+            dt_obj = utils.convert_datetime_timezone(dt_obj, tz_name=tz_name)
+        return dt_obj</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.DatetimeStringField"><code class="flex name class">
+<span>class <span class="ident">DatetimeStringField</span></span>
+<span>(</span><span>*, format_: Optional[str] = '%Y-%m-%d %H:%M:%S.%f%z', to_datetime_obj: Optional[bool] = False, allowed_tz_names: Optional[List[str]] = None, **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DatetimeStringField(Field):
+    def __init__(
+            self,
+            *,
+            format_: Optional[str] = &#34;%Y-%m-%d %H:%M:%S.%f%z&#34;,
+            to_datetime_obj: Optional[bool] = False,
+            allowed_tz_names: Optional[List[str]] = None,
+            **kwargs: Any,
+        ) -&gt; None:
+        assert isinstance(format_, str), &#34;Param `format_` must be of type &#39;str&#39;&#34;
+        assert isinstance(to_datetime_obj, bool), &#34;Param `to_datetime_obj` must be of type &#39;bool&#39;&#34;
+        assert allowed_tz_names is None or isinstance(allowed_tz_names, list), &#34;Param `allowed_tz_names` must be of type &#39;list&#39;&#34;
+        self.format_ = format_
+        self.to_datetime_obj = to_datetime_obj
+        self.allowed_tz_names = allowed_tz_names
+        super(DatetimeStringField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        datetime_obj, is_valid = utils.validate_datetime_string(self.field_value, self.format_)
+        if not is_valid or datetime_obj is None:
+            suffix = (
+                f&#34;Must be a valid datetime-string of format &#39;{self.format_}&#39;.&#34;
+                f&#34; Eg: &#39;{self.sample_value()}&#39;.&#34;
+            )
+            return [self.create_invalid_field_error(suffix=suffix)]
+        if self.allowed_tz_names:
+            assert utils.is_timezone_aware(datetime_obj), (
+                f&#34;&#39;{self.__class__.__name__}&#39; has param `format_` set to &#39;{self.format_}&#39; which is not timezone-aware.&#34;
+                &#34; Therefore the param `allowed_tz_names` must not be passed.&#34;
+            )
+            if not utils.is_datetime_of_timezone(datetime_obj, allowed_tz_names=self.allowed_tz_names):
+                suffix = (
+                    f&#34;Must be a valid datetime-string of format &#39;{self.format_}&#39;.&#34;
+                    f&#34; Must be of one of the following timezones [{&#39; | &#39;.join(self.allowed_tz_names)}].&#34;
+                    f&#34; Eg: &#39;{self.sample_value()}&#39;.&#34;
+                )
+                return [self.create_invalid_field_error(suffix=suffix)]
+        if self.to_datetime_obj and datetime_obj is not None:
+            self.field_value = datetime_obj
+        return []
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        dt_obj = datetime(
+            year=2020,
+            month=4,
+            day=20,
+            hour=17,
+            minute=30,
+            second=45,
+            microsecond=585675,
+            tzinfo=timezone.utc,
+        )
+        dt_obj = datetime.strptime(dt_obj.strftime(self.format_), self.format_)
+        if self.allowed_tz_names and utils.is_timezone_aware(dt_obj):
+            tz_name = random.choice(self.allowed_tz_names)
+            dt_obj = utils.convert_datetime_timezone(dt_obj, tz_name=tz_name)
+        return dt_obj.strftime(self.format_)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.DictionaryField"><code class="flex name class">
+<span>class <span class="ident">DictionaryField</span></span>
+<span>(</span><span>*, allow_empty: Optional[bool] = True, **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DictionaryField(Field):
+    def __init__(self, *, allow_empty: Optional[bool] = True, **kwargs: Any) -&gt; None:
+        assert isinstance(allow_empty, bool), &#34;Param `allow_empty` must be of type &#39;bool&#39;&#34;
+        self.allow_empty = allow_empty
+        super(DictionaryField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        if not utils.is_valid_object_of_type(self.field_value, type_=dict):
+            return [self.create_invalid_field_error()]
+        if not utils.is_empty_value_allowed(self.field_value, allow_empty=self.allow_empty):
+            return [self.create_invalid_field_error(suffix=&#34;Must be a non-empty dictionary&#34;)]
+        return []
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return {
+            &#34;a&#34;: 1,
+            &#34;b&#34;: 2,
+            &#34;c&#34;: 3,
+        }</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.EmailIdStringField"><code class="flex name class">
+<span>class <span class="ident">EmailIdStringField</span></span>
+<span>(</span><span>**kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class EmailIdStringField(Field):
+    def __init__(self, **kwargs: Any) -&gt; None:
+        super(EmailIdStringField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        if utils.is_valid_email_id_string(self.field_value):
+            return []
+        return [self.create_invalid_field_error()]
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return &#34;hello@example.com&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.Field"><code class="flex name class">
+<span>class <span class="ident">Field</span></span>
+<span>(</span><span>*, source: Optional[str] = None, target: Optional[str] = None, required: Optional[bool] = True, nullable: Optional[bool] = False, default_factory: Optional[Callable] = None, converter_factory: Optional[Callable] = None, sample_value_factory: Optional[Callable] = None, validators: Optional[List[Callable]] = None, error: Optional[Error] = None, type_alias: Optional[str] = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Field:
+    &#34;&#34;&#34;Class that represents a field (that needs to be validated)&#34;&#34;&#34;
+
+    def __init__(
+            self,
+            *,
+            source: Optional[str] = None,
+            target: Optional[str] = None,
+            required: Optional[bool] = True,
+            nullable: Optional[bool] = False,
+            default_factory: Optional[Callable] = None,
+            converter_factory: Optional[Callable] = None,
+            sample_value_factory: Optional[Callable] = None,
+            validators: Optional[List[Callable]] = None,
+            error: Optional[Error] = None,
+            type_alias: Optional[str] = None,
+        ) -&gt; None:
+        &#34;&#34;&#34;
+        Parameters:
+            - source (str): Field name used in the input data (optional)
+            - target (str): Field name used in the validated data (optional)
+            - required (bool): True if the field is required, else False. Default: True
+            - nullable (bool): True if the field is nullable, else False. Default: False
+            - default_factory (callable): Callable that returns the default value to set for the field
+            if `required=False` and the field is missing.
+            - converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+            the converted value (for the field).
+            - sample_value_factory (callable): Callable that returns the sample value for the field.
+            - validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+            The callable returns True if validation is successful, else False.
+            - error (Error instance): Instance of type `valcheck.models.Error`.
+            - type_alias (str): Alias of the field type (optional).
+        &#34;&#34;&#34;
+        assert source is None or utils.is_valid_object_of_type(source, type_=str, allow_empty=False), (
+            &#34;Param `source` must be of type &#39;str&#39; and must be non-empty&#34;
+        )
+        assert target is None or utils.is_valid_object_of_type(target, type_=str, allow_empty=False), (
+            &#34;Param `target` must be of type &#39;str&#39; and must be non-empty&#34;
+        )
+        assert isinstance(required, bool), &#34;Param `required` must be of type &#39;bool&#39;&#34;
+        assert isinstance(nullable, bool), &#34;Param `nullable` must be of type &#39;bool&#39;&#34;
+        assert default_factory is None or callable(default_factory), (
+            &#34;Param `default_factory` must be a callable that returns the default value if the field is missing when `required=False`&#34;
+        )
+        assert converter_factory is None or callable(converter_factory), (
+            &#34;Param `converter_factory` must be a callable that takes in the validated value (of the field), and returns&#34;
+            &#34; the converted value (for the field).&#34;
+        )
+        assert sample_value_factory is None or callable(sample_value_factory), (
+            &#34;Param `sample_value_factory` must be a callable that returns the sample value&#34;
+        )
+        assert validators is None or isinstance(validators, list), &#34;Param `validators` must be of type &#39;list&#39;&#34;
+        if isinstance(validators, list):
+            for validator in validators:
+                assert callable(validator), &#34;Param `validators` must be a list of callables&#34;
+        assert error is None or isinstance(error, Error), &#34;Param `error` must be of type `valcheck.models.Error`&#34;
+        assert type_alias is None or utils.is_valid_object_of_type(type_alias, type_=str, allow_empty=False), (
+            &#34;Param `type_alias` must be of type &#39;str&#39; and must be non-empty&#34;
+        )
+
+        self._field_identifier = utils.set_as_empty()
+        self._field_value = utils.set_as_empty()
+        self.source = source
+        self.target = target
+        self.required = required
+        self.nullable = nullable
+        self.default_factory = default_factory
+        self.converter_factory = converter_factory
+        self.sample_value_factory = sample_value_factory
+        self.validators = validators or []
+        self.error = error or Error()
+        self.type_alias = type_alias or self.__class__.__name__
+
+    def copy(self) -&gt; Field:
+        &#34;&#34;&#34;Returns deep-copy of current `Field` object&#34;&#34;&#34;
+        return utils.make_deep_copy(self)
+
+    def __str__(self) -&gt; str:
+        kwargs_list = [
+            f&#34;field_identifier={utils.wrap_in_quotes_if_string(self.field_identifier)}&#34;,
+            f&#34;field_value={utils.wrap_in_quotes_if_string(self.field_value)}&#34;,
+            f&#34;source={utils.wrap_in_quotes_if_string(self.source)}&#34;,
+            f&#34;target={utils.wrap_in_quotes_if_string(self.target)}&#34;,
+            f&#34;required={self.required}&#34;,
+            f&#34;nullable={self.nullable}&#34;,
+            f&#34;type_alias={utils.wrap_in_quotes_if_string(self.type_alias)}&#34;,
+        ]
+        kwargs_string = &#34;(&#34; + &#34;, &#34;.join(kwargs_list) + &#34;)&#34;
+        return f&#34;{self.__class__.__name__}{kwargs_string}&#34;
+
+    @property
+    def field_identifier(self) -&gt; str:
+        return self._field_identifier
+
+    @field_identifier.setter
+    def field_identifier(self, value: str) -&gt; None:
+        assert isinstance(value, str), &#34;Param `field_identifier` must be of type &#39;str&#39;&#34;
+        self._field_identifier = value
+
+    @property
+    def field_value(self) -&gt; Union[Any, utils.Empty]:
+        return self._field_value
+
+    @field_value.setter
+    def field_value(self, value: Union[Any, utils.Empty]) -&gt; None:
+        self._field_value = value
+
+    def _can_be_set_to_null(self) -&gt; bool:
+        return self.nullable and self.field_value is None
+
+    def _cannot_be_set_to_null(self) -&gt; bool:
+        return not self.nullable and self.field_value is None
+
+    def _has_valid_custom_validators(self) -&gt; bool:
+        if not self.validators:
+            return True
+        validator_return_values = [validator(self.field_value) for validator in self.validators]
+        for return_value in validator_return_values:
+            assert isinstance(return_value, bool), (
+                f&#34;Expected the return type of `validators` to be &#39;bool&#39;, but got &#39;{type(return_value).__name__}&#39;&#34;
+            )
+        return all(validator_return_values)
+
+    def _convert_field_value_if_needed(self) -&gt; Any:
+        &#34;&#34;&#34;Returns the converted field value if a `converter_factory` is present; otherwise returns the same field value&#34;&#34;&#34;
+        return self.converter_factory(self.field_value) if self.converter_factory else self.field_value
+
+    def validate(self) -&gt; List[Error]:
+        &#34;&#34;&#34;Returns list of errors (each of type `valcheck.models.Error`)&#34;&#34;&#34;
+        raise NotImplementedError()
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        &#34;&#34;&#34;Returns a sample value for the field&#34;&#34;&#34;
+        return None
+
+    def validate_entire_field(self) -&gt; ValidatedField:
+        if utils.is_empty(self.field_value) and not self.required and self.default_factory:
+            self.field_value = self.default_factory()
+        validated_field = ValidatedField(field=self, errors=[])
+        if utils.is_empty(self.field_value) and not self.required and not self.default_factory:
+            return validated_field
+        if self._can_be_set_to_null():
+            validated_field.field.field_value = self._convert_field_value_if_needed()
+            return validated_field
+        if utils.is_empty(self.field_value) and self.required:
+            validated_field.errors += [self.create_missing_field_error()]
+            return validated_field
+        if self._cannot_be_set_to_null():
+            suffix = &#34;Cannot be null&#34;
+            validated_field.errors += [self.create_invalid_field_error(suffix=suffix)]
+            return validated_field
+        errors = self.validate()
+        if errors:
+            validated_field.errors += errors
+            return validated_field
+        if not self._has_valid_custom_validators():
+            suffix = &#34;Custom validations failed&#34;
+            validated_field.errors += [self.create_invalid_field_error(suffix=suffix)]
+            return validated_field
+        validated_field.field.field_value = self._convert_field_value_if_needed()
+        return validated_field
+
+    def invalid_field_error_message(
+            self,
+            *,
+            prefix: Optional[str] = None,
+            suffix: Optional[str] = None,
+        ) -&gt; str:
+        return utils.make_message(
+            f&#34;Invalid {self.type_alias} &#39;{self.source}&#39;&#34;,
+            prefix=prefix,
+            suffix=suffix,
+            sep=&#34; || &#34;,
+        )
+
+    def missing_field_error_message(
+            self,
+            *,
+            prefix: Optional[str] = None,
+            suffix: Optional[str] = None,
+        ) -&gt; str:
+        return utils.make_message(
+            f&#34;Missing {self.type_alias} &#39;{self.source}&#39;&#34;,
+            prefix=prefix,
+            suffix=suffix,
+            sep=&#34; || &#34;,
+        )
+
+    def create_error_instance(self, *, validator_message: str) -&gt; Error:
+        &#34;&#34;&#34;Creates and returns a new `valcheck.models.Error` instance for the field&#34;&#34;&#34;
+        error_copy = self.error.copy()
+        error_copy.validator_message = validator_message
+        error_copy.append_to_field_path(self.source)
+        return error_copy
+
+    def create_invalid_field_error(
+            self,
+            *,
+            prefix: Optional[str] = None,
+            suffix: Optional[str] = None,
+        ) -&gt; Error:
+        validator_message = self.invalid_field_error_message(prefix=prefix, suffix=suffix)
+        return self.create_error_instance(validator_message=validator_message)
+
+    def create_missing_field_error(
+            self,
+            *,
+            prefix: Optional[str] = None,
+            suffix: Optional[str] = None,
+        ) -&gt; Error:
+        validator_message = self.missing_field_error_message(prefix=prefix, suffix=suffix)
+        return self.create_error_instance(validator_message=validator_message)</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.AnyField" href="#valcheck.fields.AnyField">AnyField</a></li>
+<li><a title="valcheck.fields.BooleanField" href="#valcheck.fields.BooleanField">BooleanField</a></li>
+<li><a title="valcheck.fields.BytesField" href="#valcheck.fields.BytesField">BytesField</a></li>
+<li><a title="valcheck.fields.ChoiceField" href="#valcheck.fields.ChoiceField">ChoiceField</a></li>
+<li><a title="valcheck.fields.DateField" href="#valcheck.fields.DateField">DateField</a></li>
+<li><a title="valcheck.fields.DateStringField" href="#valcheck.fields.DateStringField">DateStringField</a></li>
+<li><a title="valcheck.fields.DatetimeField" href="#valcheck.fields.DatetimeField">DatetimeField</a></li>
+<li><a title="valcheck.fields.DatetimeStringField" href="#valcheck.fields.DatetimeStringField">DatetimeStringField</a></li>
+<li><a title="valcheck.fields.DictionaryField" href="#valcheck.fields.DictionaryField">DictionaryField</a></li>
+<li><a title="valcheck.fields.EmailIdStringField" href="#valcheck.fields.EmailIdStringField">EmailIdStringField</a></li>
+<li><a title="valcheck.fields.FloatField" href="#valcheck.fields.FloatField">FloatField</a></li>
+<li><a title="valcheck.fields.FloatStringField" href="#valcheck.fields.FloatStringField">FloatStringField</a></li>
+<li><a title="valcheck.fields.IntegerField" href="#valcheck.fields.IntegerField">IntegerField</a></li>
+<li><a title="valcheck.fields.IntegerStringField" href="#valcheck.fields.IntegerStringField">IntegerStringField</a></li>
+<li><a title="valcheck.fields.JsonStringField" href="#valcheck.fields.JsonStringField">JsonStringField</a></li>
+<li><a title="valcheck.fields.ListField" href="#valcheck.fields.ListField">ListField</a></li>
+<li><a title="valcheck.fields.ModelDictionaryField" href="#valcheck.fields.ModelDictionaryField">ModelDictionaryField</a></li>
+<li><a title="valcheck.fields.ModelListField" href="#valcheck.fields.ModelListField">ModelListField</a></li>
+<li><a title="valcheck.fields.MultiChoiceField" href="#valcheck.fields.MultiChoiceField">MultiChoiceField</a></li>
+<li><a title="valcheck.fields.NumberField" href="#valcheck.fields.NumberField">NumberField</a></li>
+<li><a title="valcheck.fields.NumberStringField" href="#valcheck.fields.NumberStringField">NumberStringField</a></li>
+<li><a title="valcheck.fields.StringField" href="#valcheck.fields.StringField">StringField</a></li>
+<li><a title="valcheck.fields.UuidField" href="#valcheck.fields.UuidField">UuidField</a></li>
+<li><a title="valcheck.fields.UuidStringField" href="#valcheck.fields.UuidStringField">UuidStringField</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="valcheck.fields.Field.field_identifier"><code class="name">prop <span class="ident">field_identifier</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def field_identifier(self) -&gt; str:
+    return self._field_identifier</code></pre>
+</details>
+</dd>
+<dt id="valcheck.fields.Field.field_value"><code class="name">prop <span class="ident">field_value</span> : Union[Any, utils.Empty]</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def field_value(self) -&gt; Union[Any, utils.Empty]:
+    return self._field_value</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="valcheck.fields.Field.copy"><code class="name flex">
+<span>def <span class="ident">copy</span></span>(<span>self) ‑> <a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns deep-copy of current <code><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></code> object</p></div>
+</dd>
+<dt id="valcheck.fields.Field.create_error_instance"><code class="name flex">
+<span>def <span class="ident">create_error_instance</span></span>(<span>self, *, validator_message: str) ‑> <a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Creates and returns a new <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code> instance for the field</p></div>
+</dd>
+<dt id="valcheck.fields.Field.create_invalid_field_error"><code class="name flex">
+<span>def <span class="ident">create_invalid_field_error</span></span>(<span>self, *, prefix: Optional[str] = None, suffix: Optional[str] = None) ‑> <a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.fields.Field.create_missing_field_error"><code class="name flex">
+<span>def <span class="ident">create_missing_field_error</span></span>(<span>self, *, prefix: Optional[str] = None, suffix: Optional[str] = None) ‑> <a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.fields.Field.invalid_field_error_message"><code class="name flex">
+<span>def <span class="ident">invalid_field_error_message</span></span>(<span>self, *, prefix: Optional[str] = None, suffix: Optional[str] = None) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.fields.Field.missing_field_error_message"><code class="name flex">
+<span>def <span class="ident">missing_field_error_message</span></span>(<span>self, *, prefix: Optional[str] = None, suffix: Optional[str] = None) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="valcheck.fields.Field.sample_value"><code class="name flex">
+<span>def <span class="ident">sample_value</span></span>(<span>self, **kwargs: Any) ‑> Optional[Any]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns a sample value for the field</p></div>
+</dd>
+<dt id="valcheck.fields.Field.validate"><code class="name flex">
+<span>def <span class="ident">validate</span></span>(<span>self) ‑> List[<a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns list of errors (each of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>)</p></div>
+</dd>
+<dt id="valcheck.fields.Field.validate_entire_field"><code class="name flex">
+<span>def <span class="ident">validate_entire_field</span></span>(<span>self) ‑> <a title="valcheck.fields.ValidatedField" href="#valcheck.fields.ValidatedField">ValidatedField</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="valcheck.fields.FloatField"><code class="flex name class">
+<span>class <span class="ident">FloatField</span></span>
+<span>(</span><span>**kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class FloatField(Field):
+    def __init__(self, **kwargs: Any) -&gt; None:
+        super(FloatField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        if isinstance(self.field_value, float):
+            return []
+        return [self.create_invalid_field_error()]
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return 3.14</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.FloatStringField"><code class="flex name class">
+<span>class <span class="ident">FloatStringField</span></span>
+<span>(</span><span>*, to_float: Optional[bool] = False, **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class FloatStringField(Field):
+    def __init__(self, *, to_float: Optional[bool] = False, **kwargs: Any) -&gt; None:
+        assert isinstance(to_float, bool), &#34;Param `to_float` must be of type &#39;bool&#39;&#34;
+        self.to_float = to_float
+        super(FloatStringField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        number_as_float, is_valid = utils.validate_float_string(self.field_value)
+        if not is_valid:
+            suffix = &#34;Must be a valid float cast as a string&#34;
+            return [self.create_invalid_field_error(suffix=suffix)]
+        if self.to_float and number_as_float is not None:
+            self.field_value = number_as_float
+        return []
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return &#34;3.14&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.IntegerField"><code class="flex name class">
+<span>class <span class="ident">IntegerField</span></span>
+<span>(</span><span>**kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class IntegerField(Field):
+    def __init__(self, **kwargs: Any) -&gt; None:
+        super(IntegerField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        if isinstance(self.field_value, int):
+            return []
+        return [self.create_invalid_field_error()]
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return 314</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.IntegerStringField"><code class="flex name class">
+<span>class <span class="ident">IntegerStringField</span></span>
+<span>(</span><span>*, to_integer: Optional[bool] = False, **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class IntegerStringField(Field):
+    def __init__(self, *, to_integer: Optional[bool] = False, **kwargs: Any) -&gt; None:
+        assert isinstance(to_integer, bool), &#34;Param `to_integer` must be of type &#39;bool&#39;&#34;
+        self.to_integer = to_integer
+        super(IntegerStringField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        number_as_int, is_valid = utils.validate_integer_string(self.field_value)
+        if not is_valid:
+            suffix = &#34;Must be a valid integer cast as a string&#34;
+            return [self.create_invalid_field_error(suffix=suffix)]
+        if self.to_integer and number_as_int is not None:
+            self.field_value = number_as_int
+        return []
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return &#34;314&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.JsonStringField"><code class="flex name class">
+<span>class <span class="ident">JsonStringField</span></span>
+<span>(</span><span>*, which: "Literal['ANY', 'JSON_ARRAY', 'JSON_OBJECT', 'JSON_OBJECT_OR_ARRAY']" = 'ANY', to_python_obj: Optional[bool] = False, **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class JsonStringField(Field):
+    def __init__(
+            self,
+            *,
+            which: Literal[&#34;ANY&#34;, &#34;JSON_ARRAY&#34;, &#34;JSON_OBJECT&#34;, &#34;JSON_OBJECT_OR_ARRAY&#34;] = &#34;ANY&#34;,
+            to_python_obj: Optional[bool] = False,
+            **kwargs: Any,
+        ) -&gt; None:
+        which_options = [&#34;ANY&#34;, &#34;JSON_ARRAY&#34;, &#34;JSON_OBJECT&#34;, &#34;JSON_OBJECT_OR_ARRAY&#34;]
+        assert isinstance(which, str) and which in which_options, f&#34;Param `which` must be one of {which_options}&#34;
+        assert isinstance(to_python_obj, bool), f&#34;Param `to_python_obj` must be of type &#39;bool&#39;&#34;
+        self.which: Literal[&#34;ANY&#34;, &#34;JSON_ARRAY&#34;, &#34;JSON_OBJECT&#34;, &#34;JSON_OBJECT_OR_ARRAY&#34;] = which
+        self.to_python_obj = to_python_obj
+        super(JsonStringField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        error_message = &#34;&#34;
+        if self.which == &#34;JSON_ARRAY&#34;:
+            parsed_obj, is_valid = utils.validate_json_array(self.field_value)
+            if not is_valid:
+                error_message = &#34;Must be a valid JSON array&#34;
+        elif self.which == &#34;JSON_OBJECT&#34;:
+            parsed_obj, is_valid = utils.validate_json_object(self.field_value)
+            if not is_valid:
+                error_message = &#34;Must be a valid JSON object&#34;
+        elif self.which == &#34;JSON_OBJECT_OR_ARRAY&#34;:
+            parsed_obj, is_valid = utils.validate_json_object_or_array(self.field_value)
+            if not is_valid:
+                error_message = &#34;Must be a valid JSON object or JSON array&#34;
+        else:
+            parsed_obj, is_valid = utils.validate_json_string(self.field_value)
+            if not is_valid:
+                error_message = &#34;Must be a valid JSON string&#34;
+
+        if error_message:
+            return [self.create_invalid_field_error(suffix=error_message)]
+        if self.to_python_obj:
+            self.field_value = parsed_obj
+        return []
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        if self.which == &#34;JSON_ARRAY&#34;:
+            return &#39;[1, 2, 3, null, &#34;hello&#34;]&#39;
+        return &#39;{&#34;key1&#34;: &#34;value1&#34;, &#34;key2&#34;: &#34;value2&#34;}&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.ListField"><code class="flex name class">
+<span>class <span class="ident">ListField</span></span>
+<span>(</span><span>*, allow_empty: Optional[bool] = True, **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ListField(Field):
+    def __init__(self, *, allow_empty: Optional[bool] = True, **kwargs: Any) -&gt; None:
+        assert isinstance(allow_empty, bool), &#34;Param `allow_empty` must be of type &#39;bool&#39;&#34;
+        self.allow_empty = allow_empty
+        super(ListField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        if not utils.is_valid_object_of_type(self.field_value, type_=list):
+            return [self.create_invalid_field_error()]
+        if not utils.is_empty_value_allowed(self.field_value, allow_empty=self.allow_empty):
+            return [self.create_invalid_field_error(suffix=&#34;Must be a non-empty list&#34;)]
+        return []
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return [1, 2, 3]</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.ModelDictionaryField"><code class="flex name class">
+<span>class <span class="ident">ModelDictionaryField</span></span>
+<span>(</span><span>*, validator_model: Type, **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ModelDictionaryField(Field):
+    def __init__(self, *, validator_model: Type, **kwargs: Any) -&gt; None:
+        from valcheck.validators import Validator
+        assert validator_model is not Validator and issubclass(validator_model, Validator), (
+            &#34;Param `validator_model` must be a sub-class of `valcheck.validators.Validator`&#34;
+        )
+        kwargs_to_disallow = [&#39;validators&#39;, &#39;error&#39;]
+        if utils.dict_has_any_keys(kwargs, keys=kwargs_to_disallow):
+            msg = (
+                f&#34;This field does not accept the following params: {kwargs_to_disallow}, since&#34;
+                &#34; the `validator_model` handles these parameters&#34;
+            )
+            raise ValueError(msg)
+        self.validator_model = validator_model
+        super(ModelDictionaryField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        if not isinstance(self.field_value, dict):
+            suffix = &#34;Field must be a dictionary&#34;
+            error = self.create_invalid_field_error(suffix=suffix)
+            return [error]
+        validator = self.validator_model(data=self.field_value)
+        validator.run_validations()
+        error_objs = validator.errors
+        for error_obj in error_objs:
+            suffix = error_obj.validator_message
+            error_obj.validator_message = self.invalid_field_error_message(suffix=suffix)
+            error_obj.append_to_field_path(self.source)
+        if not error_objs:
+            self.field_value = validator.validated_data
+        return error_objs
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return {
+            **self.validator_model(data={}).get_representation(**kwargs),
+        }</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.ModelListField"><code class="flex name class">
+<span>class <span class="ident">ModelListField</span></span>
+<span>(</span><span>*, validator_model: Type, allow_empty: Optional[bool] = True, **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ModelListField(Field):
+    def __init__(self, *, validator_model: Type, allow_empty: Optional[bool] = True, **kwargs: Any) -&gt; None:
+        from valcheck.validators import Validator
+        assert validator_model is not Validator and issubclass(validator_model, Validator), (
+            &#34;Param `validator_model` must be a sub-class of `valcheck.validators.Validator`&#34;
+        )
+        kwargs_to_disallow = [&#39;validators&#39;, &#39;error&#39;]
+        if utils.dict_has_any_keys(kwargs, keys=kwargs_to_disallow):
+            msg = (
+                f&#34;This field does not accept the following params: {kwargs_to_disallow}, since&#34;
+                &#34; the `validator_model` handles these parameters&#34;
+            )
+            raise ValueError(msg)
+        assert isinstance(allow_empty, bool), &#34;Param `allow_empty` must be of type &#39;bool&#39;&#34;
+        self.validator_model = validator_model
+        self.allow_empty = allow_empty
+        super(ModelListField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        if not isinstance(self.field_value, list):
+            suffix = &#34;Field must be a list&#34;
+            error = self.create_invalid_field_error(suffix=suffix)
+            return [error]
+        if not self.allow_empty and not self.field_value:
+            suffix = &#34;Field must be a non-empty list&#34;
+            error = self.create_invalid_field_error(suffix=suffix)
+            return [error]
+        errors: List[Error] = []
+        validated_field_value = []
+        for idx, item in enumerate(self.field_value):
+            row_number = idx + 1
+            row_number_string = f&#34;&lt;Row number: {row_number}&gt;&#34;
+            if not isinstance(item, dict):
+                suffix = f&#34;Row must be a dictionary {row_number_string}&#34;
+                error = self.create_invalid_field_error(suffix=suffix)
+                errors.append(error)
+                continue
+            validator = self.validator_model(data=item)
+            validator.run_validations()
+            error_objs = validator.errors
+            validated_field_value.append(validator.validated_data)
+            for error_obj in error_objs:
+                suffix = f&#34;{error_obj.validator_message} {row_number_string}&#34;
+                error_obj.validator_message = self.invalid_field_error_message(suffix=suffix)
+                error_obj.append_to_field_path(self.source)
+            errors.extend(error_objs)
+        if not errors:
+            self.field_value = validated_field_value
+        return errors
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return [
+            self.validator_model(data={}).get_representation(**kwargs),
+        ]</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.MultiChoiceField"><code class="flex name class">
+<span>class <span class="ident">MultiChoiceField</span></span>
+<span>(</span><span>*, choices: Iterable[Any], **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class MultiChoiceField(Field):
+    def __init__(self, *, choices: Iterable[Any], **kwargs: Any) -&gt; None:
+        assert utils.is_collection_of_items(choices) and bool(choices), &#34;Param `choices` must be a non-empty iterable&#34;
+        self.choices = choices
+        super(MultiChoiceField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        if (
+            utils.is_collection_of_items(self.field_value)
+            and bool(self.field_value)
+            and all([item in self.choices for item in self.field_value])
+        ):
+            return []
+        suffix = f&#34;Must be a valid list of choices i.e; one or more of {list(self.choices)}&#34;
+        return [self.create_invalid_field_error(suffix=suffix)]
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return (
+            random.sample(self.choices, k=2) if len(self.choices) &gt; 1 else random.sample(self.choices, k=1)
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.NumberField"><code class="flex name class">
+<span>class <span class="ident">NumberField</span></span>
+<span>(</span><span>**kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class NumberField(Field):
+    def __init__(self, **kwargs: Any) -&gt; None:
+        super(NumberField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        if utils.is_instance_of_any(obj=self.field_value, types=[int, float]):
+            return []
+        suffix = &#34;Must be a valid number (either integer or float)&#34;
+        return [self.create_invalid_field_error(suffix=suffix)]
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return 3.14</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.NumberStringField"><code class="flex name class">
+<span>class <span class="ident">NumberStringField</span></span>
+<span>(</span><span>*, to_number: Optional[bool] = False, **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class NumberStringField(Field):
+    def __init__(self, *, to_number: Optional[bool] = False, **kwargs: Any) -&gt; None:
+        assert isinstance(to_number, bool), &#34;Param `to_number` must be of type &#39;bool&#39;&#34;
+        self.to_number = to_number
+        super(NumberStringField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        number, is_valid = utils.validate_number_string(self.field_value)
+        if not is_valid:
+            suffix = &#34;Must be a valid number (either integer or float) cast as a string&#34;
+            return [self.create_invalid_field_error(suffix=suffix)]
+        if self.to_number and number is not None:
+            self.field_value = number
+        return []
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return &#34;3.14&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.StringField"><code class="flex name class">
+<span>class <span class="ident">StringField</span></span>
+<span>(</span><span>*, allow_empty: Optional[bool] = True, **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class StringField(Field):
+    def __init__(self, *, allow_empty: Optional[bool] = True, **kwargs: Any) -&gt; None:
+        assert isinstance(allow_empty, bool), &#34;Param `allow_empty` must be of type &#39;bool&#39;&#34;
+        self.allow_empty = allow_empty
+        super(StringField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        if not utils.is_valid_object_of_type(self.field_value, type_=str):
+            return [self.create_invalid_field_error()]
+        if not utils.is_empty_value_allowed(self.field_value, allow_empty=self.allow_empty):
+            return [self.create_invalid_field_error(suffix=&#34;Must be a non-empty string&#34;)]
+        return []
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return &#34;some string&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.UuidField"><code class="flex name class">
+<span>class <span class="ident">UuidField</span></span>
+<span>(</span><span>**kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class UuidField(Field):
+    def __init__(self, **kwargs: Any) -&gt; None:
+        super(UuidField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        if isinstance(self.field_value, uuid.UUID):
+            return []
+        return [self.create_invalid_field_error()]
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return uuid.uuid4()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.UuidStringField"><code class="flex name class">
+<span>class <span class="ident">UuidStringField</span></span>
+<span>(</span><span>*, to_uuid_obj: Optional[bool] = False, **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a field (that needs to be validated)</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>source (str): Field name used in the input data (optional)</li>
+<li>target (str): Field name used in the validated data (optional)</li>
+<li>required (bool): True if the field is required, else False. Default: True</li>
+<li>nullable (bool): True if the field is nullable, else False. Default: False</li>
+<li>default_factory (callable): Callable that returns the default value to set for the field
+if <code>required=False</code> and the field is missing.</li>
+<li>converter_factory (callable): Callable that takes in the validated value (of the field), and returns
+the converted value (for the field).</li>
+<li>sample_value_factory (callable): Callable that returns the sample value for the field.</li>
+<li>validators (list of callables): List of callables that each return a boolean (takes the field value as a param).
+The callable returns True if validation is successful, else False.</li>
+<li>error (Error instance): Instance of type <code><a title="valcheck.models.Error" href="models.html#valcheck.models.Error">Error</a></code>.</li>
+<li>type_alias (str): Alias of the field type (optional).</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class UuidStringField(Field):
+    def __init__(self, *, to_uuid_obj: Optional[bool] = False, **kwargs: Any) -&gt; None:
+        assert isinstance(to_uuid_obj, bool), &#34;Param `to_uuid_obj` must be of type &#39;bool&#39;&#34;
+        self.to_uuid_obj = to_uuid_obj
+        super(UuidStringField, self).__init__(**kwargs)
+
+    def validate(self) -&gt; List[Error]:
+        uuid_obj, is_valid = utils.validate_uuid_string(self.field_value)
+        if not is_valid:
+            suffix = &#34;Must be a valid UUID string&#34;
+            return [self.create_invalid_field_error(suffix=suffix)]
+        if self.to_uuid_obj and uuid_obj is not None:
+            self.field_value = uuid_obj
+        return []
+
+    def sample_value(self, **kwargs: Any) -&gt; Union[Any, None]:
+        if self.sample_value_factory:
+            return self.sample_value_factory()
+        return str(uuid.uuid4())</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></b></code>:
+<ul class="hlist">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="valcheck.fields.ValidatedField"><code class="flex name class">
+<span>class <span class="ident">ValidatedField</span></span>
+<span>(</span><span>*, field: <a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a>, errors: List[Error])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that represents a validated field</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ValidatedField:
+    &#34;&#34;&#34;Class that represents a validated field&#34;&#34;&#34;
+
+    def __init__(
+            self,
+            *,
+            field: Field,
+            errors: List[Error],
+        ) -&gt; None:
+        assert isinstance(field, Field), &#34;Param `field` must be of type `valcheck.fields.Field`&#34;
+        assert utils.is_list_of_instances_of_type(errors, type_=Error, allow_empty=True), (
+            &#34;Param `errors` must be a list where each item is of type `valcheck.models.Error`&#34;
+        )
+        self._field = field
+        self._errors = errors
+
+    def __str__(self) -&gt; str:
+        kwargs_list = [
+            f&#34;is_valid={not bool(self.errors)}&#34;,
+            f&#34;field_identifier={utils.wrap_in_quotes_if_string(self.field.field_identifier)}&#34;,
+            f&#34;field={self.field}&#34;,
+        ]
+        kwargs_string = &#34;(&#34; + &#34;, &#34;.join(kwargs_list) + &#34;)&#34;
+        return f&#34;{self.__class__.__name__}{kwargs_string}&#34;
+
+    @property
+    def field(self) -&gt; Field:
+        return self._field
+
+    @field.setter
+    def field(self, value: Field) -&gt; None:
+        assert isinstance(value, Field), &#34;Param `field` must be of type `valcheck.fields.Field`&#34;
+        self._field = value
+
+    @property
+    def errors(self) -&gt; List[Error]:
+        return self._errors
+
+    @errors.setter
+    def errors(self, value: List[Error]) -&gt; None:
+        assert utils.is_list_of_instances_of_type(value, type_=Error, allow_empty=True), (
+            &#34;Param `errors` must be a list where each item is of type `valcheck.models.Error`&#34;
+        )
+        self._errors = value</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="valcheck.fields.ValidatedField.errors"><code class="name">prop <span class="ident">errors</span> : List[Error]</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def errors(self) -&gt; List[Error]:
+    return self._errors</code></pre>
+</details>
+</dd>
+<dt id="valcheck.fields.ValidatedField.field"><code class="name">prop <span class="ident">field</span> : <a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def field(self) -&gt; Field:
+    return self._field</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="valcheck" href="index.html">valcheck</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="valcheck.fields.AnyField" href="#valcheck.fields.AnyField">AnyField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.BooleanField" href="#valcheck.fields.BooleanField">BooleanField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.BytesField" href="#valcheck.fields.BytesField">BytesField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.ChoiceField" href="#valcheck.fields.ChoiceField">ChoiceField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.DateField" href="#valcheck.fields.DateField">DateField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.DateStringField" href="#valcheck.fields.DateStringField">DateStringField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.DatetimeField" href="#valcheck.fields.DatetimeField">DatetimeField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.DatetimeStringField" href="#valcheck.fields.DatetimeStringField">DatetimeStringField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.DictionaryField" href="#valcheck.fields.DictionaryField">DictionaryField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.EmailIdStringField" href="#valcheck.fields.EmailIdStringField">EmailIdStringField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.Field" href="#valcheck.fields.Field">Field</a></code></h4>
+<ul class="">
+<li><code><a title="valcheck.fields.Field.copy" href="#valcheck.fields.Field.copy">copy</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_error_instance" href="#valcheck.fields.Field.create_error_instance">create_error_instance</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_invalid_field_error" href="#valcheck.fields.Field.create_invalid_field_error">create_invalid_field_error</a></code></li>
+<li><code><a title="valcheck.fields.Field.create_missing_field_error" href="#valcheck.fields.Field.create_missing_field_error">create_missing_field_error</a></code></li>
+<li><code><a title="valcheck.fields.Field.field_identifier" href="#valcheck.fields.Field.field_identifier">field_identifier</a></code></li>
+<li><code><a title="valcheck.fields.Field.field_value" href="#valcheck.fields.Field.field_value">field_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.invalid_field_error_message" href="#valcheck.fields.Field.invalid_field_error_message">invalid_field_error_message</a></code></li>
+<li><code><a title="valcheck.fields.Field.missing_field_error_message" href="#valcheck.fields.Field.missing_field_error_message">missing_field_error_message</a></code></li>
+<li><code><a title="valcheck.fields.Field.sample_value" href="#valcheck.fields.Field.sample_value">sample_value</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate" href="#valcheck.fields.Field.validate">validate</a></code></li>
+<li><code><a title="valcheck.fields.Field.validate_entire_field" href="#valcheck.fields.Field.validate_entire_field">validate_entire_field</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.FloatField" href="#valcheck.fields.FloatField">FloatField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.FloatStringField" href="#valcheck.fields.FloatStringField">FloatStringField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.IntegerField" href="#valcheck.fields.IntegerField">IntegerField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.IntegerStringField" href="#valcheck.fields.IntegerStringField">IntegerStringField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.JsonStringField" href="#valcheck.fields.JsonStringField">JsonStringField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.ListField" href="#valcheck.fields.ListField">ListField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.ModelDictionaryField" href="#valcheck.fields.ModelDictionaryField">ModelDictionaryField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.ModelListField" href="#valcheck.fields.ModelListField">ModelListField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.MultiChoiceField" href="#valcheck.fields.MultiChoiceField">MultiChoiceField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.NumberField" href="#valcheck.fields.NumberField">NumberField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.NumberStringField" href="#valcheck.fields.NumberStringField">NumberStringField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.StringField" href="#valcheck.fields.StringField">StringField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.UuidField" href="#valcheck.fields.UuidField">UuidField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.UuidStringField" href="#valcheck.fields.UuidStringField">UuidStringField</a></code></h4>
+</li>
+<li>
+<h4><code><a title="valcheck.fields.ValidatedField" href="#valcheck.fields.ValidatedField">ValidatedField</a></code></h4>
+<ul class="">
+<li><code><a title="valcheck.fields.ValidatedField.errors" href="#valcheck.fields.ValidatedField.errors">errors</a></code></li>
+<li><code><a title="valcheck.fields.ValidatedField.field" href="#valcheck.fields.ValidatedField.field">field</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>
