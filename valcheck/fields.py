@@ -821,7 +821,7 @@ class ModelDictionaryField(Field):
         if self.sample_value_factory:
             return self.sample_value_factory()
         return {
-            **self.validator_model(data={}).get_representation(**kwargs),
+            **self.validator_model().get_representation(**kwargs),
         }
 
 
@@ -879,7 +879,7 @@ class ModelListField(Field):
         if self.sample_value_factory:
             return self.sample_value_factory()
         return [
-            self.validator_model(data={}).get_representation(**kwargs),
+            self.validator_model().get_representation(**kwargs),
         ]
 
 
