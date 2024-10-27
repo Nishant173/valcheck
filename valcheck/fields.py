@@ -639,7 +639,7 @@ class NumberField(Field):
         super(NumberField, self).__init__(**kwargs)
 
     def validate(self) -> List[Error]:
-        if utils.is_instance_of_any(obj=self.field_value, types=[int, float]):
+        if isinstance(self.field_value, (int, float)):
             return []
         suffix = "Must be a valid number (either integer or float)"
         return [self.create_invalid_field_error(suffix=suffix)]

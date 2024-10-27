@@ -36,9 +36,9 @@ class TestJsonSerializer(unittest.TestCase):
         json_string = json_serializer.to_json_string(obj)
         self.assertTrue(isinstance(json_string, str) and bool(json_string))
         python_obj = json_serializer.from_json_string(json_string)
-        if utils.is_instance_of_any(obj, types=[dict, list]):
+        if isinstance(obj, (dict, list)):
             self.assertTrue(
-                utils.is_instance_of_any(python_obj, types=[dict, list])
+                isinstance(python_obj, (dict, list))
             )
         if print_details:
             print(

@@ -109,13 +109,9 @@ def wrap_in_quotes_if_string(obj: Any, /) -> Any:
     return obj
 
 
-def is_instance_of_any(obj: Any, *, types: List[Type]) -> bool:
-    return any((isinstance(obj, type_) for type_ in types))
-
-
 def is_collection_of_items(obj: Any, /) -> bool:
     """If the given `obj` is one of `[list, tuple, set]`, returns `True`"""
-    return is_instance_of_any(obj, types=[list, tuple, set])
+    return isinstance(obj, (list, tuple, set))
 
 
 def is_list_of_instances_of_type(obj: Any, /, *, type_: Type, allow_empty: Optional[bool] = True) -> bool:
