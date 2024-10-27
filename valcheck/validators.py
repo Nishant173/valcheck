@@ -43,6 +43,12 @@ class Validator:
             context: Optional[Dict[str, Any]] = None,
             deep_copy: Optional[bool] = False,
         ) -> None:
+        """
+        Parameters:
+            - data (Dict[str, Any]): Dictionary having the data to be validated.
+            - context (Dict[str, Any]): Dictionary having the context used for validations.
+            - deep_copy (bool): If `deep_copy=True`, creates a deep-copy of the params `data` and `context`.
+        """
         assert isinstance(data, dict), "Param `data` must be a dictionary"
         assert context is None or isinstance(context, dict), "Param `context` must be a dictionary"
         assert isinstance(deep_copy, bool), "Param `deep_copy` must be a boolean"
