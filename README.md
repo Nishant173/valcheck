@@ -25,3 +25,4 @@ class PersonValidator(validators.Validator):
 
 ## Documentation
 - The documentation for the `valcheck` package can be found in the `docs/` folder (based on the version). You can view the respective HTML file (`docs/version-xxx/index.html`) in your browser after cloning/downloading this repository.
+
