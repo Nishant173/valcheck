@@ -39,13 +39,20 @@ class Validator:
     def __init__(
             self,
             *,
-            data: Dict[str, Any],
+            data: Optional[Dict[str, Any]] = None,
             context: Optional[Dict[str, Any]] = None,
             deep_copy: Optional[bool] = False,
         ) -> None:
-        assert isinstance(data, dict), "Param `data` must be a dictionary"
+        """
+        Parameters:
+            - data (Dict[str, Any]): Dictionary having the data to be validated.
+            - context (Dict[str, Any]): Dictionary having the context used for validations.
+            - deep_copy (bool): If `deep_copy=True`, creates a deep-copy of the params `data` and `context`.
+        """
+        assert data is None or isinstance(data, dict), "Param `data` must be a dictionary"
         assert context is None or isinstance(context, dict), "Param `context` must be a dictionary"
         assert isinstance(deep_copy, bool), "Param `deep_copy` must be a boolean"
+        data = data if data else {}
         context = context if context else {}
         self._data: Dict[str, Any] = utils.make_deep_copy(data) if deep_copy else data
         self._context: Dict[str, Any] = utils.make_deep_copy(context) if deep_copy else context
@@ -73,8 +80,8 @@ class Validator:
                 "required": field.required,
                 "nullable": field.nullable,
                 "field_validators_of_model": (
-                    field.validator_model(data={}).list_field_validators()
-                    if utils.is_instance_of_any(obj=field, types=[ModelDictionaryField, ModelListField])
+                    field.validator_model().list_field_validators()
+                    if isinstance(field, (ModelDictionaryField, ModelListField))
                     else []
                 ),
             } for field_identifier, field in self._field_info.items()
@@ -322,5 +329,4 @@ class Validator:
             self._clear_validated_data()
         if raise_exception and self.errors:
             raise ValidationException(errors=self.errors)
-
 

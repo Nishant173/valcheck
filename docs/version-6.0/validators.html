@@ -37,7 +37,7 @@ hljs.highlightAll();
 <dl>
 <dt id="valcheck.validators.Validator"><code class="flex name class">
 <span>class <span class="ident">Validator</span></span>
-<span>(</span><span>*, data: Dict[str, Any], context: Optional[Dict[str, Any]] = None, deep_copy: Optional[bool] = False)</span>
+<span>(</span><span>*, data: Optional[Dict[str, Any]] = None, context: Optional[Dict[str, Any]] = None, deep_copy: Optional[bool] = False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Class that represents a Validator.</p>
@@ -56,7 +56,13 @@ hljs.highlightAll();
 - list_field_validators()
 - model_validator()
 - model_validators_to_consider()
-- run_validations()</p></div>
+- run_validations()</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>data (Dict[str, Any]): Dictionary having the data to be validated.</li>
+<li>context (Dict[str, Any]): Dictionary having the context used for validations.</li>
+<li>deep_copy (bool): If <code>deep_copy=True</code>, creates a deep-copy of the params <code>data</code> and <code>context</code>.</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -85,13 +91,20 @@ hljs.highlightAll();
     def __init__(
             self,
             *,
-            data: Dict[str, Any],
+            data: Optional[Dict[str, Any]] = None,
             context: Optional[Dict[str, Any]] = None,
             deep_copy: Optional[bool] = False,
         ) -&gt; None:
-        assert isinstance(data, dict), &#34;Param `data` must be a dictionary&#34;
+        &#34;&#34;&#34;
+        Parameters:
+            - data (Dict[str, Any]): Dictionary having the data to be validated.
+            - context (Dict[str, Any]): Dictionary having the context used for validations.
+            - deep_copy (bool): If `deep_copy=True`, creates a deep-copy of the params `data` and `context`.
+        &#34;&#34;&#34;
+        assert data is None or isinstance(data, dict), &#34;Param `data` must be a dictionary&#34;
         assert context is None or isinstance(context, dict), &#34;Param `context` must be a dictionary&#34;
         assert isinstance(deep_copy, bool), &#34;Param `deep_copy` must be a boolean&#34;
+        data = data if data else {}
         context = context if context else {}
         self._data: Dict[str, Any] = utils.make_deep_copy(data) if deep_copy else data
         self._context: Dict[str, Any] = utils.make_deep_copy(context) if deep_copy else context
@@ -119,8 +132,8 @@ hljs.highlightAll();
                 &#34;required&#34;: field.required,
                 &#34;nullable&#34;: field.nullable,
                 &#34;field_validators_of_model&#34;: (
-                    field.validator_model(data={}).list_field_validators()
-                    if utils.is_instance_of_any(obj=field, types=[ModelDictionaryField, ModelListField])
+                    field.validator_model().list_field_validators()
+                    if isinstance(field, (ModelDictionaryField, ModelListField))
                     else []
                 ),
             } for field_identifier, field in self._field_info.items()

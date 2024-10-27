@@ -73,7 +73,7 @@ class JsonSerializer:
                     if not func:
                         continue
                     obj[key] = func(value)
-                    if utils.is_instance_of_any(obj[key], types=[dict, list]):
+                    if isinstance(obj[key], (dict, list)):
                         obj[key] = self._make_json_serializable(obj[key])
         elif isinstance(obj, list):
             for idx, item in enumerate(obj):
@@ -86,13 +86,13 @@ class JsonSerializer:
                     if not func:
                         continue
                     obj[idx] = func(item)
-                    if utils.is_instance_of_any(obj[idx], types=[dict, list]):
+                    if isinstance(obj[idx], (dict, list)):
                         obj[idx] = self._make_json_serializable(obj[idx])
         else:
             func = self._get_serializable_function(obj)
             if func:
                 obj = func(obj)
-                if utils.is_instance_of_any(obj, types=[dict, list]):
+                if isinstance(obj, (dict, list)):
                     obj = self._make_json_serializable(obj)
         return obj
 
