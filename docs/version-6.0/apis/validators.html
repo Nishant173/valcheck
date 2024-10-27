@@ -37,10 +37,16 @@ hljs.highlightAll();
 <dl>
 <dt id="valcheck.apis.validators.ApiRequestValidator"><code class="flex name class">
 <span>class <span class="ident">ApiRequestValidator</span></span>
-<span>(</span><span>*, data: Dict[str, Any], context: Optional[Dict[str, Any]] = None, deep_copy: Optional[bool] = False)</span>
+<span>(</span><span>*, data: Optional[Dict[str, Any]] = None, context: Optional[Dict[str, Any]] = None, deep_copy: Optional[bool] = False)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Class that represents an API request Validator.</p></div>
+<div class="desc"><p>Class that represents an API request Validator.</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>data (Dict[str, Any]): Dictionary having the data to be validated.</li>
+<li>context (Dict[str, Any]): Dictionary having the context used for validations.</li>
+<li>deep_copy (bool): If <code>deep_copy=True</code>, creates a deep-copy of the params <code>data</code> and <code>context</code>.</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
